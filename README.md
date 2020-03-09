@@ -32,3 +32,18 @@ each slave and between slave and master, guarantee performance.
 Here is our [conference paper](dsceu04.pdf).
 
 The source code is licensed under the [Creative Commons 2.0 Attribution License](http://creativecommons.org/licenses/by/2.0).
+
+## To install on Ubuntu 18:
+`sudo apt install libcommoncpp2-dev swig tcl8.6-dev libpython3.8-dev ruby ruby2.5-dev`  
+`cd ClockKit && make -k`
+### To run a test (on localhost):
+`sudo cp clockkit.conf /etc/clockkit.conf`  
+`cd ClockKit`  
+`./ckserver 4444`  
+In another window, `./ckphaselock`
+### To plot the accuracy of a simulated run:
+`sudo apt install gnuplot`  
+`cd simulation && make`
+### To generate documentation of the source code:
+`sudo apt install doxygen`  
+`cd ClockKit && make docs`
