@@ -30,3 +30,5 @@ measurably on unreliable networks.  Several phase-locked loops, within
 each slave and between slave and master, guarantee performance.
 
 Here is our [conference paper](dsceu04.pdf).
+
+The source code is licensed under the [Creative Commons 2.0 Attribution License](http://creativecommons.org/licenses/by/2.0).
