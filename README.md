@@ -29,4 +29,4 @@ PCI bus contention) is trapped.  Performance degrades gracefully and
 measurably on unreliable networks.  Several phase-locked loops, within
 each slave and between slave and master, guarantee performance.
 
-Here is the [complete paper](dsceu04.pdf).
+Here is our [conference paper](dsceu04.pdf).
