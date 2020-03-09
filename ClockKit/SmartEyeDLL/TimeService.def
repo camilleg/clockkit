@@ -1,0 +1,29 @@
+;**********************************************
+; $Id: TimeService.def,v 1.1 2003/11/26 00:25:49 kowitz Exp $
+;
+; $Log: TimeService.def,v $
+; Revision 1.1  2003/11/26 00:25:49  kowitz
+; SmartEye DLL project for providing timing information to Smart Eye Pro
+;
+; Revision 1.4  2003/10/18 14:30:50  pers
+; adjusted interface to better suit dynamic loading
+;
+; Revision 1.3  2003/10/17 13:56:13  pers
+; UTC implementation complete (but untested)
+;
+; Revision 1.2  2003/10/17 10:57:03  pers
+; added standard Smart Eye CVS headers
+;
+;*********************************************
+; (C) Copyright 2003 Smart Eye AB
+;*********************************************
+
+NAME "TIMESERVICE.DLL"
+DESCRIPTION "UTC time base module for Smart Eye tracking equipment"
+EXPORTS
+  startTimeService @1
+  stopTimeService  @2
+  getCurrentTime   @3
+  timeToString     @4
+
+VERSION 1.0
