@@ -44,7 +44,7 @@ Camille Goudeseune and Braden Kowitz.  2004.  "Synchronous data collection from 
 `sudo cp clockkit.conf /etc/clockkit.conf`  
 `cd ClockKit`  
 `./ckserver 4444`  
-In another window, `./ckphaselock`
+In another window, `./ckphaselock` or `./ckphaselock.rb`
 ### To plot the accuracy of a simulated run:
 `sudo apt install gnuplot`  
 `cd simulation && make`
