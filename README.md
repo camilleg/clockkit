@@ -33,6 +33,10 @@ Here is our [conference paper](dsceu04.pdf).
 
 The source code is licensed under the [Creative Commons 2.0 Attribution License](http://creativecommons.org/licenses/by/2.0).
 
+To cite this work, use:  
+Camille Goudeseune and Braden Kowitz.  2004.  "Synchronous data collection from diverse hardware."
+*Driving Simulation Conference - Europe (Conférence Simulation de Conduite)*, pp. 245-252. 
+
 ## To install on Ubuntu 18:
 `sudo apt install libcommoncpp2-dev swig tcl8.6-dev libpython3.8-dev ruby ruby2.5-dev`  
 `cd ClockKit && make -k`
