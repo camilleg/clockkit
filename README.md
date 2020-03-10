@@ -3,11 +3,11 @@
 *Camille Goudeseune and Braden Kowitz  
 Integrated Systems Laboratory, Beckman Institute, UIUC*
 
-Published in 2004 on http://zx81.isl.uiuc.edu/camilleg/clockkit (defunct).  
-Software revised and published on GitHub in in 2020.
+Published on http://zx81.isl.uiuc.edu/camilleg/clockkit (defunct) in 2004.  
+Software revised and published on GitHub in 2020.
 
 We describe an accurate open-source C++ distributed clock for networked
-commodity PC's.  With no extra hardware, this clock correlates sensor data
+commodity PCs.  With no extra hardware, this clock correlates sensor data
 (head- and eye-trackers, biometrics, captured video, driving simulator
 data) from multiple PC's with latency and jitter under 10 microseconds
 average, 100 microseconds worst case.  PC-driven actuators like motion
@@ -37,7 +37,7 @@ To cite this work, use:
 Camille Goudeseune and Braden Kowitz.  2004.  "Synchronous data collection from diverse hardware."
 *Driving Simulation Conference - Europe (Conférence Simulation de Conduite)*, pp. 245-252. 
 
-## To install on Ubuntu 18:
+### To install on Ubuntu 18:
 `sudo apt install libcommoncpp2-dev swig tcl8.6-dev libpython3.8-dev ruby ruby2.5-dev`  
 `cd ClockKit && make -k`
 ### To run a test (on localhost):
