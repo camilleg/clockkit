@@ -104,11 +104,14 @@ void ClockServer::updateEntry(string addr, int offset, int rtt)
             map<string, Entry>::iterator it;
             
             // purge old entries
-            for(it = ackData_.begin(); it != ackData_.end(); it++)
+            for(it = ackData_.begin(); it != ackData_.end();)
             {
                 timestamp_t entryTime = (it->second).time;
-                if (now - entryTime > SYSTEM_STATE_PURGE_TIME)
-                    ackData_.erase(it);
+                if (now - entryTime > SYSTEM_STATE_PURGE_TIME) {
+                    it = ackData_.erase(it);
+                } else {
+                    ++it;
+                }
             }
         
             // calculate maximum offset
