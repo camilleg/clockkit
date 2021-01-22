@@ -1,0 +1,6 @@
+ClockKit/*.o
+ClockKit/*.so
+ClockKit/clockkit.py
+ClockKit/clockkit_*_wrap.c
+ClockKit/ckserver
+ClockKit/ckphaselock
