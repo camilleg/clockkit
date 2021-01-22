@@ -3,8 +3,8 @@
 *Camille Goudeseune and Braden Kowitz  
 Integrated Systems Laboratory, Beckman Institute, UIUC*
 
-Published on http://zx81.isl.uiuc.edu/camilleg/clockkit (defunct) in 2004.  
-Software revised and published on GitHub in 2020.
+Software revised and published on GitHub in 2020.  
+Originally published in 2004 on [http://zx81.isl.uiuc.edu/camilleg/clockkit](https://web.archive.org/web/20041205064911/http://zx81.isl.uiuc.edu/camilleg/dsceu04.pdf) (defunct).
 
 We describe an accurate open-source C++ distributed clock for networked
 commodity PCs.  With no extra hardware, this clock correlates sensor data
@@ -34,7 +34,7 @@ Here is our [conference paper](dsceu04.pdf).
 The source code is licensed under the [Creative Commons 2.0 Attribution License](http://creativecommons.org/licenses/by/2.0).
 
 To cite this work, use:  
-Camille Goudeseune and Braden Kowitz.  2004.  "Synchronous data collection from diverse hardware."
+Camille Goudeseune and Braden Kowitz.  2004.  "Synchronous data collection from diverse hardware."  
 *Driving Simulation Conference - Europe (Conférence Simulation de Conduite)*, pp. 245-252. 
 
 ### To install on Ubuntu 18:
