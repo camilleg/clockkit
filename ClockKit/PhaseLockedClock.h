@@ -1,6 +1,4 @@
-#ifndef DEX_PHASE_LOCKED_CLOCK_H
-#define DEX_PHASE_LOCKED_CLOCK_H
-
+#pragma once
 #include <cc++/thread.h>
 #include "Clock.h"
 #include "VariableFrequencyClock.h"
@@ -174,4 +172,3 @@ private:
 };
 
 }
-#endif

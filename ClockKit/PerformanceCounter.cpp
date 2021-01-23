@@ -1,6 +1,3 @@
-#ifndef DEX_PERFORMANCE_COUNTER_CPP
-#define DEX_PERFORMANCE_COUNTER_CPP
-
 #include "PerformanceCounter.h"
 #include "Exceptions.h"
 #include <windows.h>
@@ -29,4 +26,3 @@ namespace dex {
     return (timestamp_t)(((double)qpc.QuadPart) * freqConversion_);
   }
 }
-#endif

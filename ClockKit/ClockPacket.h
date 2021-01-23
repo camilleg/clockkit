@@ -1,6 +1,4 @@
-#ifndef DEX_CLOCK_PACKET_H
-#define DEX_CLOCK_PACKET_H
-
+#pragma once
 #include "Common.h"
 
 namespace dex {
@@ -164,4 +162,3 @@ public:
 };
 
 }
-#endif

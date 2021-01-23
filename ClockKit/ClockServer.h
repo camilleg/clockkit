@@ -1,6 +1,4 @@
-#ifndef DEX_CLOCK_SERVER_H
-#define DEX_CLOCK_SERVER_H
-
+#pragma once
 #include <cc++/thread.h>
 #include <cc++/socket.h>
 #include "Clock.h"
@@ -63,5 +61,3 @@ protected:
 };
 
 }
-
-#endif

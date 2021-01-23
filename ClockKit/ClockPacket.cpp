@@ -1,6 +1,3 @@
-#ifndef DEX_CLOCK_PACKET_CPP
-#define DEX_CLOCK_PACKET_CPP
-
 #include "Common.h"
 #include "ClockPacket.h"
 #include <iostream>
@@ -120,6 +117,4 @@ void ClockPacket::print()
 		 << Timestamp::timestampToString(clientReceiveTime_) << endl;
 }
 
-} // namespace dex
-
-#endif
+}

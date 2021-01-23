@@ -1,6 +1,4 @@
-#ifndef DEX_EXCEPTIONS_H
-#define DEX_EXCEPTIONS_H
-
+#pragma once
 #include <string>
 
 using namespace std;
@@ -33,4 +31,3 @@ public:
 };
 
 }
-#endif

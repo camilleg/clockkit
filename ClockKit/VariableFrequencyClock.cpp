@@ -1,6 +1,3 @@
-#ifndef DEX_VARIABLE_FREQUENCY_CLOCK_CPP
-#define DEX_VARIABLE_FREQUENCY_CLOCK_CPP
-
 #include "VariableFrequencyClock.h"
 #include "Exceptions.h"
 
@@ -53,4 +50,3 @@ void VariableFrequencyClock::updateMarkers()
 }
 
 }
-#endif

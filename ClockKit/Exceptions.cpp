@@ -1,6 +1,3 @@
-#ifndef DEX_EXCEPTIONS_CPP
-#define DEX_EXCEPTIONS_CPP
-
 #include "Exceptions.h"
 #include <iostream>
 
@@ -18,4 +15,3 @@ string Exception::getMessage() { return message_; }
 ClockException::ClockException(string message) : Exception(message) {}
 
 }
-#endif

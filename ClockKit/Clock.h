@@ -1,15 +1,10 @@
-#ifndef DEX_CLOCK_H
-#define DEX_CLOCK_H
-
+#pragma once
 #include "Common.h"
 
 namespace dex {
 
-/**
- * An abstract class that represents a basic clock
- * The frequency for all clocks is 1000000 Hz with the notable exception
- * of VariableFrequencyClock.
- */
+// Abstract base class.
+// Clocks have frequency 1000000 Hz, except for VariableFrequencyClock.
 class Clock
 {
 public:
@@ -41,4 +36,3 @@ public:
 };
 
 }
-#endif

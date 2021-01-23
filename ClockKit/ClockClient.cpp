@@ -1,6 +1,3 @@
-#ifndef DEX_CLOCK_CLIENT_CPP
-#define DEX_CLOCK_CLIENT_CPP
-
 #include "ClockClient.h"
 #include "Exceptions.h"
 #include "HighResolutionClock.h"
@@ -140,4 +137,3 @@ void ClockClient::setAcknowledge(bool acknowledge)
 }
 
 } // namespace dex
-#endif

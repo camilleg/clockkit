@@ -1,6 +1,3 @@
-#ifndef DEX_CONFIG_READER_CPP
-#define DEX_CONFIG_READER_CPP
-
 #include "ConfigReader.h"
 
 #include "Common.h"
@@ -85,6 +82,4 @@ PhaseLockedClock* PhaseLockedClockFromConfigFile(string filename)
     return plc;
 }
 
-} // namespace dex
-
-#endif //DEX_CONFIG_READER_CPP
+}

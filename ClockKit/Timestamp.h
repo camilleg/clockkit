@@ -1,6 +1,4 @@
-#ifndef DEX_TIMESTAMP_H
-#define DEX_TIMESTAMP_H
-
+#pragma once
 #include <string>
 
 using namespace std;
@@ -14,29 +12,16 @@ namespace dex {
 class Timestamp
 {
 public:
-
-    /**
-     * Converts a timestamp value into a string.
-     */
+    // Converts a timestamp to a string.
     static string timestampToString(timestamp_t t);
     
-    /**
-     * Converts a string to a timestamp value. 
-     */
+    // Converts a string to a timestamp. 
     static timestamp_t stringToTimestamp(string t);
 
-    /**
-     * Writes a 64 bit timestamp out to buffer location
-     * with proper byte ordering.
-     * - Writes 8 bytes into the buffer.
-     */
+    // Writes a 64 bit timestamp with proper byte ordering.
     static void timestampToBytes(timestamp_t time, char* buffer);
     
-    /**
-     * Reads a 64 bit timestamp from a buffer location
-     * with proper byte ordering.
-     * - Reads 8 bytes out of the buffer.
-     */
+    // Reads a 64 bit timestamp with proper byte ordering.
     static timestamp_t bytesToTimestamp(char* buffer);
     
 private:
@@ -44,4 +29,3 @@ private:
 };
 
 }
-#endif

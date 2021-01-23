@@ -1,6 +1,4 @@
-#ifndef DEX_VARIABLE_FREQUENCY_CLOCK_H
-#define DEX_VARIABLE_FREQUENCY_CLOCK_H
-
+#pragma once
 #include "Clock.h"
 
 namespace dex {
@@ -56,4 +54,3 @@ private:
 };
 
 }
-#endif

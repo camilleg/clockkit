@@ -1,6 +1,3 @@
-#ifndef DEX_CLOCK_SERVER_CPP
-#define DEX_CLOCK_SERVER_CPP
-
 #include "ClockServer.h"
 #include "ClockPacket.h"
 #include "HighResolutionClock.h"
@@ -114,4 +111,3 @@ void ClockServer::updateEntry(string addr, int offset, int rtt)
 }
 
 }
-#endif

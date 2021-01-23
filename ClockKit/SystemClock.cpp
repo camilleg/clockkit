@@ -1,6 +1,3 @@
-#ifndef DEX_SYSTEM_CLOCK_CPP
-#define DEX_SYSTEM_CLOCK_CPP
-
 #include "SystemClock.h"
 #ifdef WIN32
 	#include <windows.h>
@@ -49,4 +46,3 @@ timestamp_t SystemClock::getValue()
 }
 
 }
-#endif

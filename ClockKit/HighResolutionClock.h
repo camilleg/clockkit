@@ -1,6 +1,4 @@
-#ifndef DEX_HIGH_RESOLUTION_CLOCK_H
-#define DEX_HIGH_RESOLUTION_CLOCK_H
-
+#pragma once
 #include "Clock.h"
 #include "SystemClock.h"
 #ifdef WIN32
@@ -30,4 +28,3 @@ private:
 }; 
 
 }
-#endif

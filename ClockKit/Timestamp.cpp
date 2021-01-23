@@ -1,6 +1,3 @@
-#ifndef DEX_TIMESTAMP_CPP
-#define DEX_TIMESTAMP_CPP
-
 #include "Timestamp.h"
 #include "Common.h"
 #include <string>
@@ -50,5 +47,3 @@ timestamp_t Timestamp::bytesToTimestamp(char* buffer)
 }
 
 }
-
-#endif

@@ -1,6 +1,4 @@
-#ifndef DEX_CLOCK_CLIENT_H
-#define DEX_CLOCK_CLIENT_H
-
+#pragma once
 #include <cc++/socket.h>
 #include "Common.h"
 #include "Clock.h"
@@ -124,4 +122,3 @@ private:
 };
 
 }
-#endif

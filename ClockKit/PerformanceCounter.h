@@ -1,13 +1,11 @@
-#ifndef DEX_PERFORMANCE_COUNTER_H
-#define DEX_PERFORMANCE_COUNTER_H
-
+#pragma once
 #include "Clock.h"
 
 namespace dex {
   // This Windows-only class represents the CPU's high resolution timer,
   // adjusted to tick at 1000000 Hz.
   // It may wrap around.  It's not necessarly monotonic.
-  class PerformanceCounter : public Clock {
+  class PerformanceCounter: public Clock {
   public:
     // Thread-safe singleton.
     static PerformanceCounter& instance();
@@ -22,4 +20,3 @@ namespace dex {
     double freqConversion_;
   };
 }
-#endif

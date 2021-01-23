@@ -1,6 +1,4 @@
-#ifndef DEX_SYSTEM_CLOCK_H
-#define DEX_SYSTEM_CLOCK_H
-
+#pragma once
 #include <cc++/thread.h>
 #include "Common.h"
 #include "Clock.h"
@@ -35,4 +33,3 @@ private:
 }; // class SystemClock
 
 }
-#endif

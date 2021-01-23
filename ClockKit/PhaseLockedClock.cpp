@@ -1,6 +1,3 @@
-#ifndef DEX_PHASE_LOCKED_CLOCK_CPP
-#define DEX_PHASE_LOCKED_CLOCK_CPP
-
 #include "PhaseLockedClock.h"
 #include "Exceptions.h"
 #include <iostream>
@@ -205,4 +202,3 @@ void PhaseLockedClock::setClock()
 }
 
 }
-#endif
