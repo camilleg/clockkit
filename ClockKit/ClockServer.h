@@ -1,19 +1,16 @@
-//----------------------------------------------------------------------------//
 #ifndef DEX_CLOCK_SERVER_H
 #define DEX_CLOCK_SERVER_H
-//----------------------------------------------------------------------------//
+
 #include <cc++/thread.h>
 #include <cc++/socket.h>
 #include "Clock.h"
 #include <string>
 #include <map>
-//----------------------------------------------------------------------------//
+
 using namespace std;
 using namespace ost;
 
 namespace dex {
-//----------------------------------------------------------------------------//
-
 
 /**
  * A network server for a local clock.
@@ -45,7 +42,6 @@ private:
     timestamp_t lastUpdate_;
 
 public:
-    
     /** 
      * Create a new ClockServer.  The server will bind to the provided
      * InetAddress and port.  To bind to ANY local address, then set the
@@ -53,12 +49,10 @@ public:
      * to answer requests for time.
      */
     ClockServer(InetAddress addr, tpport_t port, Clock& clock);
-
     
     void setLogging(bool log);
     
 protected:
-    
     /**
      * The thread calls this run method, which is responsible for
      * all network operations.
@@ -66,12 +60,8 @@ protected:
     void run();
     
     void updateEntry(string addr, int offset, int rtt);
-    
 };
 
-//----------------------------------------------------------------------------//
-} // namespace dex
+}
 
-//----------------------------------------------------------------------------//
-#endif //DEX_CLOCK_SERVER_H
-
+#endif

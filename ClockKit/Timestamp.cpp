@@ -1,24 +1,20 @@
-//----------------------------------------------------------------------------//
 #ifndef DEX_TIMESTAMP_CPP
 #define DEX_TIMESTAMP_CPP
-//----------------------------------------------------------------------------//
+
 #include "Timestamp.h"
 #include "Common.h"
 #include <string>
 #include <stdio.h>
 #include <cc++/config.h>
-//----------------------------------------------------------------------------//
+
 using namespace std;
 namespace dex {
-//----------------------------------------------------------------------------//
-
 
 string Timestamp::timestampToString(timestamp_t t)
 {
 	const timestamp_t second = 1000000;
 	int secs  = (int) (t / second);
 	int usecs = (int) (t % second);
-
     char buff[256];
     sprintf(buff, "<time %i %i>", secs, usecs); 
     return string(buff);
@@ -32,7 +28,6 @@ timestamp_t Timestamp::stringToTimestamp(string t)
 	const timestamp_t second = 1000000;
 	return timestamp_t(secs * second) + usecs;
 }
-
 
 void Timestamp::timestampToBytes(timestamp_t time, char* buffer)
 {
@@ -54,8 +49,6 @@ timestamp_t Timestamp::bytesToTimestamp(char* buffer)
 	return time;
 }
 
-//----------------------------------------------------------------------------//
-} // namespace dex
+}
 
-//----------------------------------------------------------------------------//
-#endif //DEX_TIMESTAMP_CPP
+#endif

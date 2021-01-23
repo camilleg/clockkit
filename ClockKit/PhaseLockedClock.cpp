@@ -1,17 +1,14 @@
-
-//----------------------------------------------------------------------------//
 #ifndef DEX_PHASE_LOCKED_CLOCK_CPP
 #define DEX_PHASE_LOCKED_CLOCK_CPP
-//----------------------------------------------------------------------------//
+
 #include "PhaseLockedClock.h"
 #include "Exceptions.h"
 #include <iostream>
 #include <cstdlib>
-//----------------------------------------------------------------------------//
+
 using namespace std;
 using namespace ost;
 namespace dex {
-//----------------------------------------------------------------------------//
 
 PhaseLockedClock::PhaseLockedClock(Clock& primary, Clock& reference)
     : Thread(2), // high priority thread
@@ -28,17 +25,14 @@ PhaseLockedClock::PhaseLockedClock(Clock& primary, Clock& reference)
     start();
 }
 
-
 PhaseLockedClock::~PhaseLockedClock()
 {
     terminate();
 }
 
-
 timestamp_t PhaseLockedClock::getValue()
 {
     if (!inSync_) throw ClockException("PhaseLockedClock not in sync");
-    
     try
     {
         enterMutex();
@@ -53,9 +47,7 @@ timestamp_t PhaseLockedClock::getValue()
         inSync_ = false;
         throw e;
     }
-    
 }
-
 
 bool PhaseLockedClock::isSynchronized()
 {
@@ -71,7 +63,6 @@ int PhaseLockedClock::getOffset()
     return offset;
 }
 
-
 void PhaseLockedClock::setPhasePanic(timestamp_t phasePanic)
 {
     phasePanic_ = phasePanic;
@@ -84,37 +75,28 @@ void PhaseLockedClock::setUpdatePanic(timestamp_t updatePanic)
 
 void PhaseLockedClock::run()
 {
-    //cout << "thread running" << endl;
-    
     while (!testCancel())
     {
         update();
-
-        // todo:
-        // put in a timestamp for the last sucessfull update
-        // if it has been a while, we declare this clock out of sync.
+        // todo: Timestamp the last sucessful update;
+        // if it has been a while, declare this clock out of sync.
     
         double variance = updateInterval_ / 10.0;
         double base = updateInterval_ - (variance / 2.0);
-        double random = ( rand() % (int)(variance * 1000) ) / 1000.0;
-        int sleep_ms = (int) ( (base + random) / 1000 );
-        
+        double random = (rand() % (int)(variance * 1000)) / 1000.0;
+        int sleep_ms = (int)((base + random) / 1000);
         sleep(sleep_ms);
     }
-    
     exit();
 }
 
 void PhaseLockedClock::update()
 {
-
-
     if (inSync_ && (primaryClock_.getValue() - lastUpdate_) > updatePanic_)
     {
         //cout << "last update too long ago." << endl;
         inSync_ = false;
     }
-    
     if (!inSync_)
     {
         //cout << "CLOCK OUT OF SYNC" << endl;
@@ -133,29 +115,24 @@ void PhaseLockedClock::update()
         //cout << "PHASE UPDATE FAILED" << endl;
         return;
     }
-    
     bool clockUpdated = updateClock();
     if (!clockUpdated)
     {
         //cout << "CLOCK UPDATE FAILED" << endl;
         return;
     }
-    
-    // mark a timestamp for sucessfull update.
+    // Mark a timestamp for sucessful update.
     lastUpdate_ = primaryClock_.getValue();
 }
-
 
 bool PhaseLockedClock::updatePhase()
 {
     try
     {
         enterMutex();
-        
         timestamp_t phase = referenceClock_.getPhase(variableFrequencyClock_);
         timestamp_t variableValue = variableFrequencyClock_.getValue();
         timestamp_t primaryValue = primaryClock_.getValue();
-
         leaveMutex();
         
         lastPhase_ = thisPhase_;
@@ -167,7 +144,6 @@ bool PhaseLockedClock::updatePhase()
         thisPrimaryValue_ = primaryValue;
         
         //cout << "detected phase: " << ((int)phase) << endl;
-        
         return true;
     }
     catch (ClockException e)
@@ -177,7 +153,6 @@ bool PhaseLockedClock::updatePhase()
         return false;
     }
 }
-
 
 bool PhaseLockedClock::updateClock()
 {
@@ -191,13 +166,11 @@ bool PhaseLockedClock::updateClock()
     const double primaryTicks = thisPrimaryValue_ - lastPrimaryValue_;
     const double primaryFrequency = 1e6 * primaryTicks / referenceElapsed;
     primaryFrequencyAvg_ += (primaryFrequency - primaryFrequencyAvg_) * 0.1;
-
     // cout << "primary clock frequency average: " << ((int)primaryFrequencyAvg_) << endl;
 
-    // if the phase is too high, we declare the clock out of sync
-    if ( ( thisPhase_ > phasePanic_ ) || (thisPhase_ < (-1 * phasePanic_)))
+    if (( thisPhase_ > phasePanic_) || (thisPhase_ < (-1 * phasePanic_)))
     {
-        //cout << "phase too high" << endl;
+	// The phase is too high, so declare the clock out of sync.
         inSync_ = false;
         return false;
     }
@@ -206,21 +179,17 @@ bool PhaseLockedClock::updateClock()
     const double phaseDiff = thisPhase_ * 0.1;
     const double frequencyDiff = 1000000 - primaryFrequencyAvg_;
 	const double variableClockFrequency = 1000000 + (frequencyDiff + phaseDiff);
-
     // cout << "using frequency: " << ((int) variableClockFrequency) << endl;
 
     enterMutex();
 	variableFrequencyClock_.setFrequency( (int) variableClockFrequency );
     leaveMutex();
-
     return true;
 }
 
 void PhaseLockedClock::setClock()
 {
-    
     enterMutex();
-    
     try
     {
         variableFrequencyClock_.setValue(referenceClock_.getValue());
@@ -232,14 +201,8 @@ void PhaseLockedClock::setClock()
         //cout << "exception while resetting to the reference clock" << endl;
         inSync_ = false;
     }
-    
     leaveMutex();
-    
 }
 
-//----------------------------------------------------------------------------//
-} // namespace dex
-//----------------------------------------------------------------------------//
-#endif //DEX_PHASE_LOCKED_CLOCK_CPP
-//----------------------------------------------------------------------------//
-
+}
+#endif

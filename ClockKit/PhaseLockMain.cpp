@@ -1,8 +1,6 @@
-
 #include "PhaseLockedClock.h"
 #include "ConfigReader.h"
 #include "Exceptions.h"
-
 #include <cc++/socket.h>
 #include <cc++/thread.h>
 
@@ -17,13 +15,10 @@ int main(int argc, char* argv[])
         cout << "usage phaseLock [config file]" << endl;
         return 0;
     }
-
     string configFile;
     if (argc == 2) configFile = argv[1];
     else configFile = DEFAULT_CONFIG_FILE_PATH;
-
-    PhaseLockedClock* plc =
-        PhaseLockedClockFromConfigFile( configFile );
+    PhaseLockedClock* plc = PhaseLockedClockFromConfigFile(configFile);
 
     while (true)
     {
@@ -38,11 +33,9 @@ int main(int argc, char* argv[])
         {
             cout << "offset: OUT OF SYNC" << endl;
         }
-
         Thread::sleep(1000);
     }
     
     cout << "DONE." << endl;
     return 0;
 }
-

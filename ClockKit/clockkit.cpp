@@ -1,7 +1,4 @@
-#include <cc++/socket.h>
-
 #include "clockkit.h"
-
 #include "ConfigReader.h"
 #include "ClockClient.h"
 #include "HighResolutionClock.h"
@@ -23,7 +20,6 @@ void ckInitializeFromConfig(const char *path)
     ckClock = dex::PhaseLockedClockFromConfigFile(std::string(path));
 }
 
-
 dex::timestamp_t ckTimeAsValue()
 {
     /* Avoid error but at the same time allow manual calling of ckInitialize
@@ -44,7 +40,7 @@ const char* ckTimeAsString()
     if (ckClock == NULL) ckInitialize();
     try
     {
-        ckTimeString = dex::Timestamp::timestampToString( ckClock->getValue() );
+        ckTimeString = dex::Timestamp::timestampToString(ckClock->getValue());
     }
     catch (dex::ClockException e)
     {
@@ -52,7 +48,6 @@ const char* ckTimeAsString()
     }
     return ckTimeString.c_str();
 }
-
 
 bool ckInSync()
 {

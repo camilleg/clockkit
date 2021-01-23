@@ -1,19 +1,16 @@
-
-//----------------------------------------------------------------------------//
 #ifndef DEX_CLOCK_CLIENT_CPP
 #define DEX_CLOCK_CLIENT_CPP
-//----------------------------------------------------------------------------//
+
 #include "ClockClient.h"
 #include "Exceptions.h"
 #include "HighResolutionClock.h"
-//----------------------------------------------------------------------------//
+
 namespace dex {
-//----------------------------------------------------------------------------//
 
 ClockClient::ClockClient(InetHostAddress addr, int port)
     :timeout_(1000), sequence_(0), lastRTT_(0), acknowledge_(false)
 {
-    // opens a udp socket on a local port, starting at 5000.
+    // Open a UDP socket on a local port, starting at 5000.
     InetAddress localhost("0.0.0.0"); // any
     int localPort = 5000;
     bool bound = false;
@@ -30,8 +27,7 @@ ClockClient::ClockClient(InetHostAddress addr, int port)
             localPort++;
         }
     }
-    
-    // set the destination address
+    // Set the destination address.
     socket_->setPeer(addr, port);
 }
 
@@ -43,8 +39,7 @@ ClockClient::~ClockClient()
 timestamp_t ClockClient::getValue()
 {
     Clock& baseClock = HighResolutionClock::instance();
-
-    // remember that: secondaryClock + phase = primaryClock
+    // secondaryClock + phase = primaryClock
     timestamp_t phase = getPhase(baseClock, false);
     timestamp_t now = baseClock.getValue();
     return (now + phase);
@@ -55,12 +50,10 @@ void ClockClient::sendPacket(ClockPacket& packet)
     const int length = ClockPacket::PACKET_LENGTH;
     char buffer[length];
     packet.write(buffer);
-    
     int bytesSent = socket_->send(buffer, length);
     if (bytesSent != length)
         throw ClockException("could not send packet");
 }
-
     
 ClockPacket ClockClient::receivePacket(Clock& clock)
 {
@@ -73,18 +66,15 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
     {
         bool packetArrived =
             socket_->isPending(Socket::pendingInput, timeoutMsec);    
-        
         if (!packetArrived)
             throw ClockException("timeout");
             
         int bytesReceived = socket_->receive(buffer, length);
-        
         if (bytesReceived != length)
             throw ClockException("received packet of wrong length");
             
         ClockPacket packet(buffer);
         packet.setClientReceiveTime(clock.getValue());
-
         if (packet.getSequenceNumber() != sequence_)
         {
             cout << "wrong sequence number, waiting for another packet" << endl;
@@ -95,9 +85,7 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
         }
         else if (packet.getRTT() > timeout_)
         {
-            //throw ClockException("response took too long: " + packet.getRTT());
             throw ClockException("response took too long");
-            
         }
         else
         {
@@ -106,7 +94,6 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
         }
     }
 }
-
 
 timestamp_t ClockClient::getPhase(Clock& clock)
 {
@@ -121,17 +108,14 @@ timestamp_t ClockClient::getPhase(Clock& clock, bool acknowledge)
     packet.setType(ClockPacket::REQUEST);
     packet.setSequenceNumber(sequence_);
     packet.setClientRequestTime(clock.getValue());
-    
     sendPacket(packet);
     
     packet = receivePacket(clock);
-
     if (acknowledge)
     {
         packet.setType(ClockPacket::ACKNOWLEDGE);
         sendPacket(packet);
     }
-
     return packet.getClockOffset();
 }
 
@@ -155,10 +139,5 @@ void ClockClient::setAcknowledge(bool acknowledge)
     acknowledge_ = acknowledge;
 }
 
-
-//----------------------------------------------------------------------------//
 } // namespace dex
-//----------------------------------------------------------------------------//
-#endif //DEX_CLOCK_CLIENT_CPP
-//----------------------------------------------------------------------------//
-
+#endif

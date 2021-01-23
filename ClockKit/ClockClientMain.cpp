@@ -1,10 +1,8 @@
-
 #include "ClockClient.h"
 #include "HighResolutionClock.h"
 #include "Exceptions.h"
 #include <cc++/socket.h>
 #include <cc++/thread.h>
-
 
 using namespace std;
 using namespace ost;
@@ -20,11 +18,9 @@ int main(int argc, char* argv[])
 
     InetHostAddress addr(argv[1]);
     int port = atoi(argv[2]);
-
     cout << "Starting Client:" << endl;
     cout << "  bind: " << addr.getHostname() << endl;
     cout << "  port: " << port << endl;
-        
 
     Clock& hires = HighResolutionClock::instance();
     ClockClient client(addr, port);
@@ -42,7 +38,5 @@ int main(int argc, char* argv[])
         catch (ClockException e) {}
         Thread::sleep(1000);
     }
-
     return 0;
 }
-

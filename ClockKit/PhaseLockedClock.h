@@ -1,15 +1,12 @@
-
-//----------------------------------------------------------------------------//
 #ifndef DEX_PHASE_LOCKED_CLOCK_H
 #define DEX_PHASE_LOCKED_CLOCK_H
-//----------------------------------------------------------------------------//
+
 #include <cc++/thread.h>
 #include "Clock.h"
 #include "VariableFrequencyClock.h"
-//----------------------------------------------------------------------------//
+
 using namespace ost;
 namespace dex {
-//----------------------------------------------------------------------------//
 
 /**
  * A method to synchronize one oscillator based on another.
@@ -93,7 +90,6 @@ public:
      *        microseconds (usec).
      */
     void setUpdatePanic(timestamp_t updatePanic);
-    
         
 protected:
 
@@ -108,7 +104,6 @@ protected:
      * every update interval (give or take %10).
      */
     void update();
-    
     
     /**
      * Tries to update the markers for the clocks.
@@ -176,10 +171,7 @@ private:
     // the timestamp of the last sucessfull update.
     timestamp_t lastUpdate_;
     
-}; // class PhaseLockedClock
-//----------------------------------------------------------------------------//
-} // namespace dex
-//----------------------------------------------------------------------------//
-#endif //DEX_PHASE_LOCKED_CLOCK_H
-//----------------------------------------------------------------------------//
+};
 
+}
+#endif

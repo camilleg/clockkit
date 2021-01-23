@@ -1,7 +1,5 @@
-
 #include "ClockServer.h"
 #include <cc++/socket.h>
-
 #include "VariableFrequencyClock.h"
 #include "HighResolutionClock.h"
 #include <cstdlib>
@@ -25,14 +23,10 @@ int main(int argc, char* argv[])
     //VariableFrequencyClock vfc(HighResolutionClock::instance());
     //vfc.setFrequency(1000000 - 2000);
     //ClockServer server(addr, port, vfc);
-    
-
     ClockServer server(addr, port, HighResolutionClock::instance());
     
     server.setLogging(true);
-    
     server.start();
     server.join();
-
     return 0;
 }

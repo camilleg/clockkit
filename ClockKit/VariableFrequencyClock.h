@@ -1,24 +1,19 @@
-//----------------------------------------------------------------------------//
 #ifndef DEX_VARIABLE_FREQUENCY_CLOCK_H
 #define DEX_VARIABLE_FREQUENCY_CLOCK_H
-//----------------------------------------------------------------------------//
+
 #include "Clock.h"
-//----------------------------------------------------------------------------//
+
 namespace dex {
-//----------------------------------------------------------------------------//
 
 /**
- * All other clocks in ClockKit run at 1000000 Hz (usec tics)
- * This clock allows one to change the frequency of a clock.
- * It wraps itself around a master clock and allows the user to dynamicaly
- * change the frequency.  It also checks for non-monotonic motion in
- * the underlying clock.  If such motion is detected, a ClockException
- * is thrown.
+ * All other clocks in ClockKit run at 1000000 Hz,
+ * but this clock's frequency can be changed.
+ * It wraps a master clock.
+ * If that clock moves nonmonotonically, a ClockException is thrown.
  */
 class VariableFrequencyClock : public Clock
 {
 public:
-	
 	/**
 	 * Creates a new variable frequency clock based on the
 	 * provided master clock.
@@ -52,23 +47,13 @@ public:
 	void setFrequency(int freq);
 
 private:
-	
 	Clock& masterClock_;
-		
 	timestamp_t masterFrequency_;
 	timestamp_t slaveFrequency_;
-	
 	timestamp_t masterMarker_;
 	timestamp_t slaveMarker_;
-	
 	void updateMarkers();
-	
 };
 
-
-//----------------------------------------------------------------------------//
-} // namespace dex
-//----------------------------------------------------------------------------//
-#endif //DEX_VARIABLE_FREQUENCY_CLOCK_H
-//----------------------------------------------------------------------------//
-
+}
+#endif

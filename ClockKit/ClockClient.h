@@ -1,18 +1,15 @@
-
-//----------------------------------------------------------------------------//
 #ifndef DEX_CLOCK_CLIENT_H
 #define DEX_CLOCK_CLIENT_H
-//----------------------------------------------------------------------------//
+
 #include <cc++/socket.h>
 #include "Common.h"
 #include "Clock.h"
 #include "ClockPacket.h"
-//----------------------------------------------------------------------------//
+
 using namespace std;
 using namespace ost;
 
 namespace dex {
-//----------------------------------------------------------------------------//
 
 /**
  * A clock that gets its time over the network from a ClockServer.
@@ -118,20 +115,13 @@ private:
     bool acknowledge_;
     UDPSocket* socket_;
 
-
     void sendPacket(ClockPacket& packet);
     
-    // receives the packet and set's the receipt time via the provided clock
+    // Receives the packet and sets the receipt time via the provided clock.
     ClockPacket receivePacket(Clock& clock);
 
     timestamp_t getPhase(Clock& clock, bool acknowledge);
+};
 
-
-}; // class ClockClient
-
-//----------------------------------------------------------------------------//
-} // namespace dex
-//----------------------------------------------------------------------------//
-#endif //DEX_CLOCK_CLIENT_H
-//----------------------------------------------------------------------------//
-
+}
+#endif

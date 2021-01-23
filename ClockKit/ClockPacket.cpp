@@ -1,16 +1,11 @@
-//----------------------------------------------------------------------------//
 #ifndef DEX_CLOCK_PACKET_CPP
 #define DEX_CLOCK_PACKET_CPP
-//----------------------------------------------------------------------------//
+
 #include "Common.h"
 #include "ClockPacket.h"
 #include <iostream>
-//----------------------------------------------------------------------------//
-using namespace std;
+
 namespace dex {
-//----------------------------------------------------------------------------//
-
-
 
 ClockPacket::ClockPacket()
     : type_(INVALID),
@@ -31,7 +26,6 @@ ClockPacket::ClockPacket(char* buffer)
     read(buffer);
 }
 
-
 void ClockPacket::read(char* buffer)
 {
     type_ = (Type) buffer[0];
@@ -43,13 +37,12 @@ void ClockPacket::read(char* buffer)
 
 void ClockPacket::write(char* buffer)
 {
-    buffer[0] = (unsigned char) type_;
+    buffer[0] = (unsigned char)type_;
     buffer[1] = sequenceNumber_;
     Timestamp::timestampToBytes(clientRequestTime_, &buffer[2]);
     Timestamp::timestampToBytes(serverReplyTime_, &buffer[10]);
     Timestamp::timestampToBytes(clientReceiveTime_, &buffer[18]);
 }
-
 
 ClockPacket::Type ClockPacket::getType()
 {
@@ -70,7 +63,6 @@ void ClockPacket::setSequenceNumber(unsigned char sequenceNumber)
 {
     sequenceNumber_ = sequenceNumber;
 }
-
 
 timestamp_t ClockPacket::getClientRequestTime()
 {
@@ -102,7 +94,6 @@ void ClockPacket::setClientReceiveTime(timestamp_t t)
     clientReceiveTime_ = t;
 }
 
-
 timestamp_t ClockPacket::getRTT()
 {
     return clientReceiveTime_ - clientRequestTime_;
@@ -127,11 +118,8 @@ void ClockPacket::print()
 		 << Timestamp::timestampToString(serverReplyTime_) << endl
          << "clientReceiveTime: "
 		 << Timestamp::timestampToString(clientReceiveTime_) << endl;
-
 }
 
-
-//----------------------------------------------------------------------------//
 } // namespace dex
-//----------------------------------------------------------------------------//
-#endif //DEX_CLOCK_PACKET_CPP
+
+#endif

@@ -1,8 +1,6 @@
 #ifndef DEX_CONFIG_READER_CPP
 #define DEX_CONFIG_READER_CPP
 
-#include <cc++/socket.h>
-
 #include "ConfigReader.h"
 
 #include "Common.h"
@@ -41,7 +39,7 @@ PhaseLockedClock* PhaseLockedClockFromConfigFile(string filename)
         file >> line;
         int pos = line.find(":");
         if (pos < 0) break;
-        string name = line.substr(0,pos);
+        string name = line.substr(0, pos);
         string value = line.substr(pos+1);
 
         if (name == "server")
@@ -75,7 +73,7 @@ PhaseLockedClock* PhaseLockedClockFromConfigFile(string filename)
     cout << "config [phasePanic:" << phasePanic << "]" << endl;
     cout << "config [updatePanic:" << updatePanic << "]" << endl;
 
-    ost::InetHostAddress addr( server.c_str() );
+    ost::InetHostAddress addr(server.c_str());
     ClockClient* client = new ClockClient(addr, port);
     client->setTimeout(timeout);
     client->setAcknowledge(true);
@@ -84,7 +82,6 @@ PhaseLockedClock* PhaseLockedClockFromConfigFile(string filename)
         *client);
     plc->setPhasePanic(phasePanic);
     plc->setUpdatePanic(updatePanic);
-
     return plc;
 }
 

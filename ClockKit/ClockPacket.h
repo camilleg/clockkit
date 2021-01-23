@@ -1,11 +1,9 @@
-//----------------------------------------------------------------------------//
 #ifndef DEX_CLOCK_PACKET_H
 #define DEX_CLOCK_PACKET_H
-//----------------------------------------------------------------------------//
+
 #include "Common.h"
-//----------------------------------------------------------------------------//
+
 namespace dex {
-//----------------------------------------------------------------------------//
 
 /**
  * Used with ClockServer and ClockClient.
@@ -14,7 +12,6 @@ namespace dex {
 class ClockPacket
 {
 public:
-
     /**
      * - INVALID: Used to detect uninitialized packets.
      * - REQUEST: Client sends packet to server requesting current time.
@@ -37,14 +34,12 @@ public:
      * - total : 26 bytes
      */
     //static const int 
-    
 	enum
 	{
 		PACKET_LENGTH = 26
 	};
 
 private:
-    
     Type type_;
     unsigned char sequenceNumber_;
     timestamp_t clientRequestTime_;
@@ -52,7 +47,6 @@ private:
     timestamp_t clientReceiveTime_;
     
 public: 
-
     /**
      * Creates a ClockPacket that is initially Empty.
      * The type is initially set to INVALID
@@ -143,8 +137,6 @@ public:
      */
     void setClientReceiveTime(timestamp_t t); 
 
-//----------------------------------------------------------------------------//
-
     /**
      * Calculates the round trip time for the client-server correspondance.
      * @return round trip time in microseonds (usec).
@@ -169,10 +161,7 @@ public:
      */
     void print();
     
-
-
 };
-//----------------------------------------------------------------------------//
-} // namespace dex
-//----------------------------------------------------------------------------//
-#endif //DEX_CLOCK_PACKET_H
+
+}
+#endif

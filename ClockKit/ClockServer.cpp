@@ -1,17 +1,13 @@
-//----------------------------------------------------------------------------//
 #ifndef DEX_CLOCK_SERVER_CPP
 #define DEX_CLOCK_SERVER_CPP
-//----------------------------------------------------------------------------//
+
 #include "ClockServer.h"
 #include "ClockPacket.h"
-#include "Clock.h"
 #include "HighResolutionClock.h"
 #include <iostream>
 #include <cmath>
-//----------------------------------------------------------------------------//
-namespace dex {
-//----------------------------------------------------------------------------//
 
+namespace dex {
 
 const timestamp_t ClockServer::SYSTEM_STATE_PURGE_TIME = 5000000; // 5 seconds
 
@@ -23,14 +19,9 @@ ClockServer::ClockServer(InetAddress addr, tpport_t port, Clock& clock)
 
 void ClockServer::run()
 {
-
     UDPSocket socket(addr_, port_);
-
     if (log_)
-    {
         cout << "time\thost\toffset\trtt" << endl;
-    }
-    
     const int length = ClockPacket::PACKET_LENGTH;
     char buffer[length];
     ClockPacket packet;
@@ -69,11 +60,8 @@ void ClockServer::run()
             {
                 cerr << "ERR: received packet of invalid type" << endl;
             }
-
         }
-        
     }
-
 }
 
 void ClockServer::setLogging(bool log)
@@ -85,25 +73,21 @@ void ClockServer::updateEntry(string addr, int offset, int rtt)
 {
     timestamp_t now = clock_.getValue();
     string nowStr = Timestamp::timestampToString(now);
-    
     ackData_[addr].time = now;
     ackData_[addr].offset = offset;
     ackData_[addr].rtt = rtt;
-    
     if (log_)
     {
         cout << nowStr << '\t'
             << addr << '\t'
             << offset << '\t'
             << rtt << endl;
-            
         if ( (now - lastUpdate_) > 1000000 )
         {
             lastUpdate_ = now;
-        
             map<string, Entry>::iterator it;
             
-            // purge old entries
+            // Purge old entries.
             for(it = ackData_.begin(); it != ackData_.end();)
             {
                 timestamp_t entryTime = (it->second).time;
@@ -113,15 +97,14 @@ void ClockServer::updateEntry(string addr, int offset, int rtt)
                     ++it;
                 }
             }
-        
-            // calculate maximum offset
+
+            // Calculate maximum offset.
             int maxOffset = 0;
             for(it = ackData_.begin(); it != ackData_.end(); it++)
             {
                 int offset = abs( (it->second).offset ) + ((it->second).rtt / 2);
                 if (offset > maxOffset) maxOffset = offset;
             }
-            
             cout << nowStr << '\t'
                  << "MAX_OFFSET"<< '\t'
                  << maxOffset << '\t'
@@ -130,10 +113,5 @@ void ClockServer::updateEntry(string addr, int offset, int rtt)
     }
 }
 
-
-
-//----------------------------------------------------------------------------//
-} // namespace dex
-//----------------------------------------------------------------------------//
-#endif //DEX_CLOCK_SERVER_CPP
-
+}
+#endif
