@@ -12,14 +12,11 @@ int main(int argc, char* argv[])
 {
     if (argc > 2)
     {
-        cout << "usage phaseLock [config file]" << endl;
-        return 0;
+        cerr << "usage: " << argv[0] << " [config_file]" << endl;
+        return 1;
     }
-    string configFile;
-    if (argc == 2) configFile = argv[1];
-    else configFile = DEFAULT_CONFIG_FILE_PATH;
-    PhaseLockedClock* plc = PhaseLockedClockFromConfigFile(configFile);
-
+    PhaseLockedClock* plc = PhaseLockedClockFromConfigFile(
+	argc == 2 ? argv[1] : DEFAULT_CONFIG_FILE_PATH);
     while (true)
     {
         try
@@ -35,7 +32,5 @@ int main(int argc, char* argv[])
         }
         Thread::sleep(1000);
     }
-    
-    cout << "DONE." << endl;
     return 0;
 }
