@@ -20,16 +20,15 @@ namespace dex {
 
 PhaseLockedClock* PhaseLockedClockFromConfigFile(string filename)
 {
+    ifstream file(filename.c_str());
+    if (!file.is_open())
+        throw Exception("failed to open config file " + filename);
+
     string server = "localhost";
     int port = 4444;
     int timeout = 1000;
     int phasePanic = 5000;
     int updatePanic = 5000000;
-
-    ifstream file(filename.c_str());
-    if (!file.is_open())
-        throw Exception("failed to open config file " + DEFAULT_CONFIG_FILE_PATH);
-
     while (!file.eof())
     {
         string line;
@@ -60,7 +59,6 @@ PhaseLockedClock* PhaseLockedClockFromConfigFile(string filename)
             updatePanic = atoi(value.c_str());
         }
     }
-
     file.close();
 
     //TODO separate printing from object creation
