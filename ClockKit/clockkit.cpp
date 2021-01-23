@@ -17,10 +17,18 @@ void ckInitialize()
     ckClock = dex::PhaseLockedClockFromConfigFile(dex::DEFAULT_CONFIG_FILE_PATH);
 }
 
+void ckInitializeFromConfig(const char *path)
+{
+    if (ckClock != NULL) return;
+    ckClock = dex::PhaseLockedClockFromConfigFile(std::string(path));
+}
+
 
 dex::timestamp_t ckTimeAsValue()
 {
-    ckInitialize();
+    /* Avoid error but at the same time allow manual calling of ckInitialize
+     * with non-default config */
+    if (ckClock == NULL) ckInitialize();
     try
     {
         return ckClock->getValue();
@@ -33,10 +41,10 @@ dex::timestamp_t ckTimeAsValue()
 
 const char* ckTimeAsString()
 {
-	ckInitialize();
-	try
+    if (ckClock == NULL) ckInitialize();
+    try
     {
-    	ckTimeString = dex::Timestamp::timestampToString( ckClock->getValue() );
+        ckTimeString = dex::Timestamp::timestampToString( ckClock->getValue() );
     }
     catch (dex::ClockException e)
     {
@@ -48,19 +56,19 @@ const char* ckTimeAsString()
 
 bool ckInSync()
 {
-	ckInitialize();
-	return ckClock->isSynchronized();
+    if (ckClock == NULL) ckInitialize();
+    return ckClock->isSynchronized();
 }
 
 int ckOffset()
 {
-	ckInitialize();
-	try
-	{
-		return ckClock->getOffset();
-	}
-	catch (dex::ClockException e)
-	{
-		return 0;	
-	}
+    if (ckClock == NULL) ckInitialize();
+    try
+    {
+        return ckClock->getOffset();
+    }
+    catch (dex::ClockException e)
+    {
+        return 0;
+    }
 }

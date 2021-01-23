@@ -18,9 +18,9 @@
 namespace dex {
 
 #ifdef WIN32
-	const string DEFAULT_CONFIG_FILE_PATH = "C:\\clockkit.conf";
+    const string DEFAULT_CONFIG_FILE_PATH = "C:\\clockkit.conf";
 #else
-	const string DEFAULT_CONFIG_FILE_PATH = "/etc/clockkit.conf";
+    const string DEFAULT_CONFIG_FILE_PATH = "/etc/clockkit.conf";
 #endif
 
 PhaseLockedClock* PhaseLockedClockFromConfigFile(string filename)
@@ -34,7 +34,7 @@ PhaseLockedClock* PhaseLockedClockFromConfigFile(string filename)
     ifstream file(filename.c_str());
     if (!file.is_open())
         throw Exception("failed to open config file " + DEFAULT_CONFIG_FILE_PATH);
- 
+
     while (!file.eof())
     {
         string line;
@@ -43,7 +43,7 @@ PhaseLockedClock* PhaseLockedClockFromConfigFile(string filename)
         if (pos < 0) break;
         string name = line.substr(0,pos);
         string value = line.substr(pos+1);
-        
+
         if (name == "server")
         {
             server = value;
@@ -65,9 +65,10 @@ PhaseLockedClock* PhaseLockedClockFromConfigFile(string filename)
             updatePanic = atoi(value.c_str());
         }
     }
-    
+
     file.close();
 
+    //TODO separate printing from object creation
     cout << "config [server:" << server << "]" << endl;
     cout << "config [port:" << port << "]" << endl;
     cout << "config [timeout:" << timeout << "]" << endl;
