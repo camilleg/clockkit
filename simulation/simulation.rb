@@ -1,22 +1,22 @@
 require './SyncClock'
 
-# Statistics
+# Statistics for error bound and phase.
 
 def clear_stats
   $phase_sum = 0.0
-  $error_sum = 0.0
+  $errbd_sum = 0.0
   $phase_count = 0
-  $error_count = 0
-  $max_error = 0
+  $errbd_count = 0
+  $errbd_max = 0.0
 end
 
-def update_stats phase, error
-  return unless error
-  $phase_sum += phase.abs
-  $error_sum += error.abs
+def update_stats phase, errbd
+  return unless errbd
+  $phase_sum += phase
+  $errbd_sum += errbd
   $phase_count += 1
-  $error_count += 1
-  $max_error = error.abs if $max_error < error.abs
+  $errbd_count += 1
+  $errbd_max = errbd if $errbd_max < errbd
 end
 
 def print_stats_header
@@ -24,8 +24,8 @@ def print_stats_header
 end
 def print_stats
   phase_avg = $phase_sum / $phase_count
-  error_avg = $error_sum / $error_count
-  puts "#{$phase_detector.min_rtt}\t#{$phase_detector.max_rtt}\t#{phase_avg}\t#{error_avg}\t#{$max_error}"
+  errbd_avg = $errbd_sum / $errbd_count
+  puts "#{$phase_detector.min_rtt}\t#{$phase_detector.max_rtt}\t#{phase_avg}\t#{errbd_avg}\t#{$error_max}"
 end
 
 # Low-level simulation
@@ -35,8 +35,8 @@ def run_simulation minutes
   advance_interval = 100000
   (minutes * 60).times {
     ($REFERENCE_FREQ / advance_interval).times {
-      Clock.advance_all advance_interval
-      update_stats $reference.time - $sync.time, $sync.error_bound
+      Clock.advance advance_interval
+      update_stats ($reference.time - $sync.time).abs, $sync.error_bound&.abs
     }
     $sync.update
   }
