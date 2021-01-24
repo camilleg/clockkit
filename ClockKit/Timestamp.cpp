@@ -9,7 +9,7 @@ namespace dex {
 
 string Timestamp::timestampToString(timestamp_t t)
 {
-	const timestamp_t second = 1000000;
+	  const timestamp_t second = 1000000;
 	int secs  = (int) (t / second);
 	int usecs = (int) (t % second);
     char buff[256];
