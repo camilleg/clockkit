@@ -20,7 +20,8 @@ string Timestamp::timestampToString(timestamp_t t)
 timestamp_t Timestamp::stringToTimestamp(string t)
 {
     int secs, usecs;
-    if (sscanf(t.c_str(), "<time %i %i>", &secs, &usecs) != 2) return 0;
+    if (sscanf(t.c_str(), "<time %i %i>", &secs, &usecs) != 2)
+        return 0;
     const timestamp_t second = 1000000;
     return timestamp_t(secs * second) + usecs;
 }
