@@ -1,5 +1,5 @@
-# Needs ruby 1.8.1, and for graphical output gnuplot 3.7.
-
+SIM=/tmp/plot.dat
+OUT=/tmp/plot.eps
 all:
-	ruby simulation.rb > plot.dat
-	gnuplot < gnuplot.txt
+	./simulation.rb > $(SIM)
+	gnuplot -c gnuplot.txt $(SIM) $(OUT)

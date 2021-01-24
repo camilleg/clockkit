@@ -6,8 +6,8 @@ set xlabel "Round trip time (usec)"
 set ylabel "usec"
 
 set term post eps
-set output 'plot.eps'
+set output ARG2
 
-plot "plot.dat" using 2:3 title 'Average Skew', \
-     "plot.dat" using 2:4 title 'Average Error Bound', \
-     "plot.dat" using 2:5 title 'Maximum Error Bound'
+plot ARG1 using 2:3 title 'Average Skew', \
+     ARG1 using 2:4 title 'Average Error Bound', \
+     ARG1 using 2:5 title 'Maximum Error Bound'

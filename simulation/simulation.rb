@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 require './SyncClock'
 
 # Statistics for error bound and phase.
@@ -25,7 +26,7 @@ end
 def print_stats
   phase_avg = $phase_sum / $phase_count
   errbd_avg = $errbd_sum / $errbd_count
-  puts "#{$phase_detector.min_rtt}\t#{$phase_detector.max_rtt}\t#{phase_avg}\t#{errbd_avg}\t#{$error_max}"
+  puts "#{$phase_detector.min_rtt}\t#{$phase_detector.max_rtt}\t#{phase_avg}\t#{errbd_avg}\t#{$errbd_max}"
 end
 
 # Low-level simulation
