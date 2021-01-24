@@ -2,7 +2,6 @@ require './PhaseDetector'
 require './VariableFrequencyClock'
 
 class SyncClock
-
   def initialize local_clock, phase_detector
     raise 'local_clock lacks time()' unless local_clock.respond_to? :time
 
@@ -113,5 +112,4 @@ class SyncClock
     freq_error = @last_freq_error + @CLOCK_VARIABILITY_MAXIMUM
     (phase_error + freq_error * (interval.to_f / $REFERENCE_FREQ)).to_i
   end
-
 end
