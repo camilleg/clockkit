@@ -3,15 +3,24 @@
 
 namespace dex {
 
-Exception::Exception(string message): message_(message)
+Exception::Exception(string message)
+    : message_(message)
 {
-   cout << "EXCEPTION: " << message << endl;
+    cout << "EXCEPTION: " << message << endl;
 }
 
-Exception::~Exception() {}
+Exception::~Exception()
+{
+}
 
-string Exception::getMessage() { return message_; }
+string Exception::getMessage()
+{
+    return message_;
+}
 
-ClockException::ClockException(string message) : Exception(message) {}
+ClockException::ClockException(string message)
+    : Exception(message)
+{
+}
 
 }

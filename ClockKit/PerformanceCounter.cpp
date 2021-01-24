@@ -8,7 +8,7 @@ PerformanceCounter PerformanceCounter::instance_;
 
 PerformanceCounter::PerformanceCounter()
 {
-       LARGE_INTEGER rate;
+    LARGE_INTEGER rate;
     if (!QueryPerformanceFrequency(&rate))
         throw ClockException("Error getting performance counter frequency");
     freqConversion_ = 1000000.0 / (double)rate.QuadPart;
@@ -25,4 +25,4 @@ timestamp_t PerformanceCounter::getValue()
     if (!QueryPerformanceCounter(&qpc)) throw ClockException("Error getting performance counter");
     return (timestamp_t)(((double)qpc.QuadPart) * freqConversion_);
 }
-}  // namespace dex
+}

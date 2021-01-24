@@ -7,24 +7,23 @@
 
 namespace dex {
 
-/** 
+/**
  * Provides the highest resolution clock available:
  * on Windows, the PerformanceCounter; otherwise, the SystemClock.
  */
-class HighResolutionClock
-{
-public:
-       static Clock& instance()
+class HighResolutionClock {
+   public:
+    static Clock& instance()
     {
-        #ifdef WIN32
-            return PerformanceCounter::instance();
-        #else
-            return SystemClock::instance();
-        #endif
+#ifdef WIN32
+        return PerformanceCounter::instance();
+#else
+        return SystemClock::instance();
+#endif
     }
 
-private:
+   private:
     HighResolutionClock();
-}; 
+};
 
-}
+}  // namespace dex

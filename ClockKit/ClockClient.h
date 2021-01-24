@@ -1,8 +1,8 @@
 #pragma once
 #include <cc++/socket.h>
-#include "Common.h"
 #include "Clock.h"
 #include "ClockPacket.h"
+#include "Common.h"
 
 using namespace std;
 using namespace ost;
@@ -26,10 +26,8 @@ namespace dex {
  * Calls to ClientClock may take some time since a server response
  * is required.
  */
-class ClockClient : public Clock
-{
-public:
-       
+class ClockClient : public Clock {
+   public:
     /**
      * Creates a client bound to localhost and an open port.
      * - The bind port is chosen by starting at 5000 and moving up.
@@ -55,9 +53,9 @@ public:
      * - Throws ClockException on network timeout.
      */
     timestamp_t getValue();
-	
+
     /**
-     * Returns the phase between a local clock and 
+     * Returns the phase between a local clock and
      * the ClockServer clock.
      * This call is the most accurate in getting timing
      * information from a ClockServer.
@@ -65,10 +63,10 @@ public:
      *
      * If set to send acknowledgments, this call will send
      * back information to the ClockServer on the phase
-     * difference of the two clocks. 
+     * difference of the two clocks.
      */
-    timestamp_t getPhase(Clock& c);	
-	
+    timestamp_t getPhase(Clock& c);
+
     /**
      * Gets the timeout value for calls on this clock.
      * If network operations take longer than this, then
@@ -78,7 +76,7 @@ public:
      * @return timeout value in microseconds (usec).
      */
     int getTimeout();
-    
+
     /**
      * Sets the timeout value for calls on this clock.
      * If network operations take longer than this, then
@@ -86,15 +84,15 @@ public:
      * The timeout value determines the maximum amount
      * of error on phase calculations.
      * @param timeout timeout value in microseconds (usec).
-     */ 
-     void setTimeout(int timeout);
-    
+     */
+    void setTimeout(int timeout);
+
     /**
      * Gets the round-trip-time from the last call on this clock.
      * @return Last round-trip-time in microseconds (usec).
      */
     int getLastRTT();
-        
+
     /**
      * Sets whether the ClockClient will send ACKNOWLEDGE packets
      * to the server on a getPhase() call.
@@ -102,10 +100,10 @@ public:
      * error bound of a distributed clock.
      */
     void setAcknowledge(bool acknowledge);
-    
-private:	
-	ClockClient(ClockClient& c);
-	ClockClient& operator=(ClockClient& rhs);
+
+   private:
+    ClockClient(ClockClient& c);
+    ClockClient& operator=(ClockClient& rhs);
 
     int timeout_;
     unsigned char sequence_;
@@ -114,11 +112,11 @@ private:
     UDPSocket* socket_;
 
     void sendPacket(ClockPacket& packet);
-    
+
     // Receives the packet and sets the receipt time via the provided clock.
     ClockPacket receivePacket(Clock& clock);
 
     timestamp_t getPhase(Clock& clock, bool acknowledge);
 };
 
-}
+}  // namespace dex

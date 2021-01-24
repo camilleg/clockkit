@@ -1,20 +1,20 @@
 #include "clockkit.h"
-#include "ConfigReader.h"
 #include "ClockClient.h"
+#include "ConfigReader.h"
+#include "Exceptions.h"
 #include "HighResolutionClock.h"
 #include "PhaseLockedClock.h"
-#include "Exceptions.h"
 
 dex::PhaseLockedClock* ckClock = NULL;
 std::string ckTimeString;
 
 void ckInitialize()
 {
-       if (ckClock != NULL) return;
+    if (ckClock != NULL) return;
     ckClock = dex::PhaseLockedClockFromConfigFile(dex::DEFAULT_CONFIG_FILE_PATH);
 }
 
-void ckInitializeFromConfig(const char *path)
+void ckInitializeFromConfig(const char* path)
 {
     if (ckClock != NULL) return;
     ckClock = dex::PhaseLockedClockFromConfigFile(std::string(path));
@@ -25,12 +25,10 @@ dex::timestamp_t ckTimeAsValue()
     /* Avoid error but at the same time allow manual calling of ckInitialize
      * with non-default config */
     if (ckClock == NULL) ckInitialize();
-    try
-    {
+    try {
         return ckClock->getValue();
     }
-    catch (dex::ClockException e)
-    {
+    catch (dex::ClockException e) {
         return 0;
     }
 }
@@ -38,12 +36,10 @@ dex::timestamp_t ckTimeAsValue()
 const char* ckTimeAsString()
 {
     if (ckClock == NULL) ckInitialize();
-    try
-    {
+    try {
         ckTimeString = dex::Timestamp::timestampToString(ckClock->getValue());
     }
-    catch (dex::ClockException e)
-    {
+    catch (dex::ClockException e) {
         ckTimeString = "";
     }
     return ckTimeString.c_str();
@@ -58,12 +54,10 @@ bool ckInSync()
 int ckOffset()
 {
     if (ckClock == NULL) ckInitialize();
-    try
-    {
+    try {
         return ckClock->getOffset();
     }
-    catch (dex::ClockException e)
-    {
+    catch (dex::ClockException e) {
         return 0;
     }
 }

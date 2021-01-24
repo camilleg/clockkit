@@ -8,14 +8,14 @@ namespace dex {
  * The base class for exceptions in the DEX package.
  * Each exception has a simple string message.
  */
-class Exception
-{
-protected:
-     string message_;
-public:
-  Exception(string message);
-  virtual ~Exception();
-  virtual string getMessage();
+class Exception {
+   protected:
+    string message_;
+
+   public:
+    Exception(string message);
+    virtual ~Exception();
+    virtual string getMessage();
 };
 
 /**
@@ -24,10 +24,9 @@ public:
  * clock may not be able to contact a server, or an
  * internal counter may have rolled over, violating monotonicity.
  */
-class ClockException : public Exception
-{
-public:
-  ClockException(string message);
+class ClockException : public Exception {
+   public:
+    ClockException(string message);
 };
 
-}
+}  // namespace dex

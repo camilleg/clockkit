@@ -5,21 +5,21 @@
 namespace dex {
 
 ClockClient::ClockClient(InetHostAddress addr, int port)
-    :timeout_(1000), sequence_(0), lastRTT_(0), acknowledge_(false)
+    : timeout_(1000)
+    , sequence_(0)
+    , lastRTT_(0)
+    , acknowledge_(false)
 {
     // Open a UDP socket on a local port, starting at 5000.
-       InetAddress localhost("0.0.0.0"); // any
+    InetAddress localhost("0.0.0.0");  // any
     int localPort = 5000;
     bool bound = false;
-    while(!bound)
-    {
-        try
-        {
+    while (!bound) {
+        try {
             socket_ = new UDPSocket(localhost, localPort);
             bound = true;
         }
-        catch (Socket*)
-        {
+        catch (Socket*) {
             delete socket_;
             localPort++;
         }
@@ -48,10 +48,9 @@ void ClockClient::sendPacket(ClockPacket& packet)
     char buffer[length];
     packet.write(buffer);
     int bytesSent = socket_->send(buffer, length);
-    if (bytesSent != length)
-        throw ClockException("could not send packet");
+    if (bytesSent != length) throw ClockException("could not send packet");
 }
-    
+
 ClockPacket ClockClient::receivePacket(Clock& clock)
 {
     const int length = ClockPacket::PACKET_LENGTH;
@@ -59,33 +58,25 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
     int timeoutMsec = timeout_ / 1000;
     if (timeoutMsec < 1) timeoutMsec = 1;
 
-    while (true)
-    {
-        bool packetArrived =
-            socket_->isPending(Socket::pendingInput, timeoutMsec);    
-        if (!packetArrived)
-            throw ClockException("timeout");
-            
+    while (true) {
+        bool packetArrived = socket_->isPending(Socket::pendingInput, timeoutMsec);
+        if (!packetArrived) throw ClockException("timeout");
+
         int bytesReceived = socket_->receive(buffer, length);
-        if (bytesReceived != length)
-            throw ClockException("received packet of wrong length");
-            
+        if (bytesReceived != length) throw ClockException("received packet of wrong length");
+
         ClockPacket packet(buffer);
         packet.setClientReceiveTime(clock.getValue());
-        if (packet.getSequenceNumber() != sequence_)
-        {
+        if (packet.getSequenceNumber() != sequence_) {
             cout << "wrong sequence number, waiting for another packet" << endl;
         }
-        else if (packet.getType() != ClockPacket::REPLY)
-        {
+        else if (packet.getType() != ClockPacket::REPLY) {
             cout << "packet of wrong type, wating for another packet" << endl;
         }
-        else if (packet.getRTT() > timeout_)
-        {
+        else if (packet.getRTT() > timeout_) {
             throw ClockException("response took too long");
         }
-        else
-        {
+        else {
             lastRTT_ = packet.getRTT();
             return packet;
         }
@@ -106,10 +97,9 @@ timestamp_t ClockClient::getPhase(Clock& clock, bool acknowledge)
     packet.setSequenceNumber(sequence_);
     packet.setClientRequestTime(clock.getValue());
     sendPacket(packet);
-    
+
     packet = receivePacket(clock);
-    if (acknowledge)
-    {
+    if (acknowledge) {
         packet.setType(ClockPacket::ACKNOWLEDGE);
         sendPacket(packet);
     }
@@ -136,4 +126,4 @@ void ClockClient::setAcknowledge(bool acknowledge)
     acknowledge_ = acknowledge;
 }
 
-} // namespace dex
+}  // namespace dex

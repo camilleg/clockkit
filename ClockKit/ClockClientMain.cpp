@@ -1,8 +1,8 @@
-#include "ClockClient.h"
-#include "HighResolutionClock.h"
-#include "Exceptions.h"
 #include <cc++/socket.h>
 #include <cc++/thread.h>
+#include "ClockClient.h"
+#include "Exceptions.h"
+#include "HighResolutionClock.h"
 
 using namespace std;
 using namespace ost;
@@ -10,11 +10,10 @@ using namespace dex;
 
 int main(int argc, char* argv[])
 {
-    if (argc != 3)
-    {
+    if (argc != 3) {
         cout << "usage clockClient <server address> <port>" << endl;
         return 0;
-       }
+    }
 
     InetHostAddress addr(argv[1]);
     int port = atoi(argv[2]);
@@ -27,15 +26,13 @@ int main(int argc, char* argv[])
     client.setTimeout(15000);
     client.setAcknowledge(true);
 
-    while (true)
-    {
-        try
-        {
+    while (true) {
+        try {
             timestamp_t now = client.getPhase(hires);
-            cout << "offset: " << now
-                 << "\trtt: " << client.getLastRTT() << endl;
+            cout << "offset: " << now << "\trtt: " << client.getLastRTT() << endl;
         }
-        catch (ClockException e) {}
+        catch (ClockException e) {
+        }
         Thread::sleep(1000);
     }
     return 0;
