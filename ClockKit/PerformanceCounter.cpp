@@ -3,7 +3,7 @@
 #include <windows.h>
 
 namespace dex {
-  using namespace std;
+    using namespace std;
   PerformanceCounter PerformanceCounter::instance_;
 
   PerformanceCounter::PerformanceCounter() {
