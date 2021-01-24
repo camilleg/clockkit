@@ -20,8 +20,7 @@ string Timestamp::timestampToString(timestamp_t t)
 timestamp_t Timestamp::stringToTimestamp(string t)
 {
     int secs, usecs;
-    if (sscanf(t.c_str(), "<time %i %i>", &secs, &usecs) != 2)
-        return 0;
+    if (sscanf(t.c_str(), "<time %i %i>", &secs, &usecs) != 2) return 0;
     const timestamp_t second = 1000000;
     return timestamp_t(secs * second) + usecs;
 }
@@ -38,7 +37,7 @@ void Timestamp::timestampToBytes(timestamp_t time, char* buffer)
 timestamp_t Timestamp::bytesToTimestamp(char* buffer)
 {
     timestamp_t time;
-    char*       t = (char*)&time;
+    char* t = (char*)&time;
     if (__BYTE_ORDER == __BIG_ENDIAN)
         for (int i = 0; i < 8; i++) t[i] = buffer[i];
     else
