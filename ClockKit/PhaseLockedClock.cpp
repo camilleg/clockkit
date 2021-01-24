@@ -187,4 +187,4 @@ void PhaseLockedClock::setClock()
     leaveMutex();
 }
 
-}
+}  // namespace dex

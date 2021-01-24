@@ -23,4 +23,4 @@ ClockException::ClockException(string message)
 {
 }
 
-}
+}  // namespace dex

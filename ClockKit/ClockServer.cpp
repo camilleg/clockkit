@@ -6,7 +6,7 @@
 
 namespace dex {
 
-const timestamp_t ClockServer::SYSTEM_STATE_PURGE_TIME = 5000000; // 5 seconds
+const timestamp_t ClockServer::SYSTEM_STATE_PURGE_TIME = 5000000;  // 5 seconds
 
 ClockServer::ClockServer(InetAddress addr, tpport_t port, Clock& clock)
     : addr_(addr)
@@ -63,32 +63,31 @@ void ClockServer::updateEntry(string addr, int offset, int rtt)
     ackData_[addr].time = now;
     ackData_[addr].offset = offset;
     ackData_[addr].rtt = rtt;
-    if (!log_)
-        return;
+    if (!log_) return;
 
     cout << nowStr << '\t' << addr << '\t' << offset << '\t' << rtt << endl;
     if ((now - lastUpdate_) > 1000000) {
-	lastUpdate_ = now;
-	map<string, Entry>::iterator it;
+        lastUpdate_ = now;
+        map<string, Entry>::iterator it;
 
-	// Purge old entries.
-	for (it = ackData_.begin(); it != ackData_.end();) {
-	    timestamp_t entryTime = (it->second).time;
-	    if (now - entryTime > SYSTEM_STATE_PURGE_TIME) {
-		it = ackData_.erase(it);
-	    }
-	    else {
-		++it;
-	    }
-	}
+        // Purge old entries.
+        for (it = ackData_.begin(); it != ackData_.end();) {
+            timestamp_t entryTime = (it->second).time;
+            if (now - entryTime > SYSTEM_STATE_PURGE_TIME) {
+                it = ackData_.erase(it);
+            }
+            else {
+                ++it;
+            }
+        }
 
-	// Calculate maximum offset.
-	int maxOffset = 0;
-	for (it = ackData_.begin(); it != ackData_.end(); it++) {
-	    int offset = abs((it->second).offset) + ((it->second).rtt / 2);
-	    if (offset > maxOffset) maxOffset = offset;
-	}
-	cout << nowStr << '\t' << "MAX_OFFSET" << '\t' << maxOffset << '\t' << endl;
+        // Calculate maximum offset.
+        int maxOffset = 0;
+        for (it = ackData_.begin(); it != ackData_.end(); it++) {
+            int offset = abs((it->second).offset) + ((it->second).rtt / 2);
+            if (offset > maxOffset) maxOffset = offset;
+        }
+        cout << nowStr << '\t' << "MAX_OFFSET" << '\t' << maxOffset << '\t' << endl;
     }
 }
 

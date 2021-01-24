@@ -47,4 +47,4 @@ timestamp_t SystemClock::getValue()
     return time;
 }
 
-}
+}  // namespace dex

@@ -114,4 +114,4 @@ void ClockPacket::print()
          << "clientReceiveTime: " << Timestamp::timestampToString(clientReceiveTime_) << endl;
 }
 
-}
+}  // namespace dex

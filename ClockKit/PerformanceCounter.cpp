@@ -25,4 +25,4 @@ timestamp_t PerformanceCounter::getValue()
     if (!QueryPerformanceCounter(&qpc)) throw ClockException("Error getting performance counter");
     return (timestamp_t)(((double)qpc.QuadPart) * freqConversion_);
 }
-}
+}  // namespace dex

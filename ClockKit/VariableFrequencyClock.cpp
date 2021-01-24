@@ -49,4 +49,4 @@ void VariableFrequencyClock::updateMarkers()
     slaveMarker_ += slaveTicks;
 }
 
-}
+}  // namespace dex

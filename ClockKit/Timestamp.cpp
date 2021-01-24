@@ -45,4 +45,4 @@ timestamp_t Timestamp::bytesToTimestamp(char* buffer)
     return time;
 }
 
-}
+}  // namespace dex
