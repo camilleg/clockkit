@@ -10,7 +10,7 @@ using namespace dex;
 
 int main(int argc, char* argv[])
 {
-    if (argc > 2)
+       if (argc > 2)
     {
         cerr << "usage: " << argv[0] << " [config_file]" << endl;
         return 1;

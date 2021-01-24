@@ -21,7 +21,7 @@ public:
 	VariableFrequencyClock(Clock& master);
 	
 	/**
-     * Returns the clock value.
+              * Returns the clock value.
 	 * Throws a ClockError if time is detected to have moved backwards.
 	 * This is usefull for slaving a variable frequency clock to a counter
 	 * that may loop.  In the case of an error, the client should reset the

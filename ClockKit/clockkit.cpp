@@ -10,7 +10,7 @@ std::string ckTimeString;
 
 void ckInitialize()
 {
-    if (ckClock != NULL) return;
+       if (ckClock != NULL) return;
     ckClock = dex::PhaseLockedClockFromConfigFile(dex::DEFAULT_CONFIG_FILE_PATH);
 }
 

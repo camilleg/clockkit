@@ -14,7 +14,7 @@ namespace dex {
 class HighResolutionClock
 {
 public:
-    static Clock& instance()
+       static Clock& instance()
     {
         #ifdef WIN32
             return PerformanceCounter::instance();

@@ -22,7 +22,7 @@ namespace dex {
 class ClockServer : public Thread
 {
 private:
-    InetAddress addr_;
+       InetAddress addr_;
     tpport_t port_;
     Clock& clock_;
     

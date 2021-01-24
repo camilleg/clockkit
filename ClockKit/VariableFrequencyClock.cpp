@@ -6,7 +6,7 @@ namespace dex {
 VariableFrequencyClock::VariableFrequencyClock(Clock& master)
 	:masterClock_(master)
 {
-	masterFrequency_ = 1000000; // master clock assumed to run at usec ticks
+   	masterFrequency_ = 1000000; // master clock assumed to run at usec ticks
 	slaveFrequency_ = 1000000;
 	masterMarker_ = masterClock_.getValue();
 	slaveMarker_ = 0;	

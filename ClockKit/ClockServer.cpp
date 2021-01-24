@@ -9,7 +9,7 @@ namespace dex {
 const timestamp_t ClockServer::SYSTEM_STATE_PURGE_TIME = 5000000; // 5 seconds
 
 ClockServer::ClockServer(InetAddress addr, tpport_t port, Clock& clock)
-    : addr_(addr), port_(port), clock_(clock), log_(false)
+       : addr_(addr), port_(port), clock_(clock), log_(false)
 {
     lastUpdate_ = clock_.getValue();
 }

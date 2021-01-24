@@ -18,7 +18,7 @@ SystemClock& SystemClock::instance()
 
 timestamp_t SystemClock::getValue()
 {
-    timestamp_t time;
+       timestamp_t time;
     enterMutex();
 
 #ifdef WIN32

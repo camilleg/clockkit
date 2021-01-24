@@ -12,7 +12,7 @@ namespace dex {
 class Timestamp
 {
 public:
-    // Converts a timestamp to a string.
+       // Converts a timestamp to a string.
     static string timestampToString(timestamp_t t);
     
     // Converts a string to a timestamp. 

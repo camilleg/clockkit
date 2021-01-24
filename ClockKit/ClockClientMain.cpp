@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
     {
         cout << "usage clockClient <server address> <port>" << endl;
         return 0;
-    }
+       }
 
     InetHostAddress addr(argv[1]);
     int port = atoi(argv[2]);

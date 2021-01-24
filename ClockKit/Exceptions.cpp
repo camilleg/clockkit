@@ -5,7 +5,7 @@ namespace dex {
 
 Exception::Exception(string message): message_(message)
 {
-	cout << "EXCEPTION: " << message << endl;
+   cout << "EXCEPTION: " << message << endl;
 }
 
 Exception::~Exception() {}

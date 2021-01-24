@@ -8,7 +8,7 @@ using namespace ost;
 namespace dex {
 
 PhaseLockedClock::PhaseLockedClock(Clock& primary, Clock& reference)
-    : Thread(2), // high priority thread
+       : Thread(2), // high priority thread
       primaryClock_(primary),
       referenceClock_(reference),
       variableFrequencyClock_(primary),

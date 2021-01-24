@@ -5,7 +5,7 @@
 namespace dex {
 
 ClockPacket::ClockPacket()
-    : type_(INVALID),
+       : type_(INVALID),
       sequenceNumber_(0),
       clientRequestTime_(0),
       serverReplyTime_(0),

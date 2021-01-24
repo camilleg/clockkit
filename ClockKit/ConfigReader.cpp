@@ -13,7 +13,7 @@
 namespace dex {
 
 #ifdef WIN32
-    const string DEFAULT_CONFIG_FILE_PATH = "C:\\clockkit.conf";
+       const string DEFAULT_CONFIG_FILE_PATH = "C:\\clockkit.conf";
 #else
     const string DEFAULT_CONFIG_FILE_PATH = "/etc/clockkit.conf";
 #endif

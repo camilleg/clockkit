@@ -14,7 +14,7 @@ public:
 	 * NOTE: For ClockClient this call may take some time.
 	 * The return value measures the time when the function returns, 
 	 * not when it was called.
-     *
+        *
      * Most clocks tick all the time, However, some clocks such as the Win2k/XP
      * system clock tick at a slow rate. 
 	 */

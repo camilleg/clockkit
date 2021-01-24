@@ -11,7 +11,7 @@ namespace dex {
 class Exception
 {
 protected:
-  string message_;
+     string message_;
 public:
   Exception(string message);
   virtual ~Exception();

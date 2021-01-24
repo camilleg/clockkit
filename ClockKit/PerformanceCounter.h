@@ -7,7 +7,7 @@ namespace dex {
   // It may wrap around.  It's not necessarly monotonic.
   class PerformanceCounter: public Clock {
   public:
-    // Thread-safe singleton.
+       // Thread-safe singleton.
     static PerformanceCounter& instance();
     // System clock, in microseconds since UNIX epoch.
     virtual timestamp_t getValue();

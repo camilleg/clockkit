@@ -8,7 +8,7 @@ ClockClient::ClockClient(InetHostAddress addr, int port)
     :timeout_(1000), sequence_(0), lastRTT_(0), acknowledge_(false)
 {
     // Open a UDP socket on a local port, starting at 5000.
-    InetAddress localhost("0.0.0.0"); // any
+       InetAddress localhost("0.0.0.0"); // any
     int localPort = 5000;
     bool bound = false;
     while(!bound)

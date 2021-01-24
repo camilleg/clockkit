@@ -29,7 +29,7 @@ namespace dex {
 class ClockClient : public Clock
 {
 public:
-    
+       
     /**
      * Creates a client bound to localhost and an open port.
      * - The bind port is chosen by starting at 5000 and moving up.

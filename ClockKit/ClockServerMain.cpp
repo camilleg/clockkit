@@ -10,7 +10,7 @@ using namespace dex;
 
 int main(int argc, char* argv[])
 {
-    if (argc != 2)
+       if (argc != 2)
     {
         cout << "usage: clockServer <port>" << endl;
         return 0;

@@ -19,7 +19,7 @@ public:
 	 * @return the system clock as a timestamp value
 	 *         in microseconds since UNIX epoch.
 	 */
-    timestamp_t getValue();
+       timestamp_t getValue();
 	
 private:
     /**

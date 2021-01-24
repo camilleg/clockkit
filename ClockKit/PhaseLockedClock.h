@@ -22,7 +22,7 @@ namespace dex {
 class PhaseLockedClock : public Clock, private Thread, private Mutex
 {
 public:
-    
+       
     /**
      * Creates a PhaseLockedClock around the provided primary and 
      * reference clocks.  The update panic is initially set at 

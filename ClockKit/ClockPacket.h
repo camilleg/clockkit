@@ -10,7 +10,7 @@ namespace dex {
 class ClockPacket
 {
 public:
-    /**
+       /**
      * - INVALID: Used to detect uninitialized packets.
      * - REQUEST: Client sends packet to server requesting current time.
      * - REPLY: Server sends client the current time.
