@@ -5,7 +5,6 @@
 #include <string>
 #include "Clock.h"
 
-using namespace std;
 using namespace ost;
 
 namespace dex {
@@ -31,7 +30,7 @@ class ClockServer : public Thread {
         int rtt;
     };
 
-    map<string, Entry> ackData_;
+    std::map<std::string, Entry> ackData_;
     bool log_;
 
     static const timestamp_t SYSTEM_STATE_PURGE_TIME;
@@ -55,7 +54,7 @@ class ClockServer : public Thread {
      */
     void run();
 
-    void updateEntry(string addr, int offset, int rtt);
+    void updateEntry(std::string addr, int offset, int rtt);
 };
 
 }  // namespace dex

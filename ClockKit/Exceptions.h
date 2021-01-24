@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 
-using namespace std;
 namespace dex {
 
 /**
@@ -10,12 +9,12 @@ namespace dex {
  */
 class Exception {
    protected:
-    string message_;
+     std::string message_;
 
    public:
-    Exception(string message);
+    Exception(std::string message);
     virtual ~Exception();
-    virtual string getMessage();
+    virtual std::string getMessage();
 };
 
 /**
@@ -26,7 +25,7 @@ class Exception {
  */
 class ClockException : public Exception {
    public:
-    ClockException(string message);
+    ClockException(std::string message);
 };
 
 }  // namespace dex

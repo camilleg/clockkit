@@ -2,6 +2,8 @@
 #include "Exceptions.h"
 #include "HighResolutionClock.h"
 
+using namespace std;
+
 namespace dex {
 
 ClockClient::ClockClient(InetHostAddress addr, int port)

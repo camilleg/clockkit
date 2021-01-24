@@ -4,6 +4,8 @@
 #include "ClockPacket.h"
 #include "HighResolutionClock.h"
 
+using namespace std;
+
 namespace dex {
 
 const timestamp_t ClockServer::SYSTEM_STATE_PURGE_TIME = 5000000;  // 5 seconds

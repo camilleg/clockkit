@@ -4,7 +4,6 @@
 #include "ClockPacket.h"
 #include "Common.h"
 
-using namespace std;
 using namespace ost;
 
 namespace dex {

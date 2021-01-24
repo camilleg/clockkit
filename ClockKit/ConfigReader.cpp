@@ -10,6 +10,8 @@
 #include <fstream>
 #include <iostream>
 
+using namespace std;
+
 namespace dex {
 
 #ifdef WIN32

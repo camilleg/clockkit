@@ -3,6 +3,6 @@
 #include "PhaseLockedClock.h"
 
 namespace dex {
-extern const string DEFAULT_CONFIG_FILE_PATH;
-extern PhaseLockedClock* PhaseLockedClockFromConfigFile(string filename);
+extern const std::string DEFAULT_CONFIG_FILE_PATH;
+extern PhaseLockedClock* PhaseLockedClockFromConfigFile(std::string filename);
 }  // namespace dex
