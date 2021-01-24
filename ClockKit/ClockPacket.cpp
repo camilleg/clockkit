@@ -108,10 +108,12 @@ timestamp_t ClockPacket::getErrorBound()
 
 void ClockPacket::print()
 {
-  std::cout << "--- PACKET ---" << std::endl
-         << "clientRequestTime: " << Timestamp::timestampToString(clientRequestTime_) << std::endl
-         << "serverReplyTime: " << Timestamp::timestampToString(serverReplyTime_) << std::endl
-         << "clientReceiveTime: " << Timestamp::timestampToString(clientReceiveTime_) << std::endl;
+    std::cout << "--- PACKET ---" << std::endl
+              << "clientRequestTime: " << Timestamp::timestampToString(clientRequestTime_)
+              << std::endl
+              << "serverReplyTime: " << Timestamp::timestampToString(serverReplyTime_) << std::endl
+              << "clientReceiveTime: " << Timestamp::timestampToString(clientReceiveTime_)
+              << std::endl;
 }
 
 }  // namespace dex

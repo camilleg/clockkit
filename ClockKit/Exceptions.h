@@ -9,7 +9,7 @@ namespace dex {
  */
 class Exception {
    protected:
-     std::string message_;
+    std::string message_;
 
    public:
     Exception(std::string message);
