@@ -1,4 +1,4 @@
- #include "ClockClient.h"
+#include "ClockClient.h"
 #include "Exceptions.h"
 #include "HighResolutionClock.h"
 
@@ -50,7 +50,8 @@ void ClockClient::sendPacket(ClockPacket& packet)
     char buffer[length];
     packet.write(buffer);
     int bytesSent = socket_->send(buffer, length);
-    if (bytesSent != length) throw ClockException("could not send packet");
+    if (bytesSent != length)
+        throw ClockException("could not send packet");
 }
 
 ClockPacket ClockClient::receivePacket(Clock& clock)
@@ -58,14 +59,17 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
     const int length = ClockPacket::PACKET_LENGTH;
     char buffer[length];
     int timeoutMsec = timeout_ / 1000;
-    if (timeoutMsec < 1) timeoutMsec = 1;
+    if (timeoutMsec < 1)
+        timeoutMsec = 1;
 
     while (true) {
         bool packetArrived = socket_->isPending(Socket::pendingInput, timeoutMsec);
-        if (!packetArrived) throw ClockException("timeout");
+        if (!packetArrived)
+            throw ClockException("timeout");
 
         int bytesReceived = socket_->receive(buffer, length);
-        if (bytesReceived != length) throw ClockException("received packet of wrong length");
+        if (bytesReceived != length)
+            throw ClockException("received packet of wrong length");
 
         ClockPacket packet(buffer);
         packet.setClientReceiveTime(clock.getValue());

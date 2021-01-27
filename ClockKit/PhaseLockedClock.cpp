@@ -1,4 +1,4 @@
- #include "PhaseLockedClock.h"
+#include "PhaseLockedClock.h"
 #include <cstdlib>
 #include <iostream>
 #include "Exceptions.h"
@@ -30,7 +30,8 @@ PhaseLockedClock::~PhaseLockedClock()
 
 timestamp_t PhaseLockedClock::getValue()
 {
-    if (!inSync_) throw ClockException("PhaseLockedClock not in sync");
+    if (!inSync_)
+        throw ClockException("PhaseLockedClock not in sync");
     try {
         enterMutex();
         timestamp_t time = variableFrequencyClock_.getValue();
@@ -52,7 +53,8 @@ bool PhaseLockedClock::isSynchronized()
 
 int PhaseLockedClock::getOffset()
 {
-    if (!inSync_) throw ClockException("PhaseLockedClock not in sync");
+    if (!inSync_)
+        throw ClockException("PhaseLockedClock not in sync");
     enterMutex();
     int offset = (int)thisPhase_;
     leaveMutex();
@@ -95,7 +97,8 @@ void PhaseLockedClock::update()
         // cout << "CLOCK OUT OF SYNC" << endl;
         setClock();
         if (inSync_) {
-            if (updatePhase()) lastUpdate_ = primaryClock_.getValue();
+            if (updatePhase())
+                lastUpdate_ = primaryClock_.getValue();
         }
         return;
     }

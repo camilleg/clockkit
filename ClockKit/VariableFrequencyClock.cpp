@@ -1,4 +1,4 @@
- #include "VariableFrequencyClock.h"
+#include "VariableFrequencyClock.h"
 #include "Exceptions.h"
 
 namespace dex {
@@ -16,7 +16,8 @@ timestamp_t VariableFrequencyClock::getValue()
 {
     timestamp_t master = masterClock_.getValue();
     timestamp_t masterTicks = master - masterMarker_;
-    if (masterTicks < 0) throw ClockException("Clock Rollover Detected");
+    if (masterTicks < 0)
+        throw ClockException("Clock Rollover Detected");
     timestamp_t slaveTicks = (masterTicks * slaveFrequency_) / masterFrequency_;
     return slaveMarker_ + slaveTicks;
 }
@@ -35,7 +36,8 @@ int VariableFrequencyClock::getFrequency()
 void VariableFrequencyClock::setFrequency(int freq)
 {
     updateMarkers();
-    if (freq <= 0) throw ClockException("frequency set to negative rate");
+    if (freq <= 0)
+        throw ClockException("frequency set to negative rate");
     slaveFrequency_ = (timestamp_t)freq;
 }
 
@@ -43,7 +45,8 @@ void VariableFrequencyClock::updateMarkers()
 {
     timestamp_t master = masterClock_.getValue();
     timestamp_t masterTicks = master - masterMarker_;
-    if (masterTicks < 0) throw ClockException("Clock Rollover Detected");
+    if (masterTicks < 0)
+        throw ClockException("Clock Rollover Detected");
     timestamp_t slaveTicks = (masterTicks * slaveFrequency_) / masterFrequency_;
     masterMarker_ = master;
     slaveMarker_ += slaveTicks;

@@ -1,4 +1,4 @@
- #include "ConfigReader.h"
+#include "ConfigReader.h"
 
 #include "ClockClient.h"
 #include "Common.h"
@@ -23,7 +23,8 @@ const string DEFAULT_CONFIG_FILE_PATH = "/etc/clockkit.conf";
 PhaseLockedClock* PhaseLockedClockFromConfigFile(string filename)
 {
     ifstream file(filename.c_str());
-    if (!file.is_open()) throw Exception("failed to open config file " + filename);
+    if (!file.is_open())
+        throw Exception("failed to open config file " + filename);
 
     string server = "localhost";
     int port = 4444;
@@ -34,7 +35,8 @@ PhaseLockedClock* PhaseLockedClockFromConfigFile(string filename)
         string line;
         file >> line;
         int pos = line.find(":");
-        if (pos < 0) break;
+        if (pos < 0)
+            break;
         string name = line.substr(0, pos);
         string value = line.substr(pos + 1);
 

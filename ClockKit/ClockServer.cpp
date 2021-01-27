@@ -1,4 +1,4 @@
- #include "ClockServer.h"
+#include "ClockServer.h"
 #include <cmath>
 #include <iostream>
 #include "ClockPacket.h"
@@ -22,7 +22,8 @@ ClockServer::ClockServer(InetAddress addr, tpport_t port, Clock& clock)
 void ClockServer::run()
 {
     UDPSocket socket(addr_, port_);
-    if (log_) cout << "time\thost\toffset\trtt" << endl;
+    if (log_)
+        cout << "time\thost\toffset\trtt" << endl;
     const int length = ClockPacket::PACKET_LENGTH;
     char buffer[length];
     ClockPacket packet;
@@ -65,7 +66,8 @@ void ClockServer::updateEntry(string addr, int offset, int rtt)
     ackData_[addr].time = now;
     ackData_[addr].offset = offset;
     ackData_[addr].rtt = rtt;
-    if (!log_) return;
+    if (!log_)
+        return;
 
     cout << nowStr << '\t' << addr << '\t' << offset << '\t' << rtt << endl;
     if ((now - lastUpdate_) > 1000000) {
@@ -87,7 +89,8 @@ void ClockServer::updateEntry(string addr, int offset, int rtt)
         int maxOffset = 0;
         for (it = ackData_.begin(); it != ackData_.end(); it++) {
             int offset = abs((it->second).offset) + ((it->second).rtt / 2);
-            if (offset > maxOffset) maxOffset = offset;
+            if (offset > maxOffset)
+                maxOffset = offset;
         }
         cout << nowStr << '\t' << "MAX_OFFSET" << '\t' << maxOffset << '\t' << endl;
     }

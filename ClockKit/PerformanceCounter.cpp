@@ -1,4 +1,4 @@
- #include "PerformanceCounter.h"
+#include "PerformanceCounter.h"
 #include <windows.h>
 #include "Exceptions.h"
 
@@ -22,7 +22,8 @@ PerformanceCounter& PerformanceCounter::instance()
 timestamp_t PerformanceCounter::getValue()
 {
     LARGE_INTEGER qpc;
-    if (!QueryPerformanceCounter(&qpc)) throw ClockException("Error getting performance counter");
+    if (!QueryPerformanceCounter(&qpc))
+        throw ClockException("Error getting performance counter");
     return (timestamp_t)(((double)qpc.QuadPart) * freqConversion_);
 }
 }  // namespace dex
