@@ -19,6 +19,9 @@ OBJECTS = \
 
 all: $(OBJECTS) ckserver ckphaselock tcl ruby python
 
+test: ckserver ckphaselock
+	./testcase.sh
+
 # To test, run "./ckserver 4444" in one window, and in other windows run
 # ckphaselock, ckphaselock.py, ckphaselock.rb, or ckphaselock.tcl.
 
