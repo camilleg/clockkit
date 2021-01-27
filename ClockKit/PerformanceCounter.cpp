@@ -1,4 +1,4 @@
-#include "PerformanceCounter.h"
+ #include "PerformanceCounter.h"
 #include <windows.h>
 #include "Exceptions.h"
 
