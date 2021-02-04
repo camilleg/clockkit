@@ -6,7 +6,7 @@
 #include "PhaseLockedClock.h"
 
 dex::PhaseLockedClock* ckClock = NULL;
-std::string ckTimeString;
+std::string ckTimeString; // Static storage for the pointer returned by ckTimeAsString().
 
 void ckInitialize()
 {

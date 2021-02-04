@@ -1,6 +1,6 @@
 #!/usr/bin/env tclsh
 load ./clockkit.so clockkit
-ckInitialize;
+ckInitialize
 
 while { 1 } {
   if { [ckInSync] } {

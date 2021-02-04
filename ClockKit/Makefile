@@ -1,4 +1,5 @@
 CPP = c++
+# -fPIC is for */*.so.
 CFLAGS = -O3 -fPIC
 LIBS = -lccgnu2 -lpthread -ldl
 SWIG = swig -Wallkw -Werror
