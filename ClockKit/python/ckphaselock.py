@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import time
 import _clockkit
-_clockkit.ckInitialize
+_clockkit.ckInitializeFromConfig('../clockkit.conf')
 while 1:
     if _clockkit.ckInSync():
         print("offset:", _clockkit.ckOffset(), "\ntime:", _clockkit.ckTimeAsString())

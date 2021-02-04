@@ -11,7 +11,7 @@ trap "rm -f $srv $cli" 0 2 3 15
 
 killall -q -w ckserver ckphaselock
 ./ckserver 4444 > $srv &
-./ckphaselock > $cli &
+./ckphaselock clockkit.conf > $cli &
 sleep 3
 killall -w ckserver ckphaselock
 a=$(tail -4 $srv | grep -c -P '<time \d+ \d+>\s')

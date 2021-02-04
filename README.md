@@ -39,15 +39,12 @@ Camille Goudeseune and Braden Kowitz.  2004.  "Synchronous data collection from 
 
 ### To install on Ubuntu 18:
 `sudo apt install libcommoncpp2-dev swig tcl8.6-dev libpython3.8-dev ruby ruby2.5-dev`  
-`cd ClockKit && make -k`
-### To run a test (on localhost):
-`sudo cp clockkit.conf /etc/clockkit.conf`  
-`cd ClockKit`  
-`./ckserver 4444`  
-In another window, `./ckphaselock` or `./ckphaselock.rb`
+`cd ClockKit && make`
+### To run a test on localhost:
+`cd ClockKit && make test-all`
 ### To plot the accuracy of a simulated run:
 `sudo apt install gnuplot`  
 `cd simulation && make`
-### To generate documentation of the source code:
+### To document the source code:
 `sudo apt install doxygen`  
 `cd ClockKit && make docs`
