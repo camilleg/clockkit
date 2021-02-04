@@ -6,7 +6,6 @@
 #include "PhaseLockedClock.h"
 
 dex::PhaseLockedClock* ckClock = NULL;
-std::string ckTimeString;
 
 void ckInitialize()
 {
@@ -41,12 +40,11 @@ const char* ckTimeAsString()
     if (ckClock == NULL)
         ckInitialize();
     try {
-        ckTimeString = dex::Timestamp::timestampToString(ckClock->getValue());
+        return dex::Timestamp::timestampToString(ckClock->getValue()).c_str();
     }
     catch (dex::ClockException e) {
-        ckTimeString = "";
+        return "";
     }
-    return ckTimeString.c_str();
 }
 
 bool ckInSync()
