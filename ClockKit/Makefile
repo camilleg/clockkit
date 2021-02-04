@@ -1,8 +1,7 @@
 CPP = c++
-INCLUDE = -I/usr/include/python3.8
-LIBDIR = 
+CFLAGS = -O3 -fPIC
 LIBS = -lccgnu2 -lpthread -ldl
-CFLAGS = -O -fPIC
+SWIG = swig -Wallkw -Werror
 
 OBJECTS = \
   Clock.o \
@@ -17,59 +16,62 @@ OBJECTS = \
   VariableFrequencyClock.o \
   clockkit.o
 
-all: $(OBJECTS) ckserver ckphaselock tcl ruby python
+EXES = \
+  ckserver \
+  ckphaselock \
+  python/_clockkit.so \
+  ruby/clockkit.so \
+  tcl/clockkit.so
+
+all: $(EXES)
+
+test-all: test test-tcl test-python test-ruby
 
 test: ckserver ckphaselock
 	./testcase.sh
+test-python: ckserver python/_clockkit.so
+	cd python && ./testcase.sh
+test-ruby: ckserver ruby/clockkit.so
+	cd ruby && ./testcase.sh
+test-tcl: ckserver tcl/clockkit.so
+	cd tcl && ./testcase.sh
 
-# To test, run "./ckserver 4444" in one window, and in other windows run
-# ckphaselock, ckphaselock.py, ckphaselock.rb, or ckphaselock.tcl.
-
-tcl: clockkit_tcl.so
-python: _clockkit.so
-ruby: clockkit.so
-
-ckserver: ClockServerMain.o $(OBJECTS)
+ckserver: ClockServerMain.cpp $(OBJECTS)
 	$(CPP) $(CFLAGS) $^ $(LIBS) -o $@
 
-ckphaselock: PhaseLockMain.o $(OBJECTS)
+ckphaselock: PhaseLockMain.cpp $(OBJECTS)
 	$(CPP) $(CFLAGS) $^ $(LIBS) -o $@
 
-# Your <tcl.h> may be in a different directory than this -I.
-clockkit_tcl_wrap.c:
-	swig -tcl -o $@ clockkit.h > $@
-clockkit_tcl_wrap.o: clockkit_tcl_wrap.c
-	$(CPP) -c $(CFLAGS) $(INCLUDE) -I/usr/include/tcl8.6 $?
-clockkit_tcl.so: clockkit_tcl_wrap.o $(OBJECTS)
+# <python.h>, <ruby.h>, and <tcl.h> might be in different directories than these -I's.
+
+python/wrap.c:
+	$(SWIG) -python -o $@ clockkit.h
+python/wrap.o: python/wrap.c
+	$(CPP) -c $(CFLAGS) -I. -I/usr/include/python3.8 $? -o $@
+python/_clockkit.so: python/wrap.o $(OBJECTS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
-# Prepend the cast (VALUE (*)(...)) to _wrap* in lines starting with rb_define_module_function.
-# Name the target clockkit.so, not clockkit_ruby.so,
-# because Ruby needs foo.so to have the same name as the module Foo.
-# Your <ruby.h> may be in a different directory than this -I.
-clockkit_ruby_wrap.c:
-	swig -ruby -o /tmp/clockkit.tmp clockkit.h
-	sed -e "s/ _wrap_ck/ (VALUE (*)(...))_wrap_ck/" /tmp/clockkit.tmp > $@
-	rm /tmp/clockkit.tmp
-clockkit_ruby_wrap.o: clockkit_ruby_wrap.c
-	$(CPP) -c $(CFLAGS) $(INCLUDE) -I/usr/include/ruby-2.5.0 -I/usr/include/x86_64-linux-gnu/ruby-2.5.0 $?
-clockkit.so: clockkit_ruby_wrap.o $(OBJECTS)
-	$(CPP) $(CFLAGS) -shared clockkit_ruby_wrap.o $(OBJECTS) $(LIBS) -o $@
+# In lines starting with rb_define_module_function, cast _wrap_ck's to (VALUE (*)(...)).
+ruby/wrap.c:
+	$(SWIG) -ruby -o $@ clockkit.h
+	sed -i -e "s/ _wrap_ck/ (VALUE (*)(...))_wrap_ck/" $@
+ruby/wrap.o: ruby/wrap.c
+	$(CPP) -c $(CFLAGS) -I. -I/usr/include/ruby-2.5.0 -I/usr/include/x86_64-linux-gnu/ruby-2.5.0 $? -o $@
+ruby/clockkit.so: ruby/wrap.o $(OBJECTS)
+	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
-# Bug: if Ruby's clockkit.so was built, ckphaselock.py uses it instead of _clockkit.so.
-# Bug: implicit relative imports stopped working in Python 3.  It's broken.
-clockkit_python_wrap.c:
-	swig -python -o $@ clockkit.h
-clockkit_python_wrap.o: clockkit_python_wrap.c
-	$(CPP) -c $(CFLAGS) $(INCLUDE) -I/usr/include/python3.8 $?
-_clockkit.so: clockkit_python_wrap.o $(OBJECTS)
+tcl/wrap.c:
+	$(SWIG) -tcl -o $@ clockkit.h
+tcl/wrap.o: tcl/wrap.c
+	$(CPP) -c $(CFLAGS) -I. -I/usr/include/tcl8.6 $? -o $@
+tcl/clockkit.so: tcl/wrap.o $(OBJECTS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
 docs:
 	doxygen doxygen.conf
 
 clean:
-	rm -rf *.o ckserver ckphaselock docs doxygen.warn *.pyc clockkit_*_wrap.c *clockkit*.so clockkit.py
+	rm -rf $(OBJECTS) $(EXES) docs doxygen.warn */wrap.c */wrap.o python/clockkit.py
 
 .cpp.o:
 	$(CPP) -c $(CFLAGS) $(INCLUDE) $< 

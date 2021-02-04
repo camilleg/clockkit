@@ -1,14 +1,12 @@
-#!/usr/bin/tclsh
-
-load ./clockkit_tcl.so clockkit
-
+#!/usr/bin/env tclsh
+load ./clockkit.so clockkit
 ckInitialize;
 
 while { 1 } {
   if { [ckInSync] } {
     set offset [ckOffset]
     set timestamp [ckTimeAsString]
-    puts "offset=$offset timestamp=$timestamp"
+    puts "offset: $offset\ntime: $timestamp"
   } else {
     puts "offset: OUT OF SYNC"
   }
