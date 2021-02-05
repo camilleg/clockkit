@@ -40,6 +40,10 @@ Camille Goudeseune and Braden Kowitz.  2004.  "Synchronous data collection from 
 ### To install on Ubuntu 18:
 `sudo apt install libcommoncpp2-dev swig tcl8.6-dev libpython3.8-dev ruby ruby2.5-dev`  
 `cd ClockKit && make`
+### To install on Windows 10:
+Install [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10), using the [Ubuntu 18](https://www.microsoft.com/store/apps/9N9TNGVNDL3Q) distro.  
+`sudo apt install make g++ tcl`  
+Proceed as with Ubuntu 18.
 ### To run a test on localhost:
 `cd ClockKit && make test-all`
 ### To plot the accuracy of a simulated run:
