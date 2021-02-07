@@ -37,7 +37,7 @@ To cite this work, use:
 Camille Goudeseune and Braden Kowitz.  2004.  "Synchronous data collection from diverse hardware."  
 *Driving Simulation Conference - Europe (Conférence Simulation de Conduite)*, pp. 245-252. 
 
-### To install on Ubuntu 18:
+### To install on Ubuntu 18 or Raspberry Pi 3 (Debian):
 `sudo apt install libcommoncpp2-dev swig tcl8.6-dev libpython3.8-dev ruby ruby2.5-dev`  
 `cd ClockKit && make`
 ### To install on Windows 10:
