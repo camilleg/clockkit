@@ -1,17 +1,19 @@
 #include "PerformanceCounter.h"
 #include <windows.h>
-#include "Exceptions.h"
 
 namespace dex {
-using namespace std;
 PerformanceCounter PerformanceCounter::instance_;
+
+// QueryPerformanceFrequency and QueryPerformanceCounter *could* fail
+// only on Windows 2000, which doesn't matter anymore.
+// If they fail, we set freqConversion_ negative,
+// and getValue() always returns zero.
 
 PerformanceCounter::PerformanceCounter()
 {
     LARGE_INTEGER rate;
-    if (!QueryPerformanceFrequency(&rate))
-        throw ClockException("Error getting performance counter frequency");
-    freqConversion_ = 1000000.0 / (double)rate.QuadPart;
+    freqConversion_ = QueryPerformanceFrequency(&rate) ?
+        1000000.0 / rate.QuadPart : -1.0;
 }
 
 PerformanceCounter& PerformanceCounter::instance()
@@ -21,9 +23,11 @@ PerformanceCounter& PerformanceCounter::instance()
 
 timestamp_t PerformanceCounter::getValue()
 {
+    if (freqConversion_ < 0.0)
+        return 0;
+
     LARGE_INTEGER qpc;
-    if (!QueryPerformanceCounter(&qpc))
-        throw ClockException("Error getting performance counter");
-    return (timestamp_t)(((double)qpc.QuadPart) * freqConversion_);
+    (void)QueryPerformanceCounter(&qpc);
+    return qpc.QuadPart * freqConversion_;
 }
 }  // namespace dex

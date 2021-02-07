@@ -2,7 +2,7 @@
 #include "Clock.h"
 
 namespace dex {
-// This Windows-only class represents the CPU's high resolution timer,
+// This Windows-only class represents a high resolution timer,
 // adjusted to tick at 1000000 Hz.
 // It may wrap around.  It's not necessarly monotonic.
 class PerformanceCounter : public Clock {

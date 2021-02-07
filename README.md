@@ -43,7 +43,8 @@ Camille Goudeseune and Braden Kowitz.  2004.  "Synchronous data collection from 
 ### To install on Windows 10:
 Install [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10), using the [Ubuntu 18](https://www.microsoft.com/store/apps/9N9TNGVNDL3Q) distro.  
 `sudo apt install make g++ tcl`  
-Proceed as with Ubuntu 18.
+Proceed as with Ubuntu 18.  
+(Older versions of Windows may return eventually, but no older than XP.)
 ### To run a test on localhost:
 `cd ClockKit && make test-all`
 ### To plot the accuracy of a simulated run:
