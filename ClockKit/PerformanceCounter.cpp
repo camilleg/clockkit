@@ -12,8 +12,7 @@ PerformanceCounter PerformanceCounter::instance_;
 PerformanceCounter::PerformanceCounter()
 {
     LARGE_INTEGER rate;
-    freqConversion_ = QueryPerformanceFrequency(&rate) ?
-        1000000.0 / rate.QuadPart : -1.0;
+    freqConversion_ = QueryPerformanceFrequency(&rate) ? 1000000.0 / rate.QuadPart : -1.0;
 }
 
 PerformanceCounter& PerformanceCounter::instance()
