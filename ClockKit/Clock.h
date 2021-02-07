@@ -20,18 +20,18 @@ class Clock {
     virtual timestamp_t getValue() = 0;
 
     /**
-     * @return The phase (or offset) between the this (primary) clock and
+     * @return The phase (or offset) between this (primary) clock and
      *         the provided (secondary) clock.
      *
      * secondaryClock + phase = primaryClock
      *
      * For clocks like RemoteClock, this measurement will be much more
-     * percise than comparing getValue() on two seperate clocks.
-     *
-     * The default implementation is:
-     * this->getValue() - c.getValue();
+     * precise than comparing getValue() on two seperate clocks.
      */
-    virtual timestamp_t getPhase(Clock& c);
+    virtual timestamp_t getPhase(Clock& c)
+    {
+	return getValue() - c.getValue();
+    }
 };
 
 }  // namespace dex

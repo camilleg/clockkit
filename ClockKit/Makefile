@@ -5,7 +5,6 @@ LIBS = -lccgnu2 -lpthread -ldl
 SWIG = swig -Wallkw -Werror
 
 OBJECTS = \
-  Clock.o \
   ClockClient.o \
   ClockPacket.o \
   ClockServer.o \
