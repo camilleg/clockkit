@@ -53,3 +53,12 @@ Proceed as with Ubuntu 18.
 ### To document the source code:
 `sudo apt install doxygen`  
 `cd ClockKit && make docs`
+
+## Contributing
+The project is currently undergoing significant changes. Contributions of any
+form are welcome nonetheless.
+
+### Coding Style
+- To keep the formatting uniform please use `clang-format` and the
+  project-provided hooks. Run `git config core.hooksPath .git_managed_hooks`
+- New code should follow the [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#c-core-guidelines)
