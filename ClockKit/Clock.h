@@ -30,7 +30,7 @@ class Clock {
      */
     virtual timestamp_t getPhase(Clock& c)
     {
-	return getValue() - c.getValue();
+        return getValue() - c.getValue();
     }
 };
 
