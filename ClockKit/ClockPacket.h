@@ -10,21 +10,20 @@ namespace dex {
 class ClockPacket {
    public:
     /**
-     * - INVALID: Used to detect uninitialized packets.
+     * - INVALID: Detect uninitialized packets.
      * - REQUEST: Client sends packet to server requesting current time.
      * - REPLY: Server sends client the current time.
-     * - ACKNOWLEDGE: Clent sends server the status of it's synchronization.
+     * - ACKNOWLEDGE: Client sends server the status of its synchronization.
      */
-    enum Type { INVALID = 0, REQUEST = 1, REPLY = 2, ACKNOWLEDGE = 3 };
+    enum Type { INVALID = 0, REQUEST, REPLY, ACKNOWLEDGE };
 
     /**
-     * each packet encodes:
+     * Each packet encodes:
      * - type : 1 byte
      * - sequence : 1 bytes
      * - 3 timestamps : 8 bytes each
      * - total : 26 bytes
      */
-    // static const int
     enum { PACKET_LENGTH = 26 };
 
    private:
@@ -57,19 +56,25 @@ class ClockPacket {
     /**
      * Writes this packet out to a buffer of PACKET_LENGTH bytes.
      */
-    void write(char* buffer);
+    void write(char* buffer) const;
 
     /**
      * Gets the type of this packet.
      * @see ClockPacket::Type
      */
-    Type getType();
+    Type getType() const
+    {
+        return type_;
+    }
 
     /**
      * Sets the type of this packet.
      * @see ClockPacket::Type
      */
-    void setType(Type t);
+    void setType(Type t)
+    {
+        type_ = t;
+    }
 
     /**
      * Gets the sequence number of the packet.
@@ -78,7 +83,10 @@ class ClockPacket {
      * between the client and the server. The sequence number allows for
      * detection of delayed responses.
      */
-    unsigned char getSequenceNumber();
+    unsigned char getSequenceNumber() const
+    {
+        return sequenceNumber_;
+    }
 
     /**
      * Sets the sequence number of the packet.
@@ -87,67 +95,76 @@ class ClockPacket {
      * between the client and the server. The sequence number allows for
      * detection of delayed responses.
      */
-    void setSequenceNumber(unsigned char sequenceNumber);
+    void setSequenceNumber(unsigned char n)
+    {
+        sequenceNumber_ = n;
+    }
 
     /**
      * Gets the Client Request Time.
      * This is the time on the client machine when the packet is sent.
      */
-    timestamp_t getClientRequestTime();
+    timestamp_t getClientRequestTime() const
+    {
+        return clientRequestTime_;
+    }
 
     /**
      * Sets the Client Request Time.
      * This is the time on the client machine when the packet is sent.
      */
-    void setClientRequestTime(timestamp_t t);
+    void setClientRequestTime(timestamp_t t)
+    {
+        clientRequestTime_ = t;
+    }
 
     /**
      * Gets the Server Reply Time.
      * This is the time on the server when the REQUEST packet is received.
      */
-    timestamp_t getServerReplyTime();
+    timestamp_t getServerReplyTime() const
+    {
+        return serverReplyTime_;
+    }
 
     /**
      * Sets the Server Reply Time.
      * This is the time on the server when the REQUEST packet is received.
      */
-    void setServerReplyTime(timestamp_t t);
+    void setServerReplyTime(timestamp_t t)
+    {
+        serverReplyTime_ = t;
+    }
 
     /**
      * Gets the Client Receive Time.
      * This is the time on the client when the server REPLY packet is received.
      */
-    timestamp_t getClientReceiveTime();
+    timestamp_t getClientReceiveTime() const
+    {
+        return clientReceiveTime_;
+    }
 
     /**
      * Sets the Client Receive Time.
      * This is the time on the client when the server REPLY packet is received.
      */
-    void setClientReceiveTime(timestamp_t t);
+    void setClientReceiveTime(timestamp_t t)
+    {
+        clientReceiveTime_ = t;
+    }
 
-    /**
-     * Calculates the round trip time for the client-server correspondance.
-     * @return round trip time in microseonds (usec).
-     */
-    timestamp_t getRTT();
+    // Return the round trip time for the client-server correspondence.
+    timestamp_t getRTT() const;
 
-    /**
-     * Calculates the estimated offset between the client and server clocks.
-     * @return estimated clock offset in microseonds (usec).
-     */
-    timestamp_t getClockOffset();
+    // Return the estimated offset between the client and server clocks.
+    timestamp_t getClockOffset() const;
 
-    /**
-     * Gives the error bound on the clock offset calculation.
-     * @return error bound in microseconds (usec).
-     */
-    timestamp_t getErrorBound();
+    // Return the error bound on the clock offset calculation.
+    timestamp_t getErrorBound() const;
 
-    /**
-     * Prints out this packet to STDOUT.
-     * This is primarly meant for debugging.
-     */
-    void print();
+    // Dump this packet to STDOUT, for debugging.
+    void print() const;
 };
 
 }  // namespace dex

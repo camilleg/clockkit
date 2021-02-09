@@ -1,0 +1,88 @@
+git commit -m 'comments, consts, inlines'
+
+Remove all exceptions, because at low level they're not rare errors,
+but expected events: network dropouts, drifting clock crystals.
+Because at high levels, they become the Boundary.
+Low level, just return -1.
+
+Replace enterMutex/leaveMutex with a C++ guard, like in ?timeliner.
+
+swig java, too, like the conference paper says.
+
+Call 'make test' from a github action?
+Two-host test case, between theora WSL and zx81.
+  WSL sees 192.168.1.101, but may need a firewall hole.
+  Run a command over ssh?
+Fancier test cases, as noted in testcase.sh.
+Any way to run a test in faster than realtime?
+  For tests, srv and cli talk faster than 1 Hz, to get data faster.
+
+Don't print to stderr.  If printing anywhere, only to a logfile.
+If the point of clockkit is to not need root, then to a local logfile, not to syslog.
+
+./ckphaselock shouldn't print config to stderr.
+An argv --verbose?
+A different client exe that ONLY prints the config and quits?
+
+Tag another release, when enough more features done.
+Republish on arxiv, with actual nonsimulated measurements over wifi.
+
+Review https://github.com/isocpp/CppCoreGuidelines.
+
+> > Is the intended usage, when asking the server for a timestamp,
+> > to take the value received directly, or call the offset method too
+> > and use the calculated value from the timestamp plus the offset?
+>
+> The comment for getValue() in ClockClient.h (called by ckTimeAsValue())
+> explains that it's slower and less accurate than getPhase().
+> But the example client PhaseLockMain.cpp calls getValue() anyways.
+> For now at least, let's use PhaseLockMain.cpp as the reference example.
+
+Port to ubuntu 20.04 LTS.
+https://github.com/DDoSolitary/LxRunOffline
+https://help.ubuntu.com/community/KVM/Installation
+
+Port to win10/win7 native instead of WSL/Ubuntu18.
+Find a Makefile toolchain example for win10/win7.
+Implement on theora.
+(Visual Studio, Community version?)
+(CMake toolchain example: https://github.com/DDoSolitary/LxRunOffline)
+Ask Anders Lundstrom to verify on win7.
+
+Fabian will figure out Gentoo's different lib path for Ruby,
+for either Makefile or README.md.
+
+Use VMs to implement a multihost test case, even if it's just on one physical CPU?
+
+Fabian says it builds & runs (ckserver at least) on Raspi 3.
+Asked andersc.lundstrom@gmail.com to verify on his Pi 4's.
+// https://raspberrypi.org/software "Raspberry Pi Desktop"
+
+Replace cc++ with ucommon (issue #9).  Then port to MacOS.
+brew install ucommon swig
+www.gnu.org/software/commoncpp/
+Mac has /usr/local/Cellar/ucommon/ but not cc++.
+// cc++ Keydata class, as an INI parser for the config file.
+
+macos: brew install gnuplot; cd simulation && make
+Iff macos:    sed -i -e "s/Time-Roman/Times-Roman/" plot.eps
+Slow.  Make it multicore?  Port to C?
+
+https://github.com/facebookincubator/ntp
+https://engineering.fb.com/2020/03/18/production-engineering/ntp-service/
+claims 100 usec accuracy within a data center.
+Four strata.  Overkill for clockkit's users?
+The numbers of ntpq -p are inaccurate.
+Fancy testing protocols.
+How can we validate our testing?
+  555 buzzer into sound card is only accurate to 48 kHz = 20 usec.
+  Oscilloscope?
+
+----
+done:
+
+Deploy and use clang-format
+apt install clang-format
+Made .clang-format.
+Made .git/hooks/pre-commit
+chmod a+x ../.git/hooks/pre-commit

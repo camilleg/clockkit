@@ -29,8 +29,9 @@ void ClockServer::run()
     ClockPacket packet;
 
     while (socket.isPending(Socket::pendingInput, TIMEOUT_INF)) {
-        timestamp_t serverReplyTime = clock_.getValue();
-        InetAddress peer = socket.getPeer();  // also sets up the socket to send back to the sender
+        const timestamp_t serverReplyTime = clock_.getValue();
+        const InetAddress peer =
+            socket.getPeer();  // also sets up the socket to send back to the sender
         if (socket.receive(buffer, length) != length) {
             cerr << "ERR: Received packet of wrong length." << endl;
         }
@@ -61,8 +62,8 @@ void ClockServer::setLogging(bool log)
 
 void ClockServer::updateEntry(string addr, int offset, int rtt)
 {
-    timestamp_t now = clock_.getValue();
-    string nowStr = Timestamp::timestampToString(now);
+    const timestamp_t now = clock_.getValue();
+    const string nowStr = Timestamp::timestampToString(now);
     ackData_[addr].time = now;
     ackData_[addr].offset = offset;
     ackData_[addr].rtt = rtt;
@@ -76,7 +77,7 @@ void ClockServer::updateEntry(string addr, int offset, int rtt)
 
         // Purge old entries.
         for (it = ackData_.begin(); it != ackData_.end();) {
-            timestamp_t entryTime = (it->second).time;
+            const timestamp_t entryTime = (it->second).time;
             if (now - entryTime > SYSTEM_STATE_PURGE_TIME) {
                 it = ackData_.erase(it);
             }
@@ -87,8 +88,8 @@ void ClockServer::updateEntry(string addr, int offset, int rtt)
 
         // Calculate maximum offset.
         int maxOffset = 0;
-        for (it = ackData_.begin(); it != ackData_.end(); it++) {
-            int offset = abs((it->second).offset) + ((it->second).rtt / 2);
+        for (it = ackData_.begin(); it != ackData_.end(); ++it) {
+            const int offset = abs((it->second).offset) + ((it->second).rtt / 2);
             if (offset > maxOffset)
                 maxOffset = offset;
         }

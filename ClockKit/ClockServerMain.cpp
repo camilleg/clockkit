@@ -15,14 +15,17 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    InetAddress addr("0.0.0.0");
+    const InetAddress addr("0.0.0.0");
     const int port = atoi(argv[1]);
 
-    // used to create a off-frequency clock for testing
-    // VariableFrequencyClock vfc(HighResolutionClock::instance());
-    // vfc.setFrequency(1000000 - 2000);
-    // ClockServer server(addr, port, vfc);
+#if 0
+    // Create an off-frequency clock for testing.
+    VariableFrequencyClock vfc(HighResolutionClock::instance());
+    vfc.setFrequency(1000000 - 2000);
+    ClockServer server(addr, port, vfc);
+#else
     ClockServer server(addr, port, HighResolutionClock::instance());
+#endif
 
     server.setLogging(true);
     server.start();

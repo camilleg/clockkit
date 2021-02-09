@@ -32,7 +32,7 @@ void ClockPacket::read(char* buffer)
     clientReceiveTime_ = Timestamp::bytesToTimestamp(&buffer[18]);
 }
 
-void ClockPacket::write(char* buffer)
+void ClockPacket::write(char* buffer) const
 {
     buffer[0] = (unsigned char)type_;
     buffer[1] = sequenceNumber_;
@@ -41,72 +41,22 @@ void ClockPacket::write(char* buffer)
     Timestamp::timestampToBytes(clientReceiveTime_, &buffer[18]);
 }
 
-ClockPacket::Type ClockPacket::getType()
-{
-    return type_;
-}
-
-void ClockPacket::setType(Type type)
-{
-    type_ = type;
-}
-
-unsigned char ClockPacket::getSequenceNumber()
-{
-    return sequenceNumber_;
-}
-
-void ClockPacket::setSequenceNumber(unsigned char sequenceNumber)
-{
-    sequenceNumber_ = sequenceNumber;
-}
-
-timestamp_t ClockPacket::getClientRequestTime()
-{
-    return clientRequestTime_;
-}
-
-void ClockPacket::setClientRequestTime(timestamp_t t)
-{
-    clientRequestTime_ = t;
-}
-
-timestamp_t ClockPacket::getServerReplyTime()
-{
-    return serverReplyTime_;
-}
-
-void ClockPacket::setServerReplyTime(timestamp_t t)
-{
-    serverReplyTime_ = t;
-}
-
-timestamp_t ClockPacket::getClientReceiveTime()
-{
-    return clientReceiveTime_;
-}
-
-void ClockPacket::setClientReceiveTime(timestamp_t t)
-{
-    clientReceiveTime_ = t;
-}
-
-timestamp_t ClockPacket::getRTT()
+timestamp_t ClockPacket::getRTT() const
 {
     return clientReceiveTime_ - clientRequestTime_;
 }
 
-timestamp_t ClockPacket::getClockOffset()
+timestamp_t ClockPacket::getClockOffset() const
 {
     return serverReplyTime_ + getRTT() / 2 - clientReceiveTime_;
 }
 
-timestamp_t ClockPacket::getErrorBound()
+timestamp_t ClockPacket::getErrorBound() const
 {
     return getRTT() / 2;
 }
 
-void ClockPacket::print()
+void ClockPacket::print() const
 {
     std::cout << "--- PACKET ---" << std::endl
               << "clientRequestTime: " << Timestamp::timestampToString(clientRequestTime_)

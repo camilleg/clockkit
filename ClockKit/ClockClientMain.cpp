@@ -11,15 +11,12 @@ using namespace dex;
 int main(int argc, char* argv[])
 {
     if (argc != 3) {
-        cout << "usage clockClient <server address> <port>" << endl;
-        return 0;
+        cerr << "usage: " << argv[0] << " <server_ip_address> <port>" << endl;
+        return 1;
     }
-
-    InetHostAddress addr(argv[1]);
-    int port = atoi(argv[2]);
-    cout << "Starting Client:" << endl;
-    cout << "  bind: " << addr.getHostname() << endl;
-    cout << "  port: " << port << endl;
+    const InetHostAddress addr(argv[1]);
+    const int port = atoi(argv[2]);
+    cout << "Starting client for " << addr.getHostname() << ":" << port << endl;
 
     Clock& hires = HighResolutionClock::instance();
     ClockClient client(addr, port);
@@ -28,7 +25,7 @@ int main(int argc, char* argv[])
 
     while (true) {
         try {
-            timestamp_t now = client.getPhase(hires);
+            const timestamp_t now = client.getPhase(hires);
             cout << "offset: " << now << "\trtt: " << client.getLastRTT() << endl;
         }
         catch (ClockException e) {

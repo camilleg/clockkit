@@ -8,12 +8,10 @@ using namespace ost;
 namespace dex {
 
 PhaseLockedClock::PhaseLockedClock(Clock& primary, Clock& reference)
-    : Thread(2)
-    ,  // high priority thread
-    primaryClock_(primary)
+    : Thread(2)  // high priority thread
+    , primaryClock_(primary)
     , referenceClock_(reference)
     , variableFrequencyClock_(primary)
-    , updateInterval_(1000000)
     , inSync_(false)
     , primaryFrequencyAvg_(1000000)
     , phasePanic_(5000)
@@ -21,11 +19,6 @@ PhaseLockedClock::PhaseLockedClock(Clock& primary, Clock& reference)
     , lastUpdate_(0)
 {
     start();
-}
-
-PhaseLockedClock::~PhaseLockedClock()
-{
-    terminate();
 }
 
 timestamp_t PhaseLockedClock::getValue()
@@ -46,42 +39,26 @@ timestamp_t PhaseLockedClock::getValue()
     }
 }
 
-bool PhaseLockedClock::isSynchronized()
-{
-    return inSync_;
-}
-
 int PhaseLockedClock::getOffset()
 {
     if (!inSync_)
         throw ClockException("PhaseLockedClock not in sync");
     enterMutex();
-    int offset = (int)thisPhase_;
+    const int offset = thisPhase_;
     leaveMutex();
     return offset;
 }
 
-void PhaseLockedClock::setPhasePanic(timestamp_t phasePanic)
-{
-    phasePanic_ = phasePanic;
-}
-
-void PhaseLockedClock::setUpdatePanic(timestamp_t updatePanic)
-{
-    updatePanic_ = updatePanic;
-}
-
 void PhaseLockedClock::run()
 {
+    // These are in usec.
+    const auto updateInterval = 1000000.0;
+    const auto variance = updateInterval * 0.1;  // 10%
+    const auto base = updateInterval - variance * 0.5;
     while (!testCancel()) {
         update();
-        // todo: Timestamp the last sucessful update;
-        // if it has been a while, declare this clock out of sync.
-
-        double variance = updateInterval_ / 10.0;
-        double base = updateInterval_ - (variance / 2.0);
-        double random = (rand() % (int)(variance * 1000)) / 1000.0;
-        int sleep_ms = (int)((base + random) / 1000);
+        const auto random = (rand() % int(variance * 1000.0)) * 0.001;
+        const int sleep_ms = int((base + random) * 0.001);
         sleep(sleep_ms);
     }
     exit();
@@ -96,20 +73,15 @@ void PhaseLockedClock::update()
     if (!inSync_) {
         // cout << "CLOCK OUT OF SYNC" << endl;
         setClock();
-        if (inSync_) {
-            if (updatePhase())
-                lastUpdate_ = primaryClock_.getValue();
-        }
+        if (inSync_ && updatePhase())
+            lastUpdate_ = primaryClock_.getValue();
         return;
     }
-
-    bool phaseUpdated = updatePhase();
-    if (!phaseUpdated) {
+    if (!updatePhase()) {
         // cout << "PHASE UPDATE FAILED" << endl;
         return;
     }
-    bool clockUpdated = updateClock();
-    if (!clockUpdated) {
+    if (!updateClock()) {
         // cout << "CLOCK UPDATE FAILED" << endl;
         return;
     }
@@ -147,8 +119,8 @@ bool PhaseLockedClock::updatePhase()
 bool PhaseLockedClock::updateClock()
 {
     // calculate the elapsed time in seconds on the reference clock
-    timestamp_t lastReferenceValue = lastVariableValue_ + lastPhase_;
-    timestamp_t thisReferenceValue = thisVariableValue_ + thisPhase_;
+    const timestamp_t lastReferenceValue = lastVariableValue_ + lastPhase_;
+    const timestamp_t thisReferenceValue = thisVariableValue_ + thisPhase_;
     const double referenceElapsed = thisReferenceValue - lastReferenceValue;
 
     // find the primary clock's frequency (filter for noise)
@@ -157,7 +129,7 @@ bool PhaseLockedClock::updateClock()
     primaryFrequencyAvg_ += (primaryFrequency - primaryFrequencyAvg_) * 0.1;
     // cout << "primary clock frequency average: " << ((int)primaryFrequencyAvg_) << endl;
 
-    if ((thisPhase_ > phasePanic_) || (thisPhase_ < (-1 * phasePanic_))) {
+    if (thisPhase_ > phasePanic_ || thisPhase_ < -phasePanic_) {
         // The phase is too high, so declare the clock out of sync.
         inSync_ = false;
         return false;
@@ -167,7 +139,7 @@ bool PhaseLockedClock::updateClock()
     const double phaseDiff = thisPhase_ * 0.1;
     const double frequencyDiff = 1000000 - primaryFrequencyAvg_;
     const double variableClockFrequency = 1000000 + (frequencyDiff + phaseDiff);
-    // cout << "using frequency: " << ((int) variableClockFrequency) << endl;
+    // cout << "using frequency: " << ((int)variableClockFrequency) << endl;
 
     enterMutex();
     variableFrequencyClock_.setFrequency((int)variableClockFrequency);

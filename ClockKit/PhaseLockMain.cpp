@@ -14,6 +14,7 @@ int main(int argc, char* argv[])
         cerr << "usage: " << argv[0] << " [config_file]" << endl;
         return 1;
     }
+
     PhaseLockedClock* plc =
         PhaseLockedClockFromConfigFile(argc == 2 ? argv[1] : DEFAULT_CONFIG_FILE_PATH);
     while (true) {

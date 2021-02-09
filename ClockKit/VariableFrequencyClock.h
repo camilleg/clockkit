@@ -14,33 +14,27 @@ class VariableFrequencyClock : public Clock {
     /**
      * Creates a new variable frequency clock based on the
      * provided master clock.
-     * The clock's value is initally set at 0.
-     * The clock's frequency is initially set at 1000000 (usec ticks)
+     * Its value starts at 0.
+     * Its frequency starts at 1 MHz.
      */
     VariableFrequencyClock(Clock& master);
 
     /**
      * Returns the clock value.
      * Throws a ClockError if time is detected to have moved backwards.
-     * This is usefull for slaving a variable frequency clock to a counter
+     * This is useful for slaving a variable frequency clock to a counter
      * that may loop.  In the case of an error, the client should reset the
-     * clock's value using setClockValue()
+     * clock's value using setClockValue().
      */
     timestamp_t getValue();
 
-    /**
-     * Sets the current time
-     */
+    // Sets the current time.
     void setValue(timestamp_t t);
 
-    /**
-     * Gets the frequency of this clock
-     */
-    int getFrequency();
-
-    /**
-     * Sets the frequency of this clock
-     */
+    int getFrequency() const
+    {
+        return slaveFrequency_;
+    }
     void setFrequency(int freq);
 
    private:

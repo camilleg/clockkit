@@ -65,7 +65,7 @@ PhaseLockedClock* PhaseLockedClockFromConfigFile(string filename)
     cout << "config [phasePanic:" << phasePanic << "]" << endl;
     cout << "config [updatePanic:" << updatePanic << "]" << endl;
 
-    ost::InetHostAddress addr(server.c_str());
+    const ost::InetHostAddress addr(server.c_str());
     ClockClient* client = new ClockClient(addr, port);
     client->setTimeout(timeout);
     client->setAcknowledge(true);

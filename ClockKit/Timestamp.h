@@ -2,11 +2,15 @@
 #include <string>
 
 namespace dex {
+
+// Microseconds since the Unix epoch.
 #ifdef WIN32
 typedef __int64 timestamp_t;
 #else
 typedef long long timestamp_t;
 #endif
+
+// Conversion functions only.  No members or methods or instances.
 
 class Timestamp {
    public:
@@ -20,7 +24,7 @@ class Timestamp {
     static void timestampToBytes(timestamp_t time, char* buffer);
 
     // Reads a 64 bit timestamp with proper byte ordering.
-    static timestamp_t bytesToTimestamp(char* buffer);
+    static timestamp_t bytesToTimestamp(const char* buffer);
 
    private:
     Timestamp();
