@@ -78,3 +78,5 @@ clean:
 
 .c.o:
 	$(CPP) -c $(CFLAGS) $(INCLUDE) $<
+
+.PHONY: all clean docs test-all test-python test-ruby test-tcl
