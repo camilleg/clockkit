@@ -67,11 +67,8 @@ tcl/wrap.o: tcl/wrap.c
 tcl/clockkit.so: tcl/wrap.o $(OBJECTS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
-docs:
-	doxygen doxygen.conf
-
 clean:
-	rm -rf $(OBJECTS) $(EXES) docs doxygen.warn */wrap.c */wrap.o python/clockkit.py
+	rm -rf $(OBJECTS) $(EXES) */wrap.c */wrap.o python/clockkit.py
 
 .cpp.o:
 	$(CPP) -c $(CFLAGS) $(INCLUDE) $< 
