@@ -13,32 +13,22 @@ ClockPacket::ClockPacket()
 {
 }
 
-ClockPacket::ClockPacket(char* buffer)
-    : type_(INVALID)
-    , sequenceNumber_(0)
-    , clientRequestTime_(0)
-    , serverReplyTime_(0)
-    , clientReceiveTime_(0)
-{
-    read(buffer);
-}
-
 void ClockPacket::read(char* buffer)
 {
-    type_ = (Type)buffer[0];
+    type_ = Type(buffer[0]);
     sequenceNumber_ = buffer[1];
-    clientRequestTime_ = Timestamp::bytesToTimestamp(&buffer[2]);
-    serverReplyTime_ = Timestamp::bytesToTimestamp(&buffer[10]);
-    clientReceiveTime_ = Timestamp::bytesToTimestamp(&buffer[18]);
+    clientRequestTime_ = Timestamp::bytesToTimestamp(buffer + 2);
+    serverReplyTime_ = Timestamp::bytesToTimestamp(buffer + 10);
+    clientReceiveTime_ = Timestamp::bytesToTimestamp(buffer + 18);
 }
 
 void ClockPacket::write(char* buffer) const
 {
     buffer[0] = (unsigned char)type_;
     buffer[1] = sequenceNumber_;
-    Timestamp::timestampToBytes(clientRequestTime_, &buffer[2]);
-    Timestamp::timestampToBytes(serverReplyTime_, &buffer[10]);
-    Timestamp::timestampToBytes(clientReceiveTime_, &buffer[18]);
+    Timestamp::timestampToBytes(clientRequestTime_, buffer + 2);
+    Timestamp::timestampToBytes(serverReplyTime_, buffer + 10);
+    Timestamp::timestampToBytes(clientReceiveTime_, buffer + 18);
 }
 
 timestamp_t ClockPacket::getRTT() const
@@ -48,7 +38,7 @@ timestamp_t ClockPacket::getRTT() const
 
 timestamp_t ClockPacket::getClockOffset() const
 {
-    return serverReplyTime_ + getRTT() / 2 - clientReceiveTime_;
+    return serverReplyTime_ + getErrorBound() - clientReceiveTime_;
 }
 
 timestamp_t ClockPacket::getErrorBound() const
