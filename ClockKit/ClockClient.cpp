@@ -12,36 +12,28 @@ ClockClient::ClockClient(InetHostAddress addr, int port)
     , lastRTT_(0)
     , acknowledge_(false)
 {
-    // Open a UDP socket on a local port, starting at 5000.
-    InetAddress localhost("0.0.0.0");  // any
+    // Open a UDP socket on the first open local port beyond 5000.
+    const InetAddress localhost("0.0.0.0");  // any
     int localPort = 5000;
-    bool bound = false;
-    while (!bound) {
+    while (true) {
         try {
             socket_ = new UDPSocket(localhost, localPort);
-            bound = true;
+            break;
         }
         catch (Socket*) {
             delete socket_;
-            localPort++;
+            ++localPort;
         }
     }
     // Set the destination address.
     socket_->setPeer(addr, port);
 }
 
-ClockClient::~ClockClient()
-{
-    delete socket_;
-}
-
 timestamp_t ClockClient::getValue()
 {
     Clock& baseClock = HighResolutionClock::instance();
-    // secondaryClock + phase = primaryClock
-    timestamp_t phase = getPhase(baseClock, false);
-    timestamp_t now = baseClock.getValue();
-    return (now + phase);
+    return baseClock.getValue() + getPhase(baseClock, false);
+    // primary clock = secondary clock + phase
 }
 
 void ClockClient::sendPacket(ClockPacket& packet)
@@ -49,8 +41,7 @@ void ClockClient::sendPacket(ClockPacket& packet)
     const int length = ClockPacket::PACKET_LENGTH;
     char buffer[length];
     packet.write(buffer);
-    int bytesSent = socket_->send(buffer, length);
-    if (bytesSent != length)
+    if (socket_->send(buffer, length) != length)
         throw ClockException("could not send packet");
 }
 
@@ -58,29 +49,26 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
 {
     const int length = ClockPacket::PACKET_LENGTH;
     char buffer[length];
-    int timeoutMsec = timeout_ / 1000;
-    if (timeoutMsec < 1)
-        timeoutMsec = 1;
+    const int timeoutMsec = std::max(1, timeout_ / 1000);
 
     while (true) {
-        bool packetArrived = socket_->isPending(Socket::pendingInput, timeoutMsec);
+        const bool packetArrived = socket_->isPending(Socket::pendingInput, timeoutMsec);
         if (!packetArrived)
             throw ClockException("timeout");
 
-        int bytesReceived = socket_->receive(buffer, length);
-        if (bytesReceived != length)
-            throw ClockException("received packet of wrong length");
+        if (socket_->receive(buffer, length) != length)
+            throw ClockException("packet had wrong length");
 
         ClockPacket packet(buffer);
         packet.setClientReceiveTime(clock.getValue());
         if (packet.getSequenceNumber() != sequence_) {
-            cout << "wrong sequence number, waiting for another packet" << endl;
+            cout << "packet out of order, so waiting for another" << endl;
         }
         else if (packet.getType() != ClockPacket::REPLY) {
-            cout << "packet of wrong type, wating for another packet" << endl;
+            cout << "packet had wrong type, so waiting for another" << endl;
         }
         else if (packet.getRTT() > timeout_) {
-            throw ClockException("response took too long");
+            throw ClockException("response timed out");
         }
         else {
             lastRTT_ = packet.getRTT();
@@ -94,42 +82,22 @@ timestamp_t ClockClient::getPhase(Clock& clock)
     return getPhase(clock, acknowledge_);
 }
 
+// We can't use a default value "bool acknowledge = acknowledge_"
+// because the base class's signature for getPhase has only the first arg.
 timestamp_t ClockClient::getPhase(Clock& clock, bool acknowledge)
 {
-    sequence_ = (sequence_ % 250) + 1;
-
+    sequence_ = sequence_ % 250 + 1;  // One byte.
     ClockPacket packet;
     packet.setType(ClockPacket::REQUEST);
     packet.setSequenceNumber(sequence_);
     packet.setClientRequestTime(clock.getValue());
     sendPacket(packet);
-
     packet = receivePacket(clock);
     if (acknowledge) {
         packet.setType(ClockPacket::ACKNOWLEDGE);
         sendPacket(packet);
     }
     return packet.getClockOffset();
-}
-
-int ClockClient::getTimeout()
-{
-    return timeout_;
-}
-
-void ClockClient::setTimeout(int timeout)
-{
-    timeout_ = timeout;
-}
-
-int ClockClient::getLastRTT()
-{
-    return lastRTT_;
-}
-
-void ClockClient::setAcknowledge(bool acknowledge)
-{
-    acknowledge_ = acknowledge;
 }
 
 }  // namespace dex

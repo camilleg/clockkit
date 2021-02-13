@@ -27,30 +27,17 @@ namespace dex {
  */
 class ClockClient : public Clock {
    public:
-    /**
-     * Creates a client bound to localhost and an open port.
-     * - The bind port is chosen by starting at 5000 and moving up.
-     * - Default timeout is 1000 usec (1 msec).
-     * - By default, the client does not send acknowledgments.
-     *
-     * @param addr internt address of the ClockClient.
-     * @param port port the ClockClient is listening on.
-     */
+    // Connect to a host and port.
     ClockClient(InetHostAddress addr, int port);
 
-    /**
-     * Destructs the Client and closes the network socket.
-     */
-    ~ClockClient();
+    ~ClockClient()
+    {
+        delete socket_;
+    }
 
-    // not all that accurate and takes longer
-    // calls getPhase(HighResolutionClock::instance());
-    /**
-     * Gets the "current" time on the ClockServer.
-     * This call is not all that accurate and can take quite
-     * a long time.  Instead, use getPhase().
-     * - Throws ClockException on network timeout.
-     */
+    // Get the ClockServer's "current" time.
+    // Slower and less accurate than getPhase().
+    // Calls getPhase(HighResolutionClock::instance()).
     timestamp_t getValue();
 
     /**
@@ -66,47 +53,34 @@ class ClockClient : public Clock {
      */
     timestamp_t getPhase(Clock& c);
 
-    /**
-     * Gets the timeout value for calls on this clock.
-     * If network operations take longer than this, then
-     * a ClockException will be thrown.
-     * The timeout value determines the maximum amount
-     * of error on phase calculations.
-     * @return timeout value in microseconds (usec).
-     */
-    int getTimeout();
+    int getTimeout() const
+    {
+        return timeout_;
+    }
+    void setTimeout(int timeout)
+    {
+        timeout_ = timeout;
+    }
 
-    /**
-     * Sets the timeout value for calls on this clock.
-     * If network operations take longer than this, then
-     * a ClockException will be thrown.
-     * The timeout value determines the maximum amount
-     * of error on phase calculations.
-     * @param timeout timeout value in microseconds (usec).
-     */
-    void setTimeout(int timeout);
+    int getLastRTT() const
+    {
+        return lastRTT_;
+    }
 
-    /**
-     * Gets the round-trip-time from the last call on this clock.
-     * @return Last round-trip-time in microseconds (usec).
-     */
-    int getLastRTT();
-
-    /**
-     * Sets whether the ClockClient will send ACKNOWLEDGE packets
-     * to the server on a getPhase() call.
-     * This allows the ClockServer to keep track of the total
-     * error bound of a distributed clock.
-     */
-    void setAcknowledge(bool acknowledge);
+    // If true, getPhase() will send the server ACKNOWLEDGE packets,
+    // so it can track a distributed clock's total error bound.
+    void setAcknowledge(bool acknowledge)
+    {
+        acknowledge_ = acknowledge;
+    }
 
    private:
     ClockClient(ClockClient& c);
     ClockClient& operator=(ClockClient& rhs);
 
-    int timeout_;
+    int timeout_;  // Timeout (usec).  Sets the max error on phase calculations.
+    int lastRTT_;  // The last call's round trip time (usec).
     unsigned char sequence_;
-    int lastRTT_;
     bool acknowledge_;
     UDPSocket* socket_;
 
