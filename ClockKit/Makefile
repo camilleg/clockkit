@@ -3,6 +3,9 @@ CPP = c++
 CFLAGS = -O3 -fPIC
 LIBS = -lccgnu2 -lpthread -ldl
 SWIG = swig -Wallkw -Werror
+RUBY   = $$(pkg-config --list-all | grep ruby-   | sort | tail -1 | sed 's/ .*//')
+PYTHON = $$(pkg-config --list-all | grep python- | sort | tail -1 | sed 's/ .*//')
+# pkg-config doesn't know about tcl.
 
 OBJECTS = \
   ClockClient.o \
@@ -25,7 +28,7 @@ EXES = \
 
 all: $(EXES)
 
-test-all: test test-tcl test-python test-ruby
+test-all: test test-python test-ruby test-tcl
 
 test: ckserver ckphaselock
 	./testcase.sh
@@ -42,21 +45,19 @@ ckserver: ClockServerMain.cpp $(OBJECTS)
 ckphaselock: PhaseLockMain.cpp $(OBJECTS)
 	$(CPP) $(CFLAGS) $^ $(LIBS) -o $@
 
-# <python.h>, <ruby.h>, and <tcl.h> might be in different directories than these -I's.
-
 python/wrap.c:
 	$(SWIG) -python -o $@ clockkit.h
 python/wrap.o: python/wrap.c
-	$(CPP) -c $(CFLAGS) -I. -I/usr/include/python3.8 $? -o $@
+	$(CPP) -c $(CFLAGS) -I. $$(pkg-config --cflags $(PYTHON)) $? -o $@
 python/_clockkit.so: python/wrap.o $(OBJECTS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
-# In lines starting with rb_define_module_function, cast _wrap_ck's to (VALUE (*)(...)).
 ruby/wrap.c:
 	$(SWIG) -ruby -o $@ clockkit.h
+	# In lines starting with rb_define_module_function, cast _wrap_ck's to (VALUE (*)(...)).
 	sed -i -e "s/ _wrap_ck/ (VALUE (*)(...))_wrap_ck/" $@
 ruby/wrap.o: ruby/wrap.c
-	$(CPP) -c $(CFLAGS) -I. -I/usr/include/ruby-2.5.0 -I/usr/include/x86_64-linux-gnu/ruby-2.5.0 $? -o $@
+	$(CPP) -c $(CFLAGS) -I. $$(pkg-config --cflags $(RUBY)) $? -o $@
 ruby/clockkit.so: ruby/wrap.o $(OBJECTS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
@@ -68,12 +69,9 @@ tcl/clockkit.so: tcl/wrap.o $(OBJECTS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
 clean:
-	rm -rf $(OBJECTS) $(EXES) */wrap.c */wrap.o python/clockkit.py
+	rm -rf $(EXES) $(OBJECTS) */wrap.o */wrap.c python/clockkit.py
 
 .cpp.o:
 	$(CPP) -c $(CFLAGS) $(INCLUDE) $< 
-
-.c.o:
-	$(CPP) -c $(CFLAGS) $(INCLUDE) $<
 
 .PHONY: all clean docs test-all test-python test-ruby test-tcl
