@@ -29,7 +29,7 @@ PCI bus contention) is trapped.  Performance degrades gracefully and
 measurably on unreliable networks.  Several phase-locked loops, within
 each slave and between slave and master, guarantee performance.
 
-Here is our [conference paper](dsceu04.pdf).
+Here is the 2004 [conference paper](dsceu04.pdf).
 
 The source code is licensed under the [Creative Commons 2.0 Attribution License](http://creativecommons.org/licenses/by/2.0).
 
@@ -37,16 +37,25 @@ To cite this work, use:
 Camille Goudeseune and Braden Kowitz.  2004.  "Synchronous data collection from diverse hardware."  
 *Driving Simulation Conference - Europe (Conférence Simulation de Conduite)*, pp. 245-252. 
 
-### To install on Ubuntu 18 or Raspberry Pi 3 (Debian):
+### To install:
+
+#### Ubuntu 20:
+`sudo apt install libcommoncpp2-dev swig tcl8.6-dev libpython3.8-dev ruby ruby2.7-dev`  
+`cd ClockKit && make`
+
+#### Ubuntu 18 or Raspberry Pi 3 (Debian):
 `sudo apt install libcommoncpp2-dev swig tcl8.6-dev libpython3.8-dev ruby ruby2.5-dev`  
 `cd ClockKit && make`
-### To install on Windows 10:
+
+#### Windows 10:
 Install [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10), using the [Ubuntu 18](https://www.microsoft.com/store/apps/9N9TNGVNDL3Q) distro.  
 `sudo apt install make g++ tcl`  
 Proceed as with Ubuntu 18.  
 (Older versions of Windows may return eventually, but no older than XP.)
+
 ### To run a test on localhost:
 `cd ClockKit && make test-all`
+
 ### To plot the accuracy of a simulated run:
 `sudo apt install gnuplot`  
 `cd simulation && make`
