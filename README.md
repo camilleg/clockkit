@@ -40,18 +40,18 @@ Camille Goudeseune and Braden Kowitz.  2004.  "Synchronous data collection from 
 ### To install:
 
 #### Ubuntu 20:
-`sudo apt install libcommoncpp2-dev swig tcl8.6-dev libpython3.8-dev ruby ruby2.7-dev`  
+`sudo apt install make g++ libcommoncpp2-dev swig tcl8.6-dev libpython3.8-dev ruby ruby2.7-dev`  
 `cd ClockKit && make`
 
 #### Ubuntu 18 or Raspberry Pi 3 (Debian):
-`sudo apt install libcommoncpp2-dev swig tcl8.6-dev libpython3.8-dev ruby ruby2.5-dev`  
+`sudo apt install make g++ libcommoncpp2-dev swig tcl8.6-dev libpython3.8-dev ruby ruby2.5-dev`  
 `cd ClockKit && make`
 
 #### Windows 10:
-Install [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10), using the [Ubuntu 18](https://www.microsoft.com/store/apps/9N9TNGVNDL3Q) distro.  
+Install [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10), using the [Ubuntu 18](https://www.microsoft.com/store/apps/9N9TNGVNDL3Q) or [Ubuntu 20](https://www.microsoft.com/store/apps/9n6svws3rx71) distro.  
 `sudo apt install make g++ tcl`  
-Proceed as with Ubuntu 18.  
-(Older versions of Windows may return eventually, but no older than XP.)
+Proceed as with Ubuntu 18 or 20.  
+(Native builds for older versions of Windows may return, but no older than XP.)
 
 ### To run a test on localhost:
 `cd ClockKit && make test-all`
