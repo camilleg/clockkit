@@ -1,7 +1,8 @@
 MAKEFLAGS += --jobs=99
-CPP = c++
+#CPP = c++
+CPP = x86_64-none-linux-musl-c++ -L"${HOME}/usr/lib" -I"${HOME}/usr/include" -idirafter"/usr/include" -idirafter.
 # -fPIC is for */*.so.
-CFLAGS = -O3 -fPIC -std=c++11 -Wall -Werror -Weffc++
+CFLAGS = -O3 -fPIC -std=c++11 -Wall -Werror -static -pie
 LIBS = -lccgnu2 -lpthread -ldl
 SWIG = swig -Wallkw -Werror
 RUBY   = $$(pkg-config --list-all | grep ruby-   | sort | tail -1 | sed 's/ .*//')
@@ -82,7 +83,7 @@ python/_clockkit.so: python/wrap.o $(OBJS)
 tcl/wrap.c:
 	$(SWIG) -tcl -o $@ clockkit.h
 tcl/wrap.o: tcl/wrap.c
-	$(CPP) -c $(CFLAGS) -I. -I/usr/include/tcl8.6 $? -o $@
+	$(CPP) -c $(CFLAGS) -I. -Idirafter"/usr/include/tcl8.6" $? -o $@
 tcl/clockkit.so: tcl/wrap.o $(OBJS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
