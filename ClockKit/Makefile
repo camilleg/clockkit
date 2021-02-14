@@ -1,3 +1,4 @@
+MAKEFLAGS += --jobs=99
 CPP = c++
 # -fPIC is for */*.so.
 CFLAGS = -O3 -fPIC
