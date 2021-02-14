@@ -49,7 +49,7 @@ Camille Goudeseune and Braden Kowitz.  2004.  "Synchronous data collection from 
 
 #### Windows 10:
 Install [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10), using the [Ubuntu 18](https://www.microsoft.com/store/apps/9N9TNGVNDL3Q) or [Ubuntu 20](https://www.microsoft.com/store/apps/9n6svws3rx71) distro.  
-`sudo apt install make g++ tcl`  
+`sudo apt install tcl`  
 Proceed as with Ubuntu 18 or 20.  
 (Native builds for older versions of Windows may return, but no older than XP.)
 
