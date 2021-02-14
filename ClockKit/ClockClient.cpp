@@ -36,9 +36,9 @@ timestamp_t ClockClient::getValue()
     // primary clock = secondary clock + phase
 }
 
-void ClockClient::sendPacket(ClockPacket& packet)
+void ClockClient::sendPacket(const ClockPacket& packet)
 {
-    const int length = ClockPacket::PACKET_LENGTH;
+    const auto length = ClockPacket::PACKET_LENGTH;
     char buffer[length];
     packet.write(buffer);
     if (socket_->send(buffer, length) != length)
@@ -47,9 +47,9 @@ void ClockClient::sendPacket(ClockPacket& packet)
 
 ClockPacket ClockClient::receivePacket(Clock& clock)
 {
-    const int length = ClockPacket::PACKET_LENGTH;
+    const auto length = ClockPacket::PACKET_LENGTH;
     char buffer[length];
-    const int timeoutMsec = std::max(1, timeout_ / 1000);
+    const auto timeoutMsec = std::max(1, timeout_ / 1000);
 
     while (true) {
         const bool packetArrived = socket_->isPending(Socket::pendingInput, timeoutMsec);
@@ -61,11 +61,11 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
 
         ClockPacket packet(buffer);
         packet.setClientReceiveTime(clock.getValue());
-        if (packet.getSequenceNumber() != sequence_) {
-            cout << "packet out of order, so waiting for another" << endl;
+        if (packet.sequenceNumber_ != sequence_) {
+            cout << "ignoring out-of-order packet" << endl;
         }
         else if (packet.getType() != ClockPacket::REPLY) {
-            cout << "packet had wrong type, so waiting for another" << endl;
+            cout << "ignoring packet with wrong type" << endl;
         }
         else if (packet.getRTT() > timeout_) {
             throw ClockException("response timed out");
@@ -86,18 +86,15 @@ timestamp_t ClockClient::getPhase(Clock& clock)
 // because the base class's signature for getPhase has only the first arg.
 timestamp_t ClockClient::getPhase(Clock& clock, bool acknowledge)
 {
-    sequence_ = sequence_ % 250 + 1;  // One byte.
-    ClockPacket packet;
-    packet.setType(ClockPacket::REQUEST);
-    packet.setSequenceNumber(sequence_);
-    packet.setClientRequestTime(clock.getValue());
-    sendPacket(packet);
-    packet = receivePacket(clock);
+    ++sequence_ %= 250;  // One byte.
+    const ClockPacket p1(ClockPacket::REQUEST, sequence_, clock.getValue());
+    sendPacket(p1);
+    ClockPacket p2 = receivePacket(clock);
     if (acknowledge) {
-        packet.setType(ClockPacket::ACKNOWLEDGE);
-        sendPacket(packet);
+        p2.setType(ClockPacket::ACKNOWLEDGE);
+        sendPacket(p2);
     }
-    return packet.getClockOffset();
+    return p2.getClockOffset();
 }
 
 }  // namespace dex

@@ -4,22 +4,22 @@
 
 namespace dex {
 
-ClockPacket::ClockPacket()
-    : type_(INVALID)
-    , sequenceNumber_(0)
-    , clientRequestTime_(0)
+ClockPacket::ClockPacket(Type t, unsigned char n, timestamp_t crt)
+    : type_(t)
+    , sequenceNumber_(n)
+    , clientRequestTime_(crt)
     , serverReplyTime_(0)
     , clientReceiveTime_(0)
 {
 }
 
-void ClockPacket::read(char* buffer)
+ClockPacket::ClockPacket(const char* buffer)
+    : type_(Type(buffer[0]))
+    , sequenceNumber_(buffer[1])
+    , clientRequestTime_(Timestamp::bytesToTimestamp(buffer + 2))
+    , serverReplyTime_(Timestamp::bytesToTimestamp(buffer + 10))
+    , clientReceiveTime_(Timestamp::bytesToTimestamp(buffer + 18))
 {
-    type_ = Type(buffer[0]);
-    sequenceNumber_ = buffer[1];
-    clientRequestTime_ = Timestamp::bytesToTimestamp(buffer + 2);
-    serverReplyTime_ = Timestamp::bytesToTimestamp(buffer + 10);
-    clientReceiveTime_ = Timestamp::bytesToTimestamp(buffer + 18);
 }
 
 void ClockPacket::write(char* buffer) const

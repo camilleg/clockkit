@@ -75,8 +75,8 @@ class ClockClient : public Clock {
     }
 
    private:
-    ClockClient(ClockClient& c);
-    ClockClient& operator=(ClockClient& rhs);
+    ClockClient(ClockClient&);
+    ClockClient& operator=(ClockClient&);
 
     int timeout_;  // Timeout (usec).  Sets the max error on phase calculations.
     int lastRTT_;  // The last call's round trip time (usec).
@@ -84,12 +84,12 @@ class ClockClient : public Clock {
     bool acknowledge_;
     UDPSocket* socket_;
 
-    void sendPacket(ClockPacket& packet);
+    void sendPacket(const ClockPacket&);
 
     // Receives the packet and sets the receipt time via the provided clock.
-    ClockPacket receivePacket(Clock& clock);
+    ClockPacket receivePacket(Clock&);
 
-    timestamp_t getPhase(Clock& clock, bool acknowledge);
+    timestamp_t getPhase(Clock&, bool acknowledge);
 };
 
 }  // namespace dex

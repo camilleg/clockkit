@@ -15,8 +15,8 @@ ClockServer::ClockServer(InetAddress addr, tpport_t port, Clock& clock)
     , port_(port)
     , clock_(clock)
     , log_(false)
+    , lastUpdate_(clock_.getValue())
 {
-    lastUpdate_ = clock_.getValue();
 }
 
 void ClockServer::run()
@@ -26,7 +26,6 @@ void ClockServer::run()
         cout << "time\thost\toffset\trtt" << endl;
     const int length = ClockPacket::PACKET_LENGTH;
     char buffer[length];
-    ClockPacket packet;
 
     while (socket.isPending(Socket::pendingInput, TIMEOUT_INF)) {
         const timestamp_t serverReplyTime = clock_.getValue();
@@ -36,7 +35,7 @@ void ClockServer::run()
             cerr << "ERR: Received packet of wrong length." << endl;
         }
         else {
-            packet.read(buffer);
+            ClockPacket packet(buffer);
             if (packet.getType() == ClockPacket::REQUEST) {
                 packet.setServerReplyTime(serverReplyTime);
                 packet.setType(ClockPacket::REPLY);

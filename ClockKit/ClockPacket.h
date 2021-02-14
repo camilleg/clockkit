@@ -19,25 +19,22 @@ class ClockPacket {
     // - total : 26 bytes
     enum { PACKET_LENGTH = 26 };
 
+    const unsigned char
+        sequenceNumber_;  // Detects out-of-order packets and thus delayed responses.
+
    private:
     Type type_;
-    unsigned char sequenceNumber_;   // Detects out-of-order packets and thus delayed responses.
     timestamp_t clientRequestTime_;  // Time on client host when packet is sent.
     timestamp_t serverReplyTime_;    // Time on server when REQUEST packet is received.
     timestamp_t clientReceiveTime_;  // Time on client when REPLY packet is received.
 
    public:
-    // Empty and INVALID.
-    ClockPacket();
+    ClockPacket(Type t, unsigned char seqNum, timestamp_t clientRequestTime);
 
     // Values are read from the buffer.
-    ClockPacket(char* buffer)
-    {
-        read(buffer);
-    }
+    ClockPacket(const char* buffer);
 
-    // Read/write values to/from a buffer of PACKET_LENGTH bytes.
-    void read(char* buffer);
+    // Write values to a buffer of PACKET_LENGTH bytes.
     void write(char* buffer) const;
 
     Type getType() const
@@ -47,15 +44,6 @@ class ClockPacket {
     void setType(Type t)
     {
         type_ = t;
-    }
-
-    unsigned char getSequenceNumber() const
-    {
-        return sequenceNumber_;
-    }
-    void setSequenceNumber(unsigned char n)
-    {
-        sequenceNumber_ = n;
     }
 
     timestamp_t getClientRequestTime() const
