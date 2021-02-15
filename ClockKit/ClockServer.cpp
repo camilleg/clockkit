@@ -36,33 +36,28 @@ void ClockServer::run()
         }
         else {
             ClockPacket packet(buffer);
-            if (packet.getType() == ClockPacket::REQUEST) {
-                packet.setServerReplyTime(serverReplyTime);
-                packet.setType(ClockPacket::REPLY);
-                packet.write(buffer);
-                if (socket.send(buffer, length) != length) {
-                    cerr << "ERR: Could not send entire packet." << endl;
-                }
-            }
-            else if (packet.getType() == ClockPacket::ACKNOWLEDGE) {
-                updateEntry(peer.getHostname(), packet.getClockOffset(), packet.getRTT());
-            }
-            else {
-                cerr << "ERR: received packet of invalid type" << endl;
+            switch (packet.getType()) {
+                case ClockPacket::REQUEST:
+                    packet.setServerReplyTime(serverReplyTime);
+                    packet.setType(ClockPacket::REPLY);
+                    packet.write(buffer);
+                    if (socket.send(buffer, length) != length)
+                        cerr << "ERR: sent incomplete packet." << endl;
+                    break;
+                case ClockPacket::ACKNOWLEDGE:
+                    updateEntry(peer.getHostname(), packet.getClockOffset(), packet.getRTT());
+                    break;
+                default:
+                    cerr << "ERR: received packet of invalid type" << endl;
             }
         }
     }
 }
 
-void ClockServer::setLogging(bool log)
-{
-    log_ = log;
-}
-
 void ClockServer::updateEntry(string addr, int offset, int rtt)
 {
-    const timestamp_t now = clock_.getValue();
-    const string nowStr = Timestamp::timestampToString(now);
+    const auto now = clock_.getValue();
+    const auto nowStr = Timestamp::timestampToString(now);
     ackData_[addr].time = now;
     ackData_[addr].offset = offset;
     ackData_[addr].rtt = rtt;
@@ -70,30 +65,31 @@ void ClockServer::updateEntry(string addr, int offset, int rtt)
         return;
 
     cout << nowStr << '\t' << addr << '\t' << offset << '\t' << rtt << endl;
-    if ((now - lastUpdate_) > 1000000) {
-        lastUpdate_ = now;
-        map<string, Entry>::iterator it;
+    if (now > lastUpdate_ < 1000000)
+        return;
 
-        // Purge old entries.
-        for (it = ackData_.begin(); it != ackData_.end();) {
-            const timestamp_t entryTime = (it->second).time;
-            if (now - entryTime > SYSTEM_STATE_PURGE_TIME) {
-                it = ackData_.erase(it);
-            }
-            else {
-                ++it;
-            }
-        }
+    lastUpdate_ = now;
+    map<string, Entry>::iterator it;
 
-        // Calculate maximum offset.
-        int maxOffset = 0;
-        for (it = ackData_.begin(); it != ackData_.end(); ++it) {
-            const int offset = abs((it->second).offset) + ((it->second).rtt / 2);
-            if (offset > maxOffset)
-                maxOffset = offset;
+    // Purge old entries.
+    for (it = ackData_.begin(); it != ackData_.end();) {
+        const timestamp_t entryTime = (it->second).time;
+        if (now - entryTime > SYSTEM_STATE_PURGE_TIME) {
+            it = ackData_.erase(it);
         }
-        cout << nowStr << '\t' << "MAX_OFFSET" << '\t' << maxOffset << '\t' << endl;
+        else {
+            ++it;
+        }
     }
+
+    // Calculate maximum offset.
+    auto maxOffset = 0;
+    for (it = ackData_.begin(); it != ackData_.end(); ++it) {
+        const auto offset = abs((it->second).offset) + ((it->second).rtt / 2);
+        if (offset > maxOffset)
+            maxOffset = offset;
+    }
+    cout << nowStr << '\t' << "MAX_OFFSET" << '\t' << maxOffset << '\t' << endl;
 }
 
 }  // namespace dex
