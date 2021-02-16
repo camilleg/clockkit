@@ -1,5 +1,6 @@
 #include <cc++/socket.h>
 #include <cc++/thread.h>
+
 #include "ClockClient.h"
 #include "Exceptions.h"
 #include "HighResolutionClock.h"
@@ -19,18 +20,24 @@ int main(int argc, char* argv[])
     cout << "Starting client for " << addr.getHostname() << ":" << port << endl;
 
     Clock& hires = HighResolutionClock::instance();
-    ClockClient client(addr, port);
-    client.setTimeout(15000);
-    client.setAcknowledge(true);
+    try {
+        ClockClient client(addr, port);
+        client.setTimeout(15000);
+        client.setAcknowledge(true);
 
-    while (true) {
-        try {
-            const timestamp_t now = client.getPhase(hires);
-            cout << "offset: " << now << "\trtt: " << client.getLastRTT() << endl;
+        while (true) {
+            try {
+                const timestamp_t now = client.getPhase(hires);
+                cout << "offset: " << now << "\trtt: " << client.getLastRTT() << endl;
+            }
+            catch (ClockException e) {
+            }
+            Thread::sleep(1000);
         }
-        catch (ClockException e) {
-        }
-        Thread::sleep(1000);
+    }
+    catch (Socket*) {
+        cout << "Failed to get any outgoing port" << endl;
+        return 127;
     }
     return 0;
 }
