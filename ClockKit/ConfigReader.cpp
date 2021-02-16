@@ -31,6 +31,7 @@ PhaseLockedClock* PhaseLockedClockFromConfigFile(string filename)
     int timeout = 1000;
     int phasePanic = 5000;
     int updatePanic = 5000000;
+    bool found = false;
     while (!file.eof()) {
         string line;
         file >> line;
@@ -42,21 +43,28 @@ PhaseLockedClock* PhaseLockedClockFromConfigFile(string filename)
 
         if (name == "server") {
             server = value;
+            found = true;
         }
         else if (name == "port") {
             port = atoi(value.c_str());
+            found = true;
         }
         else if (name == "timeout") {
             timeout = atoi(value.c_str());
+            found = true;
         }
         else if (name == "phasePanic") {
             phasePanic = atoi(value.c_str());
+            found = true;
         }
         else if (name == "updatePanic") {
             updatePanic = atoi(value.c_str());
+            found = true;
         }
     }
     file.close();
+    if (!found)
+        cerr << "no commands in config file '" << filename << "'" << endl;
 
     // TODO separate printing from object creation
     cout << "config [server:" << server << "]" << endl;
