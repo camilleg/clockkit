@@ -23,13 +23,18 @@ OBJECTS = \
 EXES = \
   ckserver \
   ckphaselock \
+
+SWIGEXES = \
   python/_clockkit.so \
   ruby/clockkit.so \
   tcl/clockkit.so
 
 all: $(EXES)
 
+bindings: $(SWIGEXES)
+
 test-all: test test-python test-ruby test-tcl
+test-bindings: test-python test-ruby test-tcl
 
 test: ckserver ckphaselock
 	./testcase.sh
