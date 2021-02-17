@@ -65,7 +65,7 @@ void ClockServer::updateEntry(string addr, int offset, int rtt)
         return;
 
     cout << nowStr << '\t' << addr << '\t' << offset << '\t' << rtt << endl;
-    if (now > lastUpdate_ < 1000000)
+    if (now < lastUpdate_ + 1000000)
         return;
 
     lastUpdate_ = now;
