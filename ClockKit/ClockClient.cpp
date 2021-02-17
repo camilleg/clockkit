@@ -9,15 +9,16 @@ namespace dex {
 
 ClockClient::ClockClient(InetHostAddress addr, int port)
     : timeout_(1000)
-    , sequence_(0)
     , lastRTT_(0)
+    , sequence_(0)
     , acknowledge_(false)
+    , socket_{new UDPSocket(InetAddress("0.0.0.0"), 0)}
 {
     // Open a UDP socket.
     // On Linux, 0 picks the next free port.  If eventually another
     // OS doesn't, then pass localPort in as an arg to this constructor,
     // from a localPort:5678 line in the config file.
-    socket_ = new UDPSocket(InetAddress("0.0.0.0"), 0);
+    // socket_ = new UDPSocket(InetAddress("0.0.0.0"), 0);
 
     // Set the destination address.
     socket_->setPeer(addr, port);

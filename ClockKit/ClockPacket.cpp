@@ -1,12 +1,14 @@
 #include "ClockPacket.h"
+
 #include <iostream>
+
 #include "Common.h"
 
 namespace dex {
 
 ClockPacket::ClockPacket(Type t, unsigned char n, timestamp_t crt)
-    : type_(t)
-    , sequenceNumber_(n)
+    : sequenceNumber_(n)
+    , type_(t)
     , clientRequestTime_(crt)
     , serverReplyTime_(0)
     , clientReceiveTime_(0)
@@ -14,8 +16,8 @@ ClockPacket::ClockPacket(Type t, unsigned char n, timestamp_t crt)
 }
 
 ClockPacket::ClockPacket(const char* buffer)
-    : type_(Type(buffer[0]))
-    , sequenceNumber_(buffer[1])
+    : sequenceNumber_(buffer[1])
+    , type_(Type(buffer[0]))
     , clientRequestTime_(Timestamp::bytesToTimestamp(buffer + 2))
     , serverReplyTime_(Timestamp::bytesToTimestamp(buffer + 10))
     , clientReceiveTime_(Timestamp::bytesToTimestamp(buffer + 18))

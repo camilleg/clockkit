@@ -1,18 +1,26 @@
 #include "PhaseLockedClock.h"
+
 #include <cstdlib>
 #include <iostream>
+
 #include "Exceptions.h"
 
 using namespace std;
 using namespace ost;
 namespace dex {
 
-PhaseLockedClock::PhaseLockedClock(Clock& primary, Clock& reference)
+PhaseLockedClock::PhaseLockedClock(Clock &primary, Clock &reference)
     : Thread(2)  // high priority thread
     , primaryClock_(primary)
     , referenceClock_(reference)
     , variableFrequencyClock_(primary)
     , inSync_(false)
+    , thisPhase_{0}
+    , lastPhase_{0}
+    , thisVariableValue_{0}
+    , lastVariableValue_{0}
+    , thisPrimaryValue_{0}
+    , lastPrimaryValue_{0}
     , primaryFrequencyAvg_(1000000)
     , phasePanic_(5000)
     , updatePanic_(5000000)
@@ -31,7 +39,7 @@ timestamp_t PhaseLockedClock::getValue()
         leaveMutex();
         return time;
     }
-    catch (ClockException e) {
+    catch (ClockException &e) {
         leaveMutex();
         // cout << "PhaseLockedClock picked up exception, now out of sync." << endl;
         inSync_ = false;
@@ -109,7 +117,7 @@ bool PhaseLockedClock::updatePhase()
         // cout << "detected phase: " << ((int)phase) << endl;
         return true;
     }
-    catch (ClockException e) {
+    catch (ClockException &e) {
         leaveMutex();
         // cout << "PLC handling clock exception: " << e.getMessage() << endl;
         return false;
@@ -155,7 +163,7 @@ void PhaseLockedClock::setClock()
         inSync_ = true;
         // cout << "CLOCK IN SYNC" << endl;
     }
-    catch (ClockException e) {
+    catch (ClockException &e) {
         // cout << "exception while resetting to the reference clock" << endl;
         inSync_ = false;
     }
