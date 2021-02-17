@@ -1,4 +1,5 @@
 #include "ClockClient.h"
+
 #include "Exceptions.h"
 #include "HighResolutionClock.h"
 
@@ -14,17 +15,8 @@ ClockClient::ClockClient(InetHostAddress addr, int port)
 {
     // Open a UDP socket on the first open local port beyond 5000.
     const InetAddress localhost("0.0.0.0");  // any
-    int localPort = 5000;
-    while (true) {
-        try {
-            socket_ = new UDPSocket(localhost, localPort);
-            break;
-        }
-        catch (Socket*) {
-            delete socket_;
-            ++localPort;
-        }
-    }
+    socket_ = new UDPSocket(localhost, 0);
+
     // Set the destination address.
     socket_->setPeer(addr, port);
 }
