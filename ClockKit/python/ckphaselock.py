@@ -5,7 +5,7 @@ import _clockkit
 
 if len(sys.argv) != 2:
     sys.exit("Usage: %s configfile" % sys.argv[0])
-_clockkit.ckInitializeFromConfig(sys.argv[1])
+_clockkit.ckInitialize(sys.argv[1])
 
 while 1:
     if _clockkit.ckInSync():

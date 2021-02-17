@@ -4,30 +4,21 @@
 #include "Exceptions.h"
 #include "HighResolutionClock.h"
 #include "PhaseLockedClock.h"
+#include "limits"
 
 dex::PhaseLockedClock* ckClock = NULL;
 std::string ckTimeString;  // Static storage for the pointer returned by ckTimeAsString().
 
-void ckInitialize()
+void ckInitialize(const char* path)
 {
-    if (ckClock != NULL)
-        return;
-    ckClock = dex::PhaseLockedClockFromConfigFile(dex::DEFAULT_CONFIG_FILE_PATH);
-}
-
-void ckInitializeFromConfig(const char* path)
-{
-    if (ckClock != NULL)
-        return;
-    ckClock = dex::PhaseLockedClockFromConfigFile(std::string(path));
+    if (ckClock == NULL)
+        ckClock = dex::PhaseLockedClockFromConfigFile(std::string(path));
 }
 
 dex::timestamp_t ckTimeAsValue()
 {
-    /* Avoid error but at the same time allow manual calling of ckInitialize
-     * with non-default config */
     if (ckClock == NULL)
-        ckInitialize();
+        return 0;  // "Zero seconds since the epoch" is obviously invalid.
     try {
         return ckClock->getValue();
     }
@@ -39,31 +30,33 @@ dex::timestamp_t ckTimeAsValue()
 const char* ckTimeAsString()
 {
     if (ckClock == NULL)
-        ckInitialize();
+        return "";
     try {
         ckTimeString = dex::Timestamp::timestampToString(ckClock->getValue());
+        return ckTimeString.c_str();
     }
     catch (dex::ClockException e) {
-        ckTimeString = "";
+        return "";
     }
-    return ckTimeString.c_str();
 }
 
 bool ckInSync()
 {
     if (ckClock == NULL)
-        ckInitialize();
+        return false;
     return ckClock->isSynchronized();
 }
 
 int ckOffset()
 {
+    // Typically 2147483647 usec, or 35 minutes, obviously invalid.
+    static const int invalid = std::numeric_limits<int>::max();
     if (ckClock == NULL)
-        ckInitialize();
+        return invalid;
     try {
         return ckClock->getOffset();
     }
     catch (dex::ClockException e) {
-        return 0;
+        return invalid;
     }
 }

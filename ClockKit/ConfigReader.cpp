@@ -14,17 +14,13 @@ using namespace std;
 
 namespace dex {
 
-#ifdef WIN32
-const string DEFAULT_CONFIG_FILE_PATH = "C:\\clockkit.conf";
-#else
-const string DEFAULT_CONFIG_FILE_PATH = "/etc/clockkit.conf";
-#endif
-
-PhaseLockedClock* PhaseLockedClockFromConfigFile(string filename)
+PhaseLockedClock* PhaseLockedClockFromConfigFile(const string& filename)
 {
     ifstream file(filename.c_str());
-    if (!file.is_open())
-        throw Exception("failed to open config file " + filename);
+    if (!file.is_open()) {
+        cerr << "failed to open config file " << filename << endl;
+        return NULL;
+    }
 
     string server = "localhost";
     int port = 4444;
@@ -32,14 +28,15 @@ PhaseLockedClock* PhaseLockedClockFromConfigFile(string filename)
     int phasePanic = 5000;
     int updatePanic = 5000000;
     bool found = false;
+
     while (!file.eof()) {
         string line;
         file >> line;
-        int pos = line.find(":");
+        const int pos = line.find(":");
         if (pos < 0)
             break;
-        string name = line.substr(0, pos);
-        string value = line.substr(pos + 1);
+        const string name(line.substr(0, pos));
+        const string value(line.substr(pos + 1));
 
         if (name == "server") {
             server = value;
@@ -64,7 +61,7 @@ PhaseLockedClock* PhaseLockedClockFromConfigFile(string filename)
     }
     file.close();
     if (!found)
-        cerr << "no commands in config file '" << filename << "'" << endl;
+        cerr << "using defaults because of useless config file '" << filename << "'" << endl;
 
     // TODO separate printing from object creation
     cout << "config [server:" << server << "]" << endl;

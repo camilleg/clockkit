@@ -2,7 +2,7 @@
 require './clockkit'
 
 abort "Usage: #$0 configfile" if ARGV.size != 1
-Clockkit.ckInitializeFromConfig ARGV[0]
+Clockkit.ckInitialize ARGV[0]
 
 loop { 
   if Clockkit.ckInSync then

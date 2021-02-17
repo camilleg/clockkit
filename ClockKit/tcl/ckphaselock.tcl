@@ -5,7 +5,7 @@ if {$argc != 1} {
   puts "Usage: $argv0 configfile"
   exit 1
 }
-ckInitializeFromConfig [lindex $argv 0]
+ckInitialize [lindex $argv 0]
 
 while {1} {
   if {[ckInSync]} {

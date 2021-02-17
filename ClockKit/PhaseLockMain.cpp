@@ -10,13 +10,12 @@ using namespace dex;
 
 int main(int argc, char* argv[])
 {
-    if (argc > 2) {
-        cerr << "usage: " << argv[0] << " [config_file]" << endl;
+    if (argc != 2) {
+        cerr << "usage: " << argv[0] << " config_file" << endl;
         return 1;
     }
 
-    PhaseLockedClock* plc =
-        PhaseLockedClockFromConfigFile(argc == 2 ? argv[1] : DEFAULT_CONFIG_FILE_PATH);
+    PhaseLockedClock* plc = PhaseLockedClockFromConfigFile(argv[1]);
     while (true) {
         try {
             const int offset = plc->getOffset();

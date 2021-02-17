@@ -58,7 +58,7 @@ void PhaseLockedClock::run()
     while (!testCancel()) {
         update();
         const auto random = (rand() % int(variance * 1000.0)) * 0.001;
-        const int sleep_ms = int((base + random) * 0.001);
+        const auto sleep_ms = int((base + random) * 0.001);
         sleep(sleep_ms);
     }
     exit();
