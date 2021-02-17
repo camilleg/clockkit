@@ -13,9 +13,11 @@ ClockClient::ClockClient(InetHostAddress addr, int port)
     , lastRTT_(0)
     , acknowledge_(false)
 {
-    // Open a UDP socket on the first open local port beyond 5000.
-    const InetAddress localhost("0.0.0.0");  // any
-    socket_ = new UDPSocket(localhost, 0);
+    // Open a UDP socket.
+    // On Linux, 0 picks the next free port.  If eventually another
+    // OS doesn't, then pass localPort in as an arg to this constructor,
+    // from a localPort:5678 line in the config file.
+    socket_ = new UDPSocket(InetAddress("0.0.0.0"), 0);
 
     // Set the destination address.
     socket_->setPeer(addr, port);
