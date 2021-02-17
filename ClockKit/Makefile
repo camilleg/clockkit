@@ -30,20 +30,19 @@ SWIGEXES = \
   tcl/clockkit.so
 
 all: $(EXES)
-
 bindings: $(SWIGEXES)
 
-test-all: test test-python test-ruby test-tcl
 test-bindings: test-python test-ruby test-tcl
 
+# Different ports let these tests run simultaneously, via --jobs=99.
 test: ckserver ckphaselock
-	./testcase.sh
+	./testcase.sh 4440
 test-python: ckserver python/_clockkit.so
-	cd python && ./testcase.sh
+	cd python && ./testcase.sh 4450
 test-ruby: ckserver ruby/clockkit.so
-	cd ruby && ./testcase.sh
+	cd ruby && ./testcase.sh 4460
 test-tcl: ckserver tcl/clockkit.so
-	cd tcl && ./testcase.sh
+	cd tcl && ./testcase.sh 4470
 
 ckserver: ClockServerMain.cpp $(OBJECTS)
 	$(CPP) $(CFLAGS) $^ $(LIBS) -o $@
@@ -75,9 +74,9 @@ tcl/clockkit.so: tcl/wrap.o $(OBJECTS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
 clean:
-	rm -rf $(EXES) $(OBJECTS) */wrap.o */wrap.c python/clockkit.py
+	rm -rf $(EXES) $(SWIGEXES) $(OBJECTS) */wrap.o */wrap.c python/clockkit.py
 
 .cpp.o:
 	$(CPP) -c $(CFLAGS) $(INCLUDE) $< 
 
-.PHONY: all clean docs test-all test-python test-ruby test-tcl
+.PHONY: all bindings clean test-all test-bindings test-python test-ruby test-tcl

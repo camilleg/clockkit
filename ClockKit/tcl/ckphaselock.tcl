@@ -1,9 +1,14 @@
 #!/usr/bin/env tclsh
 load ./clockkit.so clockkit
-ckInitializeFromConfig "../clockkit.conf"
 
-while { 1 } {
-  if { [ckInSync] } {
+if {$argc != 1} {
+  puts "Usage: $argv0 configfile"
+  exit 1
+}
+ckInitializeFromConfig [lindex $argv 0]
+
+while {1} {
+  if {[ckInSync]} {
     set offset [ckOffset]
     set timestamp [ckTimeAsString]
     puts "offset: $offset\ntime: $timestamp"
