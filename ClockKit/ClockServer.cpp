@@ -28,7 +28,7 @@ void ClockServer::run()
     if (log_)
         cout << "time\thost\toffset\trtt" << endl;
     const int length = ClockPacket::PACKET_LENGTH;
-    char buffer[length];
+    uint8_t buffer[length];
 
     while (socket.isPending(Socket::pendingInput, TIMEOUT_INF)) {
         const timestamp_t serverReplyTime = clock_.getValue();

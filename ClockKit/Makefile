@@ -1,11 +1,7 @@
 MAKEFLAGS += --jobs=99
-CPP = g++
-
-# -fPIC is for SWIGEXES.
-CPPFLAGS = -O3 -fPIC -pedantic -Wall -Weffc++ -Werror
-CFLAGS = -fPIC
-CXXFLAGS = -std=c++11
-
+CPP = c++
+# -fPIC is for */*.so.
+CFLAGS = -O3 -fPIC -std=c++11 -Wall -Werror -Weffc++ -pedantic
 LIBS = -lccgnu2 -lpthread -ldl
 SWIG = swig -Wallkw -Werror
 RUBY   = $$(pkg-config --list-all | grep ruby-   | sort | tail -1 | sed 's/ .*//')
@@ -79,5 +75,8 @@ tcl/clockkit.so: tcl/wrap.o $(OBJECTS)
 
 clean:
 	rm -rf $(EXES) $(SWIGEXES) $(OBJECTS) */wrap.o */wrap.c python/clockkit.py
+
+.cpp.o:
+	$(CPP) -c $(CFLAGS) $(INCLUDE) $< 
 
 .PHONY: all bindings clean test-all test-bindings test-python test-ruby test-tcl
