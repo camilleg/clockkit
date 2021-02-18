@@ -1,5 +1,6 @@
 #include <cc++/socket.h>
 #include <cc++/thread.h>
+
 #include "ConfigReader.h"
 #include "Exceptions.h"
 #include "PhaseLockedClock.h"
@@ -23,7 +24,7 @@ int main(int argc, char* argv[])
             cout << "offset: " << offset << endl;
             cout << "time: " << Timestamp::timestampToString(now) << endl;
         }
-        catch (ClockException e) {
+        catch (ClockException& e) {
             cout << "offset: OUT OF SYNC" << endl;
         }
         Thread::sleep(1000);

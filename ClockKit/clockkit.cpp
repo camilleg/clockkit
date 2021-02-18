@@ -1,4 +1,5 @@
 #include "clockkit.h"
+
 #include "ClockClient.h"
 #include "ConfigReader.h"
 #include "Exceptions.h"
@@ -22,7 +23,7 @@ dex::timestamp_t ckTimeAsValue()
     try {
         return ckClock->getValue();
     }
-    catch (dex::ClockException e) {
+    catch (dex::ClockException& e) {
         return 0;
     }
 }
@@ -35,7 +36,7 @@ const char* ckTimeAsString()
         ckTimeString = dex::Timestamp::timestampToString(ckClock->getValue());
         return ckTimeString.c_str();
     }
-    catch (dex::ClockException e) {
+    catch (dex::ClockException& e) {
         return "";
     }
 }
@@ -56,7 +57,7 @@ int ckOffset()
     try {
         return ckClock->getOffset();
     }
-    catch (dex::ClockException e) {
+    catch (dex::ClockException& e) {
         return invalid;
     }
 }

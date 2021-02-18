@@ -32,6 +32,8 @@ class Clock {
     {
         return getValue() - c.getValue();
     }
+
+    virtual ~Clock() = default;
 };
 
 }  // namespace dex

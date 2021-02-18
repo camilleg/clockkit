@@ -1,6 +1,8 @@
 #include "ClockServer.h"
+
 #include <cmath>
 #include <iostream>
+
 #include "ClockPacket.h"
 #include "HighResolutionClock.h"
 
@@ -14,6 +16,7 @@ ClockServer::ClockServer(InetAddress addr, tpport_t port, Clock& clock)
     : addr_(addr)
     , port_(port)
     , clock_(clock)
+    , ackData_{std::map<std::string, Entry>()}
     , log_(false)
     , lastUpdate_(clock_.getValue())
 {
