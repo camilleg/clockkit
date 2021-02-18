@@ -17,14 +17,14 @@ pkill -f 'tclsh ./ckphaselock.tcl'
 pkill -f "ckserver $port"
 ../ckserver $port > $srv &
 ./ckphaselock.tcl $conf > $cli &
-sleep 3
+sleep 2
 pkill -f 'tclsh ./ckphaselock.tcl'
 pkill -f "ckserver $port"
 sed -i '/EXCEPTION/d' $cli
-a=$(tail -3 $srv | grep -c -P '<time \d+ \d+>\s')
-b=$(tail -4 $cli | grep -c -P 'offset: [-\d]+')
-c=$(tail -4 $cli | grep -c -P 'time: <time \d+ \d+>')
-if [[ "$a $b $c" == "3 2 2" ]]; then
+a=$(tail -10 $srv | grep -c -P '<time \d+ \d+>\s')
+b=$(tail -20 $cli | grep -c -P 'offset: [-\d]+')
+c=$(tail -20 $cli | grep -c -P 'time: <time \d+ \d+>')
+if [[ "$a $b $c" == "10 10 10" ]]; then
   # Test passed.
   exit 0
 fi

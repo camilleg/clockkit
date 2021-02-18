@@ -15,5 +15,5 @@ while {1} {
   } else {
     puts "offset: OUT OF SYNC"
   }
-  after 1000
+  after 100
 }
