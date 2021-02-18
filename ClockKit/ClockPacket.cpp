@@ -6,7 +6,7 @@
 
 namespace dex {
 
-ClockPacket::ClockPacket(Type t, unsigned char n, timestamp_t crt)
+ClockPacket::ClockPacket(Type t, uint8_t n, timestamp_t crt)
     : sequenceNumber_(n)
     , type_(t)
     , clientRequestTime_(crt)
@@ -15,7 +15,7 @@ ClockPacket::ClockPacket(Type t, unsigned char n, timestamp_t crt)
 {
 }
 
-ClockPacket::ClockPacket(const char* buffer)
+ClockPacket::ClockPacket(uint8_t* buffer)
     : sequenceNumber_(buffer[1])
     , type_(Type(buffer[0]))
     , clientRequestTime_(Timestamp::bytesToTimestamp(buffer + 2))
@@ -24,13 +24,18 @@ ClockPacket::ClockPacket(const char* buffer)
 {
 }
 
-void ClockPacket::write(char* buffer) const
+void ClockPacket::write(uint8_t* buffer) const
 {
-    buffer[0] = (unsigned char)type_;
+    buffer[0] = static_cast<uint8_t>(type_);
     buffer[1] = sequenceNumber_;
-    Timestamp::timestampToBytes(clientRequestTime_, buffer + 2);
-    Timestamp::timestampToBytes(serverReplyTime_, buffer + 10);
-    Timestamp::timestampToBytes(clientReceiveTime_, buffer + 18);
+    auto ts = Timestamp::timestampToBytes(clientRequestTime_);
+    std::copy(ts.begin(), ts.end(), buffer + 2);
+
+    ts = Timestamp::timestampToBytes(serverReplyTime_);
+    std::copy(ts.begin(), ts.end(), buffer + 10);
+
+    ts = Timestamp::timestampToBytes(clientReceiveTime_);
+    std::copy(ts.begin(), ts.end(), buffer + 18);
 }
 
 void ClockPacket::print() const

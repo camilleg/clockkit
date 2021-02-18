@@ -1,13 +1,14 @@
 #pragma once
+#include <array>
 #include <string>
 
 namespace dex {
 
 // Microseconds since the Unix epoch.
 #ifdef WIN32
-typedef __int64 timestamp_t;
+using timestamp_t = __int64;
 #else
-typedef long long timestamp_t;
+using timestamp_t = int64_t;
 #endif
 
 class Timestamp {
@@ -24,10 +25,10 @@ class Timestamp {
     static timestamp_t stringToTimestamp(std::string t);
 
     // Writes a 64 bit timestamp with proper byte ordering.
-    static void timestampToBytes(timestamp_t time, char* buffer);
+    static std::array<uint8_t, 8> timestampToBytes(timestamp_t time);
 
     // Reads a 64 bit timestamp with proper byte ordering.
-    static timestamp_t bytesToTimestamp(const char* buffer);
+    static timestamp_t bytesToTimestamp(const uint8_t* buffer);
 };
 
 }  // namespace dex

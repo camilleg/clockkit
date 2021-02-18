@@ -19,6 +19,7 @@ class ClockPacket {
     // - total : 26 bytes
     enum { PACKET_LENGTH = 26 };
 
+    // XXX is a single byte not a bit less for a sequence number?
     const unsigned char
         sequenceNumber_;  // Detects out-of-order packets and thus delayed responses.
 
@@ -29,13 +30,13 @@ class ClockPacket {
     timestamp_t clientReceiveTime_;  // Time on client when REPLY packet is received.
 
    public:
-    explicit ClockPacket(Type t, unsigned char seqNum, timestamp_t clientRequestTime);
+    explicit ClockPacket(Type t, uint8_t seqNum, timestamp_t clientRequestTime);
 
     // Values are read from the buffer.
-    explicit ClockPacket(const char* buffer);
+    explicit ClockPacket(uint8_t* buffer);
 
     // Write values to a buffer of PACKET_LENGTH bytes.
-    void write(char* buffer) const;
+    void write(uint8_t* buffer) const;
 
     inline Type getType() const
     {
@@ -74,6 +75,7 @@ class ClockPacket {
     }
 
     // Return the round trip time for the client-server correspondence.
+    // XXX A round trip time is not really a timestamp; can't be negative
     inline timestamp_t getRTT() const
     {
         return clientReceiveTime_ - clientRequestTime_;

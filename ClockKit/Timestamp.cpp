@@ -13,7 +13,6 @@
 
 #include <array>
 #include <cstddef>
-#include <iostream>
 
 const char* format = "<time %i %i>";
 
@@ -22,7 +21,7 @@ namespace dex {
 namespace internal {
 union tsBytes {
     timestamp_t ts;
-    char bytes[8];
+    std::array<uint8_t, 8> bytes;
 };
 }  // namespace internal
 
@@ -43,7 +42,7 @@ timestamp_t Timestamp::stringToTimestamp(std::string t)
     return sec * 1000000 + usec;
 }
 
-void Timestamp::timestampToBytes(timestamp_t time, char* buffer)
+std::array<uint8_t, 8> Timestamp::timestampToBytes(timestamp_t time)
 {
     internal::tsBytes u;
 #if __BYTE_ORDER != __BIG_ENDIAN
@@ -51,22 +50,13 @@ void Timestamp::timestampToBytes(timestamp_t time, char* buffer)
 #else
     u.ts = time;
 #endif
-    for (size_t i = 0; i < 8; ++i) {
-        buffer[i] = u.bytes[i];
-    }
+    return u.bytes;
 }
 
-timestamp_t Timestamp::bytesToTimestamp(const char* buffer)
+timestamp_t Timestamp::bytesToTimestamp(const uint8_t* buffer)
 {
     internal::tsBytes u;
-    u.bytes[0] = buffer[0];
-    u.bytes[1] = buffer[1];
-    u.bytes[2] = buffer[2];
-    u.bytes[3] = buffer[3];
-    u.bytes[4] = buffer[4];
-    u.bytes[5] = buffer[5];
-    u.bytes[6] = buffer[6];
-    u.bytes[7] = buffer[7];
+    std::memcpy(u.bytes.data(), buffer, 8);
 
     return static_cast<timestamp_t>(
 #if __BYTE_ORDER != __BIG_ENDIAN

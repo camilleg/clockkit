@@ -66,8 +66,8 @@ class ClockClient : public Clock {
     explicit ClockClient(ClockClient&);
     ClockClient& operator=(ClockClient&);
 
-    int timeout_;  // Timeout (usec).  Sets the max error on phase calculations.
-    int lastRTT_;  // The last call's round trip time (usec).
+    int timeout_;     // Timeout (usec).  Sets the max error on phase calculations.
+    size_t lastRTT_;  // The last call's round trip time (usec).
     unsigned char sequence_;
     bool acknowledge_;
     UDPSocket* socket_;

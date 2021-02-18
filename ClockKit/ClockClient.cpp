@@ -32,7 +32,7 @@ timestamp_t ClockClient::getValue()
 void ClockClient::sendPacket(const ClockPacket& packet)
 {
     constexpr auto length = ClockPacket::PACKET_LENGTH;
-    char buffer[length];
+    uint8_t buffer[length];
     packet.write(buffer);
     if (socket_->send(buffer, length) != length)
         throw ClockException("could not send packet");
@@ -41,16 +41,10 @@ void ClockClient::sendPacket(const ClockPacket& packet)
 ClockPacket ClockClient::receivePacket(Clock& clock)
 {
     constexpr auto length = ClockPacket::PACKET_LENGTH;
-    char buffer[length];
+    uint8_t buffer[length];
     const auto timeoutMsec = std::max(1, timeout_ / 1000);
 
     while (true) {
-        // XXX why is this constant?
-        /*
-         *const bool packetArrived = socket_->isPending(Socket::pendingInput, timeoutMsec);
-         *if (!packetArrived)
-         *    throw ClockException("timeout");
-         */
         if (!socket_->isPending(Socket::pendingInput, timeoutMsec))
             throw ClockException("timeout");
 
