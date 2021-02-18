@@ -30,7 +30,7 @@ timestamp_t Timestamp::stringToTimestamp(std::string t)
     return sec * 1000000 + usec;
 }
 
-auto toBigEndian =
+std::function<char(char)> toBigEndian =
 // C++20 will have std::endian.
 #if __BYTE_ORDER == __BIG_ENDIAN
     std::identity<char>();
@@ -41,16 +41,14 @@ auto toBigEndian =
 void Timestamp::timestampToBytes(timestamp_t time, char* buffer)
 {
     const char* t = (const char*)&time;
-    for (int i = 0; i < 8; ++i) buffer[i] = t[toBigEndian(i)];
-    // XXX candidate for iteration
-    // std::for_each(buffer, buffer+7, toBigEndian);
+    for (int i = 0; i < 8; ++i) buffer[i] = toBigEndian(t[i]);
 }
 
 timestamp_t Timestamp::bytesToTimestamp(const char* buffer)
 {
     timestamp_t time;
     char* t = (char*)&time;
-    for (int i = 0; i < 8; ++i) t[i] = buffer[toBigEndian(i)];
+    for (int i = 0; i < 8; ++i) t[i] = toBigEndian(buffer[i]);
     return time;
 }
 
