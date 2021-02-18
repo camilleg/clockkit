@@ -12,14 +12,12 @@ ClockClient::ClockClient(InetHostAddress addr, int port)
     , lastRTT_(0)
     , sequence_(0)
     , acknowledge_(false)
-    , socket_{new UDPSocket(InetAddress("0.0.0.0"), 0)}
-{
-    // Open a UDP socket.
+
     // On Linux, 0 picks the next free port.  If eventually another
     // OS doesn't, then pass localPort in as an arg to this constructor,
     // from a localPort:5678 line in the config file.
-    // socket_ = new UDPSocket(InetAddress("0.0.0.0"), 0);
-
+    , socket_{new UDPSocket(InetAddress("0.0.0.0"), 0)}
+{
     // Set the destination address.
     socket_->setPeer(addr, port);
 }
@@ -33,7 +31,7 @@ timestamp_t ClockClient::getValue()
 
 void ClockClient::sendPacket(const ClockPacket& packet)
 {
-    const auto length = ClockPacket::PACKET_LENGTH;
+    constexpr auto length = ClockPacket::PACKET_LENGTH;
     char buffer[length];
     packet.write(buffer);
     if (socket_->send(buffer, length) != length)
@@ -42,13 +40,18 @@ void ClockClient::sendPacket(const ClockPacket& packet)
 
 ClockPacket ClockClient::receivePacket(Clock& clock)
 {
-    const auto length = ClockPacket::PACKET_LENGTH;
+    constexpr auto length = ClockPacket::PACKET_LENGTH;
     char buffer[length];
     const auto timeoutMsec = std::max(1, timeout_ / 1000);
 
     while (true) {
-        const bool packetArrived = socket_->isPending(Socket::pendingInput, timeoutMsec);
-        if (!packetArrived)
+        // XXX why is this constant?
+        /*
+         *const bool packetArrived = socket_->isPending(Socket::pendingInput, timeoutMsec);
+         *if (!packetArrived)
+         *    throw ClockException("timeout");
+         */
+        if (!socket_->isPending(Socket::pendingInput, timeoutMsec))
             throw ClockException("timeout");
 
         if (socket_->receive(buffer, length) != length)
@@ -57,10 +60,10 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
         ClockPacket packet(buffer);
         packet.setClientReceiveTime(clock.getValue());
         if (packet.sequenceNumber_ != sequence_) {
-            cout << "ignoring out-of-order packet" << endl;
+            cout << "ignoring out-of-order packet\n";
         }
         else if (packet.getType() != ClockPacket::REPLY) {
-            cout << "ignoring packet with wrong type" << endl;
+            cout << "ignoring packet with wrong type\n";
         }
         else if (packet.getRTT() > timeout_) {
             throw ClockException("response timed out");
@@ -70,11 +73,6 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
             return packet;
         }
     }
-}
-
-timestamp_t ClockClient::getPhase(Clock& clock)
-{
-    return getPhase(clock, acknowledge_);
 }
 
 // We can't use a default value "bool acknowledge = acknowledge_"

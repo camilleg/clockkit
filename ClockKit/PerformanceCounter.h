@@ -13,8 +13,8 @@ class PerformanceCounter : public Clock {
     virtual timestamp_t getValue();
 
    private:
-    PerformanceCounter();
-    PerformanceCounter(PerformanceCounter&);
+    explicit PerformanceCounter();
+    explicit PerformanceCounter(PerformanceCounter&);
     PerformanceCounter& operator=(PerformanceCounter&);
     static PerformanceCounter instance_;
     double freqConversion_;

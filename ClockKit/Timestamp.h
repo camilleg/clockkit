@@ -10,10 +10,13 @@ typedef __int64 timestamp_t;
 typedef long long timestamp_t;
 #endif
 
-// Conversion functions only.  No members or methods or instances.
-
 class Timestamp {
    public:
+    // Conversion functions only.  No members or methods or instances.
+    Timestamp() = delete;
+    Timestamp(Timestamp& t) = delete;
+    ~Timestamp() = delete;
+
     // Converts a timestamp to a string.
     static std::string timestampToString(timestamp_t t);
 
@@ -25,9 +28,6 @@ class Timestamp {
 
     // Reads a 64 bit timestamp with proper byte ordering.
     static timestamp_t bytesToTimestamp(const char* buffer);
-
-   private:
-    Timestamp();
 };
 
 }  // namespace dex

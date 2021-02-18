@@ -29,58 +29,67 @@ class ClockPacket {
     timestamp_t clientReceiveTime_;  // Time on client when REPLY packet is received.
 
    public:
-    ClockPacket(Type t, unsigned char seqNum, timestamp_t clientRequestTime);
+    explicit ClockPacket(Type t, unsigned char seqNum, timestamp_t clientRequestTime);
 
     // Values are read from the buffer.
-    ClockPacket(const char* buffer);
+    explicit ClockPacket(const char* buffer);
 
     // Write values to a buffer of PACKET_LENGTH bytes.
     void write(char* buffer) const;
 
-    Type getType() const
+    inline Type getType() const
     {
         return type_;
     }
-    void setType(Type t)
+    inline void setType(Type t)
     {
         type_ = t;
     }
 
-    timestamp_t getClientRequestTime() const
+    inline timestamp_t getClientRequestTime() const
     {
         return clientRequestTime_;
     }
-    void setClientRequestTime(timestamp_t t)
+    inline void setClientRequestTime(timestamp_t t)
     {
         clientRequestTime_ = t;
     }
 
-    timestamp_t getServerReplyTime() const
+    inline timestamp_t getServerReplyTime() const
     {
         return serverReplyTime_;
     }
-    void setServerReplyTime(timestamp_t t)
+    inline void setServerReplyTime(timestamp_t t)
     {
         serverReplyTime_ = t;
     }
 
-    timestamp_t getClientReceiveTime() const
+    inline timestamp_t getClientReceiveTime() const
     {
         return clientReceiveTime_;
     }
-    void setClientReceiveTime(timestamp_t t)
+    inline void setClientReceiveTime(timestamp_t t)
     {
         clientReceiveTime_ = t;
     }
 
     // Return the round trip time for the client-server correspondence.
-    timestamp_t getRTT() const;
+    inline timestamp_t getRTT() const
+    {
+        return clientReceiveTime_ - clientRequestTime_;
+    }
 
     // Return the estimated offset between the client and server clocks.
-    timestamp_t getClockOffset() const;
+    timestamp_t getClockOffset() const
+    {
+        return serverReplyTime_ + getErrorBound() - clientReceiveTime_;
+    }
 
     // Return the error bound on the clock offset calculation.
-    timestamp_t getErrorBound() const;
+    inline timestamp_t getErrorBound() const
+    {
+        return getRTT() / 2;
+    }
 
     // Dump this packet to STDOUT, for debugging.
     void print() const;

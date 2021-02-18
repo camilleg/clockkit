@@ -1,5 +1,6 @@
 #pragma once
 #include <cc++/socket.h>
+
 #include "Clock.h"
 #include "ClockPacket.h"
 #include "Common.h"
@@ -28,7 +29,7 @@ namespace dex {
 class ClockClient : public Clock {
    public:
     // Connect to a host and port.
-    ClockClient(InetHostAddress addr, int port);
+    explicit ClockClient(InetHostAddress addr, int port);
 
     ~ClockClient()
     {
@@ -40,42 +41,29 @@ class ClockClient : public Clock {
     // Calls getPhase(HighResolutionClock::instance()).
     timestamp_t getValue();
 
-    /**
-     * Returns the phase between a local clock and
-     * the ClockServer clock.
-     * This call is the most accurate in getting timing
-     * information from a ClockServer.
-     * - Throws ClockException on network timeout.
-     *
-     * If set to send acknowledgments, this call will send
-     * back information to the ClockServer on the phase
-     * difference of the two clocks.
-     */
-    timestamp_t getPhase(Clock& c);
-
-    int getTimeout() const
+    inline int getTimeout() const
     {
         return timeout_;
     }
-    void setTimeout(int timeout)
+    inline void setTimeout(int timeout)
     {
         timeout_ = timeout;
     }
 
-    int getLastRTT() const
+    inline int getLastRTT() const
     {
         return lastRTT_;
     }
 
     // If true, getPhase() will send the server ACKNOWLEDGE packets,
     // so it can track a distributed clock's total error bound.
-    void setAcknowledge(bool acknowledge)
+    inline void setAcknowledge(bool acknowledge)
     {
         acknowledge_ = acknowledge;
     }
 
    private:
-    ClockClient(ClockClient&);
+    explicit ClockClient(ClockClient&);
     ClockClient& operator=(ClockClient&);
 
     int timeout_;  // Timeout (usec).  Sets the max error on phase calculations.
@@ -90,6 +78,23 @@ class ClockClient : public Clock {
     ClockPacket receivePacket(Clock&);
 
     timestamp_t getPhase(Clock&, bool acknowledge);
+
+    /**
+     * Returns the phase between a local clock and
+     * the ClockServer clock.
+     * This call is the most accurate in getting timing
+     * information from a ClockServer.
+     * - Throws ClockException on network timeout.
+     *
+     * If set to send acknowledgments, this call will send
+     * back information to the ClockServer on the phase
+     * difference of the two clocks.
+     */
+   public:
+    inline timestamp_t getPhase(Clock& clock)
+    {
+        return getPhase(clock, acknowledge_);
+    }
 };
 
 }  // namespace dex

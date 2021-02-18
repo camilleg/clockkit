@@ -41,7 +41,9 @@ timestamp_t PhaseLockedClock::getValue()
     }
     catch (ClockException &e) {
         leaveMutex();
-        // cout << "PhaseLockedClock picked up exception, now out of sync." << endl;
+#ifdef DEBUG
+        cout << "PhaseLockedClock picked up exception, now out of sync." << endl;
+#endif
         inSync_ = false;
         throw e;
     }
@@ -75,22 +77,30 @@ void PhaseLockedClock::run()
 void PhaseLockedClock::update()
 {
     if (inSync_ && (primaryClock_.getValue() - lastUpdate_) > updatePanic_) {
-        // cout << "last update too long ago." << endl;
+#ifdef DEBUG
+        cout << "last update too long ago." << endl;
+#endif
         inSync_ = false;
     }
     if (!inSync_) {
-        // cout << "CLOCK OUT OF SYNC" << endl;
+#ifdef DEBUG
+        cout << "CLOCK OUT OF SYNC" << endl;
+#endif
         setClock();
         if (inSync_ && updatePhase())
             lastUpdate_ = primaryClock_.getValue();
         return;
     }
     if (!updatePhase()) {
-        // cout << "PHASE UPDATE FAILED" << endl;
+#ifdef DEBUG
+        cout << "PHASE UPDATE FAILED" << endl;
+#endif
         return;
     }
     if (!updateClock()) {
-        // cout << "CLOCK UPDATE FAILED" << endl;
+#ifdef DEBUG
+        cout << "CLOCK UPDATE FAILED" << endl;
+#endif
         return;
     }
     // Mark a timestamp for sucessful update.
@@ -114,12 +124,16 @@ bool PhaseLockedClock::updatePhase()
         thisVariableValue_ = variableValue;
         thisPrimaryValue_ = primaryValue;
 
-        // cout << "detected phase: " << ((int)phase) << endl;
+#ifdef DEBUG
+        cout << "detected phase: " << ((int)phase) << endl;
+#endif
         return true;
     }
     catch (ClockException &e) {
         leaveMutex();
-        // cout << "PLC handling clock exception: " << e.getMessage() << endl;
+#ifdef DEBUG
+        cout << "PLC handling clock exception: " << e.getMessage() << endl;
+#endif
         return false;
     }
 }
@@ -135,7 +149,9 @@ bool PhaseLockedClock::updateClock()
     const double primaryTicks = thisPrimaryValue_ - lastPrimaryValue_;
     const double primaryFrequency = 1e6 * primaryTicks / referenceElapsed;
     primaryFrequencyAvg_ += (primaryFrequency - primaryFrequencyAvg_) * 0.1;
-    // cout << "primary clock frequency average: " << ((int)primaryFrequencyAvg_) << endl;
+#ifdef DEBUG
+    cout << "primary clock frequency average: " << ((int)primaryFrequencyAvg_) << endl;
+#endif
 
     if (thisPhase_ > phasePanic_ || thisPhase_ < -phasePanic_) {
         // The phase is too high, so declare the clock out of sync.
@@ -147,7 +163,9 @@ bool PhaseLockedClock::updateClock()
     const double phaseDiff = thisPhase_ * 0.1;
     const double frequencyDiff = 1000000 - primaryFrequencyAvg_;
     const double variableClockFrequency = 1000000 + (frequencyDiff + phaseDiff);
-    // cout << "using frequency: " << ((int)variableClockFrequency) << endl;
+#ifdef DEBUG
+    cout << "using frequency: " << ((int)variableClockFrequency) << endl;
+#endif
 
     enterMutex();
     variableFrequencyClock_.setFrequency((int)variableClockFrequency);
@@ -161,10 +179,14 @@ void PhaseLockedClock::setClock()
     try {
         variableFrequencyClock_.setValue(referenceClock_.getValue());
         inSync_ = true;
-        // cout << "CLOCK IN SYNC" << endl;
+#ifdef DEBUG
+        cout << "CLOCK IN SYNC" << endl;
+#endif
     }
     catch (ClockException &e) {
-        // cout << "exception while resetting to the reference clock" << endl;
+#ifdef DEBUG
+        cout << "exception while resetting to the reference clock" << endl;
+#endif
         inSync_ = false;
     }
     leaveMutex();

@@ -1,5 +1,6 @@
 #pragma once
 #include <cc++/thread.h>
+
 #include "Clock.h"
 #include "Common.h"
 
@@ -17,6 +18,7 @@ class SystemClock : public Clock, private Mutex {
      * Constructor is private.  Use SystemClock::instance() instead.
      * Copy constructor and assignment operator are private and unimplemented.
      */
+    // XXX do we even need the constructor or can it be `delete`d?
     SystemClock();
     SystemClock(SystemClock& c);
     SystemClock& operator=(SystemClock& rhs);
