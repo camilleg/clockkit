@@ -12,7 +12,7 @@ class Exception {
     std::string message_;
 
    public:
-    Exception(std::string message);
+    explicit Exception(std::string message);
     virtual ~Exception();
     virtual std::string getMessage();
 };
@@ -25,7 +25,7 @@ class Exception {
  */
 class ClockException : public Exception {
    public:
-    ClockException(std::string message);
+    explicit ClockException(std::string message);
 };
 
 }  // namespace dex

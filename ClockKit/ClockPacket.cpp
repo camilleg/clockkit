@@ -33,29 +33,12 @@ void ClockPacket::write(char* buffer) const
     Timestamp::timestampToBytes(clientReceiveTime_, buffer + 18);
 }
 
-timestamp_t ClockPacket::getRTT() const
-{
-    return clientReceiveTime_ - clientRequestTime_;
-}
-
-timestamp_t ClockPacket::getClockOffset() const
-{
-    return serverReplyTime_ + getErrorBound() - clientReceiveTime_;
-}
-
-timestamp_t ClockPacket::getErrorBound() const
-{
-    return getRTT() / 2;
-}
-
 void ClockPacket::print() const
 {
     std::cout << "--- PACKET ---" << std::endl
-              << "clientRequestTime: " << Timestamp::timestampToString(clientRequestTime_)
-              << std::endl
-              << "serverReplyTime: " << Timestamp::timestampToString(serverReplyTime_) << std::endl
-              << "clientReceiveTime: " << Timestamp::timestampToString(clientReceiveTime_)
-              << std::endl;
+              << "clientRequestTime: " << Timestamp::timestampToString(clientRequestTime_) << "\n"
+              << "serverReplyTime: " << Timestamp::timestampToString(serverReplyTime_) << "\n"
+              << "clientReceiveTime: " << Timestamp::timestampToString(clientReceiveTime_) << "\n";
 }
 
 }  // namespace dex

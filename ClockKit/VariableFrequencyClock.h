@@ -17,7 +17,7 @@ class VariableFrequencyClock : public Clock {
      * Its value starts at 0.
      * Its frequency starts at 1 MHz.
      */
-    VariableFrequencyClock(Clock& master);
+    explicit VariableFrequencyClock(Clock& master);
 
     /**
      * Returns the clock value.
@@ -31,7 +31,7 @@ class VariableFrequencyClock : public Clock {
     // Sets the current time.
     void setValue(timestamp_t t);
 
-    int getFrequency() const
+    inline int getFrequency() const
     {
         return slaveFrequency_;
     }
@@ -44,6 +44,9 @@ class VariableFrequencyClock : public Clock {
     timestamp_t masterMarker_;
     timestamp_t slaveMarker_;
     void updateMarkers();
+
+    // Helper functions
+    std::pair<timestamp_t, timestamp_t> getTicks();
 };
 
 }  // namespace dex

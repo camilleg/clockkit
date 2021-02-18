@@ -1,7 +1,12 @@
 #include "Timestamp.h"
+
 #include <cc++/config.h>
 #include <stdio.h>
+
+#include <algorithm>
+#include <functional>
 #include <string>
+
 #include "Common.h"
 
 const char* format = "<time %i %i>";
@@ -25,24 +30,27 @@ timestamp_t Timestamp::stringToTimestamp(std::string t)
     return sec * 1000000 + usec;
 }
 
+auto toBigEndian =
 // C++20 will have std::endian.
 #if __BYTE_ORDER == __BIG_ENDIAN
-#define src(i) (i)
+    std::identity<char>();
 #else
-#define src(i) (7 - (i))
+    [](char a) { return 7 - a; };
 #endif
 
 void Timestamp::timestampToBytes(timestamp_t time, char* buffer)
 {
     const char* t = (const char*)&time;
-    for (int i = 0; i < 8; ++i) buffer[i] = t[src(i)];
+    for (int i = 0; i < 8; ++i) buffer[i] = t[toBigEndian(i)];
+    // XXX candidate for iteration
+    // std::for_each(buffer, buffer+7, toBigEndian);
 }
 
 timestamp_t Timestamp::bytesToTimestamp(const char* buffer)
 {
     timestamp_t time;
     char* t = (char*)&time;
-    for (int i = 0; i < 8; ++i) t[i] = buffer[src(i)];
+    for (int i = 0; i < 8; ++i) t[i] = buffer[toBigEndian(i)];
     return time;
 }
 

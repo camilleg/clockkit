@@ -1,5 +1,6 @@
 #pragma once
 #include <cc++/thread.h>
+
 #include "Clock.h"
 #include "VariableFrequencyClock.h"
 
@@ -29,7 +30,7 @@ class PhaseLockedClock : public Clock, private Thread, private Mutex {
      * is started to manage it.  When the object is deleted, the thread
      * will be suspended.
      */
-    PhaseLockedClock(Clock& primary, Clock& reference);
+    explicit PhaseLockedClock(Clock& primary, Clock& reference);
 
     /**
      * Cleans up all resources associated with this Clock and
@@ -55,7 +56,7 @@ class PhaseLockedClock : public Clock, private Thread, private Mutex {
      * goes into out-of-sync mode and will throw a ClockException
      * on any attempt to getValue() or getPhase()
      */
-    bool isSynchronized() const
+    inline bool isSynchronized() const
     {
         return inSync_;
     }
@@ -71,14 +72,14 @@ class PhaseLockedClock : public Clock, private Thread, private Mutex {
     // Call this or setUpdatePanic() while the clock is running, to compensate
     // for a crystal drifting due to temperature change (handheld or mobile),
     // or for bandwidth change (failing hotspot, WLAN degradation).
-    void setPhasePanic(timestamp_t phasePanic)
+    inline void setPhasePanic(timestamp_t phasePanic)
     {
         phasePanic_ = phasePanic;
     }
 
     // If the last successful update was longer ago than this,
     // the clock will be set to out-of-sync.
-    void setUpdatePanic(timestamp_t updatePanic)
+    inline void setUpdatePanic(timestamp_t updatePanic)
     {
         updatePanic_ = updatePanic;
     }
@@ -104,7 +105,7 @@ class PhaseLockedClock : public Clock, private Thread, private Mutex {
     void setClock();
 
    private:
-    PhaseLockedClock(PhaseLockedClock& c);
+    explicit PhaseLockedClock(PhaseLockedClock& c);
     PhaseLockedClock& operator=(PhaseLockedClock& rhs);
 
     Clock& primaryClock_;

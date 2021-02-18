@@ -1,14 +1,14 @@
 #include "ConfigReader.h"
 
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+
 #include "ClockClient.h"
 #include "Common.h"
 #include "Exceptions.h"
 #include "HighResolutionClock.h"
 #include "PhaseLockedClock.h"
-
-#include <cstdlib>
-#include <fstream>
-#include <iostream>
 
 using namespace std;
 
@@ -18,7 +18,7 @@ PhaseLockedClock* PhaseLockedClockFromConfigFile(const string& filename)
 {
     ifstream file(filename.c_str());
     if (!file.is_open()) {
-        cerr << "failed to open config file " << filename << endl;
+        cerr << "failed to open config file " << filename << "\n";
         return NULL;
     }
 

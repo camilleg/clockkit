@@ -1,4 +1,5 @@
 #include "VariableFrequencyClock.h"
+
 #include "Exceptions.h"
 
 namespace dex {
@@ -12,14 +13,19 @@ VariableFrequencyClock::VariableFrequencyClock(Clock& master)
 {
 }
 
-timestamp_t VariableFrequencyClock::getValue()
+std::pair<timestamp_t, timestamp_t> VariableFrequencyClock::getTicks()
 {
     const timestamp_t master = masterClock_.getValue();
     const timestamp_t masterTicks = master - masterMarker_;
     if (masterTicks < 0)
         throw ClockException("Clock Rollover Detected");
     const timestamp_t slaveTicks = (masterTicks * slaveFrequency_) / masterFrequency_;
-    return slaveMarker_ + slaveTicks;
+    return std::make_pair(masterTicks, slaveTicks);
+}
+
+timestamp_t VariableFrequencyClock::getValue()
+{
+    return slaveMarker_ + getTicks().second;
 }
 
 void VariableFrequencyClock::setValue(timestamp_t t)
@@ -38,14 +44,8 @@ void VariableFrequencyClock::setFrequency(int freq)
 
 void VariableFrequencyClock::updateMarkers()
 {
-    const timestamp_t master = masterClock_.getValue();
-    const timestamp_t masterTicks = master - masterMarker_;
-    if (masterTicks < 0)
-        throw ClockException("Clock Rollover Detected");
-    const timestamp_t slaveTicks = (masterTicks * slaveFrequency_) / masterFrequency_;
-    slaveMarker_ += slaveTicks;
-    // todo: decopypaste the above with getValue()
-    masterMarker_ = master;
+    slaveMarker_ += getTicks().second;
+    masterMarker_ = masterClock_.getValue();
 }
 
 }  // namespace dex
