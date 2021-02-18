@@ -1,3 +1,5 @@
+#error "this file is not compiled"
+
 #include <cc++/socket.h>
 #include <cc++/thread.h>
 

@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
         catch (ClockException& e) {
             cout << "offset: OUT OF SYNC" << endl;
         }
-        Thread::sleep(1000);
+        Thread::sleep(100);
     }
     return 0;
 }

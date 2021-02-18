@@ -10,5 +10,5 @@ loop {
   else
     puts "offset: OUT OF SYNC"
   end
-  sleep 1
+  sleep 0.1
 }

@@ -68,16 +68,17 @@ void ClockServer::updateEntry(string addr, int offset, int rtt)
         return;
 
     cout << nowStr << '\t' << addr << '\t' << offset << '\t' << rtt << endl;
+    // 1.0 seconds sets only how often to recalculate MAX_OFFSET.
     if (now < lastUpdate_ + 1000000)
         return;
-
     lastUpdate_ = now;
+
     map<string, Entry>::iterator it;
 
     // Purge old entries.
     for (it = ackData_.begin(); it != ackData_.end();) {
         const timestamp_t entryTime = (it->second).time;
-        if (now - entryTime > SYSTEM_STATE_PURGE_TIME) {
+        if (now > entryTime + SYSTEM_STATE_PURGE_TIME) {
             it = ackData_.erase(it);
         }
         else {
@@ -92,7 +93,7 @@ void ClockServer::updateEntry(string addr, int offset, int rtt)
         if (offset > maxOffset)
             maxOffset = offset;
     }
-    cout << nowStr << '\t' << "MAX_OFFSET" << '\t' << maxOffset << '\t' << endl;
+    cout << nowStr << '\t' << "MAX_OFFSET" << '\t' << maxOffset << '\t' << "---" << endl;
 }
 
 }  // namespace dex

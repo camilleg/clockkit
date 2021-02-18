@@ -62,8 +62,8 @@ int PhaseLockedClock::getOffset()
 void PhaseLockedClock::run()
 {
     // These are in usec.
-    const auto updateInterval = 1000000.0;
-    const auto variance = updateInterval * 0.1;  // 10%
+    const auto updateInterval = 100000.0;        // 10 Hz.  From the config file?
+    const auto variance = updateInterval * 0.1;  // +-10%
     const auto base = updateInterval - variance * 0.5;
     while (!testCancel()) {
         update();
@@ -76,44 +76,28 @@ void PhaseLockedClock::run()
 
 void PhaseLockedClock::update()
 {
-    if (inSync_ && (primaryClock_.getValue() - lastUpdate_) > updatePanic_) {
-#ifdef DEBUG
-        cout << "last update too long ago." << endl;
-#endif
+    if (inSync_ && primaryClock_.getValue() - lastUpdate_ > updatePanic_) {
+        // Last update too long ago.
         inSync_ = false;
     }
-    if (!inSync_) {
-#ifdef DEBUG
-        cout << "CLOCK OUT OF SYNC" << endl;
-#endif
+    if (inSync_) {
+        if (!updateClock())
+            return;
+    }
+    else {
         setClock();
-        if (inSync_ && updatePhase())
-            lastUpdate_ = primaryClock_.getValue();
-        return;
     }
-    if (!updatePhase()) {
-#ifdef DEBUG
-        cout << "PHASE UPDATE FAILED" << endl;
-#endif
-        return;
-    }
-    if (!updateClock()) {
-#ifdef DEBUG
-        cout << "CLOCK UPDATE FAILED" << endl;
-#endif
-        return;
-    }
-    // Mark a timestamp for sucessful update.
-    lastUpdate_ = primaryClock_.getValue();
+    if (inSync_ && updatePhase())
+        lastUpdate_ = primaryClock_.getValue();
 }
 
 bool PhaseLockedClock::updatePhase()
 {
     try {
         enterMutex();
-        timestamp_t phase = referenceClock_.getPhase(variableFrequencyClock_);
-        timestamp_t variableValue = variableFrequencyClock_.getValue();
-        timestamp_t primaryValue = primaryClock_.getValue();
+        const timestamp_t phase = referenceClock_.getPhase(variableFrequencyClock_);
+        const timestamp_t variableValue = variableFrequencyClock_.getValue();
+        const timestamp_t primaryValue = primaryClock_.getValue();
         leaveMutex();
 
         lastPhase_ = thisPhase_;

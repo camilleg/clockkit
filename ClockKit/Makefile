@@ -1,7 +1,7 @@
 MAKEFLAGS += --jobs=99
 CPP = c++
 # -fPIC is for */*.so.
-CFLAGS = -O3 -fPIC --std=c++11
+CFLAGS = -O3 -fPIC -std=c++11
 LIBS = -lccgnu2 -lpthread -ldl
 SWIG = swig -Wallkw -Werror
 RUBY   = $$(pkg-config --list-all | grep ruby-   | sort | tail -1 | sed 's/ .*//')

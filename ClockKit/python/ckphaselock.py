@@ -12,4 +12,4 @@ while 1:
         print("offset:", _clockkit.ckOffset(), "\ntime:", _clockkit.ckTimeAsString())
     else:
         print("offset: OUT OF SYNC")
-    time.sleep(1)
+    time.sleep(0.1)
