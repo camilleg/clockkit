@@ -7,7 +7,6 @@
 #include "VariableFrequencyClock.h"
 
 using namespace std;
-using namespace ost;
 using namespace dex;
 
 int main(int argc, char* argv[])
@@ -17,7 +16,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    const InetAddress addr("0.0.0.0");
+    const ost::InetAddress addr("0.0.0.0");
     const int port = atoi(argv[1]);
 
 #ifdef DEBUG

@@ -5,8 +5,12 @@
 
 #include "Exceptions.h"
 
-using namespace std;
-using namespace ost;
+#ifdef DEBUG
+// The extra output from these cout<<'s breaks "make test".
+using std::cout;
+using std::endl;
+#endif
+
 namespace dex {
 
 PhaseLockedClock::PhaseLockedClock(Clock &primary, Clock &reference)

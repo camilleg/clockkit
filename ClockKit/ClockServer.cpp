@@ -12,7 +12,7 @@ namespace dex {
 
 const timestamp_t ClockServer::SYSTEM_STATE_PURGE_TIME = 5000000;  // 5 seconds
 
-ClockServer::ClockServer(InetAddress addr, tpport_t port, Clock& clock)
+ClockServer::ClockServer(ost::InetAddress addr, ost::tpport_t port, Clock& clock)
     : addr_(addr)
     , port_(port)
     , clock_(clock)
@@ -24,15 +24,15 @@ ClockServer::ClockServer(InetAddress addr, tpport_t port, Clock& clock)
 
 void ClockServer::run()
 {
-    UDPSocket socket(addr_, port_);
+    ost::UDPSocket socket(addr_, port_);
     if (log_)
         cout << "time\thost\toffset\trtt" << endl;
     const int length = ClockPacket::PACKET_LENGTH;
     uint8_t buffer[length];
 
-    while (socket.isPending(Socket::pendingInput, TIMEOUT_INF)) {
+    while (socket.isPending(ost::Socket::pendingInput, TIMEOUT_INF)) {
         const timestamp_t serverReplyTime = clock_.getValue();
-        const InetAddress peer =
+        const ost::InetAddress peer =
             socket.getPeer();  // also sets up the socket to send back to the sender
         if (socket.receive(buffer, length) != length) {
             cerr << "ERR: Received packet of wrong length." << endl;

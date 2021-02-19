@@ -4,11 +4,10 @@
 #include "Clock.h"
 #include "Common.h"
 
-using namespace ost;
 namespace dex {
 
 // A singleton system clock.
-class SystemClock : public Clock, private Mutex {
+class SystemClock : public Clock, private ost::Mutex {
    public:
     static SystemClock& instance();
     timestamp_t getValue();

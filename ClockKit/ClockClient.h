@@ -5,8 +5,6 @@
 #include "ClockPacket.h"
 #include "Common.h"
 
-using namespace ost;
-
 namespace dex {
 
 /**
@@ -29,7 +27,7 @@ namespace dex {
 class ClockClient : public Clock {
    public:
     // Connect to a host and port.
-    explicit ClockClient(InetHostAddress addr, int port);
+    explicit ClockClient(ost::InetHostAddress addr, int port);
 
     ~ClockClient()
     {
@@ -70,7 +68,7 @@ class ClockClient : public Clock {
     size_t lastRTT_;  // The last call's round trip time (usec).
     unsigned char sequence_;
     bool acknowledge_;
-    UDPSocket* socket_;
+    ost::UDPSocket* socket_;
 
     void sendPacket(const ClockPacket&);
 

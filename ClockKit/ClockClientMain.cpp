@@ -8,16 +8,15 @@
 #include "HighResolutionClock.h"
 
 using namespace std;
-using namespace ost;
 using namespace dex;
 
 int main(int argc, char* argv[])
 {
     if (argc != 3) {
-        cerr << "usage: " << argv[0] << " <server_ip_address> <port>\n";
+        cerr << "usage: " << argv[0] << " server_ip_address port\n";
         return 1;
     }
-    const InetHostAddress addr(argv[1]);
+    const ost::InetHostAddress addr(argv[1]);
     const int port = atoi(argv[2]);
     cout << "Starting client for " << addr.getHostname() << ":" << port << "\n";
 
@@ -30,14 +29,14 @@ int main(int argc, char* argv[])
         while (true) {
             try {
                 const timestamp_t now = client.getPhase(hires);
-                cout << "offset: " << now << "\trtt: " << client.getLastRTT() << "\n";
+                cout << "offset: " << now << "\trtt: " << client.getLastRTT() << endl;
             }
             catch (ClockException& e) {
             }
-            Thread::sleep(1000);
+            ost::Thread::sleep(1000);
         }
     }
-    catch (Socket*) {
+    catch (ost::Socket*) {
         cout << "Failed to get any outgoing port\n";
         return 127;
     }

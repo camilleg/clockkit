@@ -7,7 +7,7 @@ using namespace std;
 
 namespace dex {
 
-ClockClient::ClockClient(InetHostAddress addr, int port)
+ClockClient::ClockClient(ost::InetHostAddress addr, int port)
     : timeout_(1000)
     , lastRTT_(0)
     , sequence_(0)
@@ -16,7 +16,7 @@ ClockClient::ClockClient(InetHostAddress addr, int port)
     // On Linux, 0 picks the next free port.  If eventually another
     // OS doesn't, then pass localPort in as an arg to this constructor,
     // from a localPort:5678 line in the config file.
-    , socket_{new UDPSocket(InetAddress("0.0.0.0"), 0)}
+    , socket_{new ost::UDPSocket(ost::InetAddress("0.0.0.0"), 0)}
 {
     // Set the destination address.
     socket_->setPeer(addr, port);
@@ -45,7 +45,7 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
     const auto timeoutMsec = std::max(1, timeout_ / 1000);
 
     while (true) {
-        if (!socket_->isPending(Socket::pendingInput, timeoutMsec))
+        if (!socket_->isPending(ost::Socket::pendingInput, timeoutMsec))
             throw ClockException("timeout");
 
         if (socket_->receive(buffer, length) != length)

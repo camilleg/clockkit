@@ -4,7 +4,6 @@
 #include "Clock.h"
 #include "VariableFrequencyClock.h"
 
-using namespace ost;
 namespace dex {
 
 /**
@@ -19,7 +18,7 @@ namespace dex {
  * - Updates occur randomly at +-10% of the update interval,
  *   to not swamp the server with synchronous requests.
  */
-class PhaseLockedClock : public Clock, private Thread, private Mutex {
+class PhaseLockedClock : public Clock, private ost::Thread, private ost::Mutex {
    public:
     /**
      * Creates a PhaseLockedClock around the provided primary and

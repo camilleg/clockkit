@@ -5,17 +5,15 @@
 #include <string>
 #include "Clock.h"
 
-using namespace ost;
-
 namespace dex {
 
 // A network server for a local clock.
 // It stores responses from the clients on the state of their synchronization.
 // To start the server's thread (run()), call start().
-class ClockServer : public Thread {
+class ClockServer : public ost::Thread {
    private:
-    const InetAddress addr_;
-    const tpport_t port_;
+    const ost::InetAddress addr_;
+    const ost::tpport_t port_;
     Clock& clock_;
 
     struct Entry {
@@ -34,7 +32,7 @@ class ClockServer : public Thread {
     // Provide requests for timestamps to clients via a UDP port.
     // To accept connections from clients on *any* local address,
     // set InetAddress to 0.0.0.0.
-    ClockServer(InetAddress addr, tpport_t port, Clock& clock);
+    ClockServer(ost::InetAddress addr, ost::tpport_t port, Clock& clock);
 
     void setLogging(bool log)
     {

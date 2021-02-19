@@ -5,29 +5,25 @@
 #include "Exceptions.h"
 #include "PhaseLockedClock.h"
 
-using namespace std;
-using namespace ost;
-using namespace dex;
-
 int main(int argc, char* argv[])
 {
     if (argc != 2) {
-        cerr << "usage: " << argv[0] << " config_file" << endl;
+        std::cerr << "usage: " << argv[0] << " config_file\n";
         return 1;
     }
 
-    PhaseLockedClock* plc = PhaseLockedClockFromConfigFile(argv[1]);
+    dex::PhaseLockedClock* clock = dex::PhaseLockedClockFromConfigFile(argv[1]);
     while (true) {
         try {
-            const int offset = plc->getOffset();
-            const timestamp_t now = plc->getValue();
-            cout << "offset: " << offset << endl;
-            cout << "time: " << Timestamp::timestampToString(now) << endl;
+            std::cout << "offset: " << clock->getOffset()
+                      << "\ntime: " << dex::Timestamp::timestampToString(clock->getValue())
+                      << std::endl;
+            // endl flushes stdout, to show output even after Ctrl+C.
         }
-        catch (ClockException& e) {
-            cout << "offset: OUT OF SYNC" << endl;
+        catch (dex::ClockException& e) {
+            std::cout << "offset: OUT OF SYNC\n";
         }
-        Thread::sleep(100);
+        ost::Thread::sleep(100);
     }
     return 0;
 }
