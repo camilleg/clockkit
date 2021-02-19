@@ -25,12 +25,6 @@ union tsBytes {
 };
 }  // namespace internal
 
-#if __BYTE_ORDER != __BIG_ENDIAN
-#define REORDER(x) (__builtin_bswap64(x))
-#else
-#define REORDER(x) (x)
-#endif
-
 std::string Timestamp::timestampToString(timestamp_t t)
 {
     const int sec = t / 1000000;
@@ -47,6 +41,12 @@ timestamp_t Timestamp::stringToTimestamp(std::string t)
         return 0;
     return sec * 1000000 + usec;
 }
+
+#if __BYTE_ORDER == __BIG_ENDIAN
+#define REORDER(x) (x)
+#else
+#define REORDER(x) (__builtin_bswap64(x))
+#endif
 
 std::array<uint8_t, 8> Timestamp::timestampToBytes(timestamp_t time)
 {
