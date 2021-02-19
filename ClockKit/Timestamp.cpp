@@ -25,6 +25,12 @@ union tsBytes {
 };
 }  // namespace internal
 
+#if __BYTE_ORDER != __BIG_ENDIAN
+#define REORDER(x) (__builtin_bswap64(x))
+#else
+#define REORDER(x) (x)
+#endif
+
 std::string Timestamp::timestampToString(timestamp_t t)
 {
     const int sec = t / 1000000;
@@ -45,11 +51,7 @@ timestamp_t Timestamp::stringToTimestamp(std::string t)
 std::array<uint8_t, 8> Timestamp::timestampToBytes(timestamp_t time)
 {
     internal::tsBytes u;
-#if __BYTE_ORDER != __BIG_ENDIAN
-    u.ts = __builtin_bswap64(time);
-#else
-    u.ts = time;
-#endif
+    u.ts = REORDER(time);
     return u.bytes;
 }
 
@@ -58,15 +60,7 @@ timestamp_t Timestamp::bytesToTimestamp(const uint8_t* buffer)
     internal::tsBytes u;
     std::memcpy(u.bytes.data(), buffer, 8);
 
-    return static_cast<timestamp_t>(
-#if __BYTE_ORDER != __BIG_ENDIAN
-        __builtin_bswap64(
-#endif
-            u.ts
-#if __BYTE_ORDER != __BIG_ENDIAN
-            )
-#endif
-    );
+    return static_cast<timestamp_t>(REORDER(u.ts));
 }
 
 }  // namespace dex
