@@ -62,7 +62,7 @@ ruby/wrap.c:
 	# In lines starting with rb_define_module_function, cast _wrap_ck's to (VALUE (*)(...)).
 	sed -i -e "s/ _wrap_ck/ (VALUE (*)(...))_wrap_ck/" $@
 ruby/wrap.o: ruby/wrap.c
-	$(CPP) -c $(CFLAGS) -I. $$(pkg-config --cflags $(RUBY)) $? -o $@
+	$(CPP) -c $(CFLAGS) -Wno-pedantic -I. $$(pkg-config --cflags $(RUBY)) $? -o $@
 ruby/clockkit.so: ruby/wrap.o $(OBJECTS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
