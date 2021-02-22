@@ -3,50 +3,40 @@
 
 namespace dex {
 
-/**
- * All other clocks in ClockKit run at 1000000 Hz,
- * but this clock's frequency can be changed.
- * It wraps a master clock.
- * If that clock moves nonmonotonically, a ClockException is thrown.
- */
+// All other clocks in ClockKit run at 1000000 Hz,
+// but this clock's frequency can be changed.
+// Its value starts at 0.
+// It wraps a source clock,
+// If that clock moves nonmonotonically, a ClockException is thrown.
 class VariableFrequencyClock : public Clock {
    public:
-    /**
-     * Creates a new variable frequency clock based on the
-     * provided master clock.
-     * Its value starts at 0.
-     * Its frequency starts at 1 MHz.
-     */
-    explicit VariableFrequencyClock(Clock& master);
+    explicit VariableFrequencyClock(Clock&);
 
-    /**
-     * Returns the clock value.
-     * Throws a ClockError if time is detected to have moved backwards.
-     * This is useful for slaving a variable frequency clock to a counter
-     * that may loop.  In the case of an error, the client should reset the
-     * clock's value using setClockValue().
-     */
+    // Returns the clock value.
+    // Throws a ClockError if time is detected to have moved backwards,
+    // e.g. if the source clock is a looping counter.
+    // If that happens, reset this clock's value with setValue().
     timestamp_t getValue();
 
     // Sets the current time.
-    void setValue(timestamp_t t);
+    void setValue(timestamp_t);
 
     inline int getFrequency() const
     {
-        return slaveFrequency_;
+        return frequency_;
     }
     void setFrequency(int freq);
 
    private:
-    Clock& masterClock_;
-    timestamp_t masterFrequency_;
-    timestamp_t slaveFrequency_;
-    timestamp_t masterMarker_;
-    timestamp_t slaveMarker_;
+    Clock& clockSrc_;
+    timestamp_t frequencySrc_;
+    timestamp_t frequency_;
+    timestamp_t markerSrc_;
+    timestamp_t marker_;
     void updateMarkers();
 
-    // Helper functions
-    std::pair<timestamp_t, timestamp_t> getTicks();
+    // Helper function.
+    std::pair<timestamp_t, timestamp_t> getTicks() const;
 };
 
 }  // namespace dex

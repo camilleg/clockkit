@@ -4,48 +4,47 @@
 
 namespace dex {
 
-VariableFrequencyClock::VariableFrequencyClock(Clock& master)
-    : masterClock_(master)
-    , masterFrequency_(1000000)
-    , slaveFrequency_(1000000)
-    , masterMarker_(masterClock_.getValue())
-    , slaveMarker_(0)
+VariableFrequencyClock::VariableFrequencyClock(Clock& src)
+    : clockSrc_(src)
+    , frequencySrc_(1000000)
+    , frequency_(1000000)
+    , markerSrc_(clockSrc_.getValue())
+    , marker_(0)
 {
+    // setValue(0); would also work, but -Werror=effc++ says to do this in the initializer list.
 }
 
-std::pair<timestamp_t, timestamp_t> VariableFrequencyClock::getTicks()
+std::pair<timestamp_t, timestamp_t> VariableFrequencyClock::getTicks() const
 {
-    const timestamp_t master = masterClock_.getValue();
-    const timestamp_t masterTicks = master - masterMarker_;
-    if (masterTicks < 0)
+    const timestamp_t ticksSrc = clockSrc_.getValue() - markerSrc_;
+    if (ticksSrc < 0)
         throw ClockException("Clock Rollover Detected");
-    const timestamp_t slaveTicks = (masterTicks * slaveFrequency_) / masterFrequency_;
-    return std::make_pair(masterTicks, slaveTicks);
+    const timestamp_t ticks = ticksSrc * frequency_ / frequencySrc_;
+    return std::make_pair(ticksSrc, ticks);
 }
 
 timestamp_t VariableFrequencyClock::getValue()
 {
-    return slaveMarker_ + getTicks().second;
+    return marker_ + getTicks().second;
 }
 
 void VariableFrequencyClock::setValue(timestamp_t t)
 {
-    masterMarker_ = masterClock_.getValue();
-    slaveMarker_ = t;
+    marker_ = t;
+    markerSrc_ = clockSrc_.getValue();
+}
+
+void VariableFrequencyClock::updateMarkers()
+{
+    setValue(getValue());
 }
 
 void VariableFrequencyClock::setFrequency(int freq)
 {
     updateMarkers();
-    if (freq <= 0)
-        throw ClockException("frequency set to negative rate");
-    slaveFrequency_ = freq;
-}
-
-void VariableFrequencyClock::updateMarkers()
-{
-    slaveMarker_ += getTicks().second;
-    masterMarker_ = masterClock_.getValue();
+    // A nonpositive frequency is silently ignored.
+    if (freq > 0)
+        frequency_ = freq;
 }
 
 }  // namespace dex
