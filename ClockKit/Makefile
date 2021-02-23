@@ -1,7 +1,7 @@
 MAKEFLAGS += --jobs=99
 CPP = c++
 # -fPIC is for */*.so.
-CFLAGS = -O3 -fPIC -std=c++11 -Wall -Werror -Weffc++ -pedantic
+CFLAGS = -O3 -fPIC -std=c++11 -Wall -Werror -Weffc++
 LIBS = -lccgnu2 -lpthread -ldl
 SWIG = swig -Wallkw -Werror
 RUBY   = $$(pkg-config --list-all | grep ruby-   | sort | tail -1 | sed 's/ .*//')
@@ -29,8 +29,18 @@ SWIGEXES = \
   ruby/clockkit.so \
   tcl/clockkit.so
 
+all: CFLAGS += -pedantic
 all: $(EXES)
-bindings: $(SWIGEXES)
+
+bindings: all $(SWIGEXES)
+
+debug: override CFLAGS += -O0 -ggdb
+debug: all
+
+# 20 is the number to cleanly shut down the server and client after, in order
+# to generate gcov data files
+profile: CFLAGS += -fPIC --coverage -fprofile-arcs -ftest-coverage -O0 -DPROFILE=20
+profile: $(EXES)
 
 test-bindings: test-python test-ruby test-tcl
 
@@ -74,9 +84,12 @@ tcl/clockkit.so: tcl/wrap.o $(OBJECTS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
 clean:
-	rm -rf $(EXES) $(SWIGEXES) $(OBJECTS) */wrap.o */wrap.c python/clockkit.py
+	rm -rf $(EXES) $(SWIGEXES) $(OBJECTS) */wrap.o */wrap.c python/clockkit.py *.gcno *.gcov
+
+purge: clean
+	rm -rf *.gcda
 
 .cpp.o:
 	$(CPP) -c $(CFLAGS) $(INCLUDE) $< 
 
-.PHONY: all bindings clean test-all test-bindings test-python test-ruby test-tcl
+.PHONY: profile bindings clean test-all test-bindings test-python test-ruby test-tcl
