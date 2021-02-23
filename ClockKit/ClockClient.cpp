@@ -43,10 +43,19 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
     constexpr auto length = ClockPacket::PACKET_LENGTH;
     uint8_t buffer[length];
     const auto timeoutMsec = std::max(1, timeout_ / 1000);
+#ifdef PROFILE
+    static size_t timeouts = 0;
+#endif
 
     while (true) {
-        if (!socket_->isPending(ost::Socket::pendingInput, timeoutMsec))
+        if (!socket_->isPending(ost::Socket::pendingInput, timeoutMsec)) {
+#ifdef PROFILE
+            timeouts++;
+            if (timeouts >= PROFILE)
+                exit(0);
+#endif
             throw ClockException("timeout");
+        }
 
         if (socket_->receive(buffer, length) != length)
             throw ClockException("packet had wrong length");
