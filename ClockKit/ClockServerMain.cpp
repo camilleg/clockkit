@@ -6,13 +6,10 @@
 #include "HighResolutionClock.h"
 #include "VariableFrequencyClock.h"
 
-using namespace std;
-using namespace dex;
-
 int main(int argc, char* argv[])
 {
     if (argc != 2) {
-        cerr << "usage: " << argv[0] << " <port>" << endl;
+        std::cerr << "usage: " << argv[0] << " <port>\n";
         return 1;
     }
 
@@ -20,16 +17,20 @@ int main(int argc, char* argv[])
     const int port = atoi(argv[1]);
 
 #ifdef DEBUG
-    // Create an off-frequency clock for testing.
-    VariableFrequencyClock vfc(HighResolutionClock::instance());
-    vfc.setFrequency(1000000 - 2000);
-    ClockServer server(addr, port, vfc);
+    // A slow clock, for testing.
+    dex::VariableFrequencyClock clock(dex::HighResolutionClock::instance());
+    clock.setFrequency(1000000 - 2000);
 #else
-    ClockServer server(addr, port, HighResolutionClock::instance());
+    auto& clock(dex::HighResolutionClock::instance());
 #endif
+    dex::ClockServer server(addr, port, clock);
 
     server.setLogging(true);
     server.start();
     server.join();
+    std::cerr << "Exited cleanly!\n";
+    ;
+    ;
+    ;
     return 0;
 }

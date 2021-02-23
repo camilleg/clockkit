@@ -10,7 +10,7 @@ using namespace std;
 
 namespace dex {
 
-const timestamp_t ClockServer::SYSTEM_STATE_PURGE_TIME = 5000000;  // 5 seconds
+const timestamp_t ClockServer::SYSTEM_STATE_PURGE_TIME = 1500000;  // usec
 
 ClockServer::ClockServer(ost::InetAddress addr, ost::tpport_t port, Clock& clock)
     : addr_(addr)
@@ -18,6 +18,7 @@ ClockServer::ClockServer(ost::InetAddress addr, ost::tpport_t port, Clock& clock
     , clock_(clock)
     , ackData_{std::map<std::string, Entry>()}
     , log_(false)
+    , die_(false)
     , lastUpdate_(clock_.getValue())
 {
 }
@@ -31,11 +32,13 @@ void ClockServer::run()
     uint8_t buffer[length];
 
     while (socket.isPending(ost::Socket::pendingInput, TIMEOUT_INF)) {
+        if (die_)
+            return;
         const timestamp_t serverReplyTime = clock_.getValue();
         const ost::InetAddress peer =
             socket.getPeer();  // also sets up the socket to send back to the sender
         if (socket.receive(buffer, length) != length) {
-            cerr << "ERR: Received packet of wrong length." << endl;
+            cerr << "ERR: packet had wrong length.\n";
         }
         else {
             ClockPacket packet(buffer);
@@ -45,13 +48,16 @@ void ClockServer::run()
                     packet.setType(ClockPacket::REPLY);
                     packet.write(buffer);
                     if (socket.send(buffer, length) != length)
-                        cerr << "ERR: sent incomplete packet." << endl;
+                        cerr << "ERR: sent incomplete packet.\n";
                     break;
                 case ClockPacket::ACKNOWLEDGE:
                     updateEntry(peer.getHostname(), packet.getClockOffset(), packet.getRTT());
                     break;
+                case ClockPacket::KILL:
+                    die_ = true;  // Tell *all* threads to exit.  (Common C++ can't do this.)
+                    return;       // Exit this thread.
                 default:
-                    cerr << "ERR: received packet of invalid type" << endl;
+                    cerr << "ERR: packet had wrong type.\n";
             }
         }
     }

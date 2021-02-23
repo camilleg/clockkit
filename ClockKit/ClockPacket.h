@@ -10,7 +10,8 @@ class ClockPacket {
     // - REQUEST: Client sends packet to server requesting current time.
     // - REPLY: Server sends client the current time.
     // - ACKNOWLEDGE: Client sends server the status of its synchronization.
-    enum Type { INVALID = 0, REQUEST, REPLY, ACKNOWLEDGE };
+    // - KILL: terminate server.
+    enum Type { INVALID = 0, REQUEST, REPLY, ACKNOWLEDGE, KILL };
 
     // Each packet has:
     // - type : 1 byte
