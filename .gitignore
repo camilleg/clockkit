@@ -1,6 +1,8 @@
+ClockKit/*.gcda
+ClockKit/*.gcno
 ClockKit/*.o
-ClockKit/ckserver
 ClockKit/ckphaselock
+ClockKit/ckserver
 ClockKit/python/clockkit.py
 ClockKit/*/wrap.c
 ClockKit/*/wrap.o
