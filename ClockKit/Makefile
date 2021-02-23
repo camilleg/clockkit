@@ -37,6 +37,8 @@ test-bindings: test-python test-ruby test-tcl
 # Different ports let these tests run simultaneously, via --jobs=99.
 test: ckserver ckphaselock
 	./testcase.sh 4440
+test-30: ckserver ckphaselock
+	./testcase-n.sh 30 4430
 test-python: ckserver python/_clockkit.so
 	cd python && ./testcase.sh 4450
 test-ruby: ckserver ruby/clockkit.so
