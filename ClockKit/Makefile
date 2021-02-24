@@ -94,4 +94,4 @@ purge: clean
 .cpp.o:
 	$(CPP) -c $(CFLAGS) $(INCLUDE) $< 
 
-.PHONY: profile bindings clean test-all test-bindings test-python test-ruby test-tcl
+.PHONY: all profile bindings purge clean test-all test-bindings test-python test-ruby test-tcl
