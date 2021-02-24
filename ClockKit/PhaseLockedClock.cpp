@@ -69,13 +69,13 @@ void PhaseLockedClock::run()
     const auto updateInterval = 100000.0;        // 10 Hz.  From the config file?
     const auto variance = updateInterval * 0.1;  // +-10%
     const auto base = updateInterval - variance * 0.5;
-    while (!testCancel()) {
+    while (!testCancel()) {  // ost::Thread::testCancel()
         update();
         const auto random = (rand() % int(variance * 1000.0)) * 0.001;
         const auto sleep_ms = int((base + random) * 0.001);
-        sleep(sleep_ms);
+        sleep(sleep_ms);  // ost::Thread::sleep()
     }
-    exit();
+    // There's no need to ost::Thread::exit().
 }
 
 void PhaseLockedClock::update()

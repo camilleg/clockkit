@@ -29,7 +29,7 @@ timestamp_t ClockClient::getValue()
     // primary clock = secondary clock + phase
 }
 
-void ClockClient::sendPacket(const ClockPacket& packet)
+void ClockClient::sendPacket(const ClockPacket& packet) const
 {
     constexpr auto length = ClockPacket::PACKET_LENGTH;
     uint8_t buffer[length];
@@ -44,14 +44,13 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
     uint8_t buffer[length];
     const auto timeoutMsec = std::max(1, timeout_ / 1000);
 #ifdef PROFILE
-    static size_t timeouts = 0;
+    static size_t timeouts = 0u;
 #endif
 
     while (true) {
         if (!socket_->isPending(ost::Socket::pendingInput, timeoutMsec)) {
 #ifdef PROFILE
-            timeouts++;
-            if (timeouts >= PROFILE)
+            if (++timeouts >= PROFILE)
                 exit(0);
 #endif
             throw ClockException("timeout");
@@ -61,6 +60,9 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
             throw ClockException("packet had wrong length");
 
         ClockPacket packet(buffer);
+        if (packet.getType() == ClockPacket::KILL) {
+            exit(0);
+        }
         packet.setClientReceiveTime(clock.getValue());
         if (packet.sequenceNumber_ != sequence_) {
             cout << "ignoring out-of-order packet\n";

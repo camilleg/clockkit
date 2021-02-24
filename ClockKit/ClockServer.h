@@ -1,6 +1,5 @@
 #pragma once
-#include <cc++/socket.h>
-#include <cc++/thread.h>
+#include <cc++/socket.h>  // for ost::lotsastuff
 #include <map>
 #include <string>
 #include "Clock.h"
@@ -24,7 +23,6 @@ class ClockServer : public ost::Thread {
     std::map<std::string, Entry> ackData_;
 
     bool log_;
-    bool die_;
 
     static const timestamp_t SYSTEM_STATE_PURGE_TIME;
     timestamp_t lastUpdate_;

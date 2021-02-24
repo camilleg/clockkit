@@ -1,5 +1,5 @@
 #pragma once
-#include <cc++/thread.h>
+#include <cc++/thread.h>  // for ost::Mutex
 
 #include "Clock.h"
 #include "Common.h"

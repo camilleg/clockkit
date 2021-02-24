@@ -26,11 +26,9 @@ int main(int argc, char* argv[])
     dex::ClockServer server(addr, port, clock);
 
     server.setLogging(true);
+    // todo: There's only one thread.  If one thread per client
+    // wouldn't be better, why not omit this single thread?
     server.start();
     server.join();
-    std::cerr << "Exited cleanly!\n";
-    ;
-    ;
-    ;
     return 0;
 }

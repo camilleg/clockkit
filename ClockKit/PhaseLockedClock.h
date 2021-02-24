@@ -1,5 +1,5 @@
 #pragma once
-#include <cc++/thread.h>
+#include <cc++/thread.h>  // for ost::Thread, private ost::Mutex
 
 #include "Clock.h"
 #include "VariableFrequencyClock.h"
@@ -22,10 +22,9 @@ class PhaseLockedClock : public Clock, private ost::Thread, private ost::Mutex {
    public:
     /**
      * Creates a PhaseLockedClock around the provided primary and
-     * reference clocks.  The update panic is initially set at
-     * 5 seconds and the phase offset panic is initially set at 5 msec.
+     * reference clocks.
      *
-     * Note: This is na Active Object.  So, when it is creted a thread
+     * This is an Active Object.  So, when it is created a thread
      * is started to manage it.  When the object is deleted, the thread
      * will be suspended.
      */
@@ -38,6 +37,12 @@ class PhaseLockedClock : public Clock, private ost::Thread, private ost::Mutex {
     ~PhaseLockedClock()
     {
         terminate();
+    }
+
+    // Kill the ClockClient and its ClockServer.
+    void die()
+    {
+        referenceClock_.die();
     }
 
     /**

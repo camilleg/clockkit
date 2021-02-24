@@ -34,6 +34,9 @@ class Clock {
     }
 
     virtual ~Clock() = default;
+
+    // Cleanly kill a ClockServer or ClockClient.
+    virtual void die() const {};
 };
 
 }  // namespace dex

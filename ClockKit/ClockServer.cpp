@@ -18,7 +18,6 @@ ClockServer::ClockServer(ost::InetAddress addr, ost::tpport_t port, Clock& clock
     , clock_(clock)
     , ackData_{std::map<std::string, Entry>()}
     , log_(false)
-    , die_(false)
     , lastUpdate_(clock_.getValue())
 {
 }
@@ -28,7 +27,7 @@ void ClockServer::run()
     ost::UDPSocket socket(addr_, port_);
     if (log_)
         cout << "time\thost\toffset\trtt" << endl;
-    const int length = ClockPacket::PACKET_LENGTH;
+    constexpr auto length = ClockPacket::PACKET_LENGTH;
     uint8_t buffer[length];
 
 #ifdef PROFILE
@@ -41,8 +40,6 @@ void ClockServer::run()
         if (iterations++ >= PROFILE)
             break;
 #endif
-        if (die_)
-            return;
         const timestamp_t serverReplyTime = clock_.getValue();
         const ost::InetAddress peer =
             socket.getPeer();  // also sets up the socket to send back to the sender
@@ -63,8 +60,7 @@ void ClockServer::run()
                     updateEntry(peer.getHostname(), packet.getClockOffset(), packet.getRTT());
                     break;
                 case ClockPacket::KILL:
-                    die_ = true;  // Tell *all* threads to exit.  (Common C++ can't do this.)
-                    return;       // Exit this thread.
+                    return;  // Exit this thread.
                 default:
                     cerr << "ERR: packet had wrong type.\n";
             }

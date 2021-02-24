@@ -60,6 +60,12 @@ class ClockClient : public Clock {
         acknowledge_ = acknowledge;
     }
 
+    // Kill the connected ClockServer.
+    void die() const
+    {
+        sendPacket(ClockPacket(ClockPacket::KILL, 0, 0));
+    }
+
    private:
     explicit ClockClient(ClockClient&);
     ClockClient& operator=(ClockClient&);
@@ -70,7 +76,7 @@ class ClockClient : public Clock {
     bool acknowledge_;
     ost::UDPSocket* socket_;
 
-    void sendPacket(const ClockPacket&);
+    void sendPacket(const ClockPacket&) const;
 
     // Receives the packet and sets the receipt time via the provided clock.
     ClockPacket receivePacket(Clock&);
