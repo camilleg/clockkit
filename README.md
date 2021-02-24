@@ -67,3 +67,4 @@ form are welcome nonetheless.
 - To maintain the formatting style, `sudo apt install clang-format`, and use `clang-format` through the provided git hook:  
   `git config core.hooksPath .git_managed_hooks`
 - New code should follow the [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#c-core-guidelines).
+- For profiling and code coverage, `sudo apt install gcovr`, `make clean && make profile`, `gcovr`.
