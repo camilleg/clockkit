@@ -10,33 +10,31 @@
 #include "HighResolutionClock.h"
 #include "PhaseLockedClock.h"
 
-using namespace std;
-
 namespace dex {
 
-PhaseLockedClock* PhaseLockedClockFromConfigFile(const string& filename)
+PhaseLockedClock* PhaseLockedClockFromConfigFile(const std::string& filename)
 {
-    ifstream file(filename.c_str());
+    std::ifstream file(filename.c_str());
     if (!file.is_open()) {
-        cerr << "failed to open config file " << filename << "\n";
+        std::cerr << "failed to open config file '" << filename << "'\n";
         return NULL;
     }
 
-    string server = "localhost";
-    int port = 4444;
-    int timeout = 1000;
-    int phasePanic = 5000;
-    int updatePanic = 5000000;
-    bool found = false;
+    std::string server = "localhost";
+    auto port = 4444;
+    auto timeout = 1000;
+    auto phasePanic = 5000;
+    auto updatePanic = 5000000;
+    auto found = false;
 
     while (!file.eof()) {
-        string line;
+        std::string line;
         file >> line;
-        const int pos = line.find(":");
+        const auto pos = line.find(":");
         if (pos < 0)
             break;
-        const string name(line.substr(0, pos));
-        const string value(line.substr(pos + 1));
+        const auto name(line.substr(0, pos));
+        const auto value(line.substr(pos + 1));
 
         if (name == "server") {
             server = value;
@@ -61,14 +59,14 @@ PhaseLockedClock* PhaseLockedClockFromConfigFile(const string& filename)
     }
     file.close();
     if (!found)
-        cerr << "using defaults because of useless config file '" << filename << "'" << endl;
+        std::cerr << "using defaults because of useless config file '" << filename << "'\n";
 
     // TODO separate printing from object creation
-    cout << "config [server:" << server << "]" << endl;
-    cout << "config [port:" << port << "]" << endl;
-    cout << "config [timeout:" << timeout << "]" << endl;
-    cout << "config [phasePanic:" << phasePanic << "]" << endl;
-    cout << "config [updatePanic:" << updatePanic << "]" << endl;
+    std::cout << "config [server:" << server << "]\n"
+              << "config [port:" << port << "]\n"
+              << "config [timeout:" << timeout << "]\n"
+              << "config [phasePanic:" << phasePanic << "]\n"
+              << "config [updatePanic:" << updatePanic << "]" << std::endl;
 
     const ost::InetHostAddress addr(server.c_str());
     ClockClient* client = new ClockClient(addr, port);
