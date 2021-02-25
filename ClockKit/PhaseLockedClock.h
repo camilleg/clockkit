@@ -120,16 +120,16 @@ class PhaseLockedClock : public Clock, private ost::Thread, private ost::Mutex {
     bool inSync_;
 
     // Phase between the VFC and the reference clock.
-    timestamp_t thisPhase_;
-    timestamp_t lastPhase_;
+    timestamp_t phase_;
+    timestamp_t phasePrev_;
 
     // VFC's value.
-    timestamp_t thisVariableValue_;
-    timestamp_t lastVariableValue_;
+    timestamp_t variableValue_;
+    timestamp_t variableValuePrev_;
 
     // Primary clock's value.
-    timestamp_t thisPrimaryValue_;
-    timestamp_t lastPrimaryValue_;
+    timestamp_t primaryValue_;
+    timestamp_t primaryValuePrev_;
 
     // Average frequency of the primary clock w.r.t the reference clock.
     double primaryFrequencyAvg_;
@@ -138,8 +138,7 @@ class PhaseLockedClock : public Clock, private ost::Thread, private ost::Mutex {
     timestamp_t phasePanic_;
     timestamp_t updatePanic_;
 
-    // Time of the last successful update.
-    timestamp_t lastUpdate_;
+    timestamp_t updatePrev_;
 };
 
 }  // namespace dex
