@@ -19,7 +19,7 @@ void ckInitialize(const char* path)
 dex::timestamp_t ckTimeAsValue()
 {
     if (ckClock == NULL)
-        return 0;  // "Zero seconds since the epoch" is obviously invalid.
+        return 0;  // "Zero usec since the epoch" is obviously invalid.
     try {
         return ckClock->getValue();
     }
