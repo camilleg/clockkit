@@ -1,6 +1,7 @@
 #include "VariableFrequencyClock.h"
 
 #include "Exceptions.h"
+#include "limits"
 
 namespace dex {
 
@@ -10,33 +11,37 @@ VariableFrequencyClock::VariableFrequencyClock(Clock& src)
     , frequency_(1000000)
     , markerSrc_(clockSrc_.getValue())
     , marker_(0)
+    , rolledOver_(false)
 {
     // setValue(0); would also work, but -Werror=effc++ says to do this in the initializer list.
 }
 
-std::pair<timestamp_t, timestamp_t> VariableFrequencyClock::getTicks() const
-{
-    const timestamp_t ticksSrc = clockSrc_.getValue() - markerSrc_;
-    if (ticksSrc < 0)
-        throw ClockException("Clock Rollover Detected");
-    const timestamp_t ticks = ticksSrc * frequency_ / frequencySrc_;
-    return std::make_pair(ticksSrc, ticks);
-}
-
 timestamp_t VariableFrequencyClock::getValue()
 {
-    return marker_ + getTicks().second;
+    // Typically -2147483647 usec, or -35 minutes, obviously invalid.
+    static const auto invalid = -std::numeric_limits<int>::max();
+    if (rolledOver_)
+        return invalid;
+
+    const timestamp_t ticksSrc = clockSrc_.getValue() - markerSrc_;
+    if (ticksSrc < 0) {
+        rolledOver_ = true;
+        return invalid;
+    }
+    return marker_ + ticksSrc * frequency_ / frequencySrc_;
 }
 
 void VariableFrequencyClock::setValue(timestamp_t t)
 {
     marker_ = t;
     markerSrc_ = clockSrc_.getValue();
+    rolledOver_ = false;
 }
 
 void VariableFrequencyClock::updateMarkers()
 {
-    setValue(getValue());
+    if (!rolledOver_)
+        setValue(getValue());
 }
 
 void VariableFrequencyClock::setFrequency(int freq)
