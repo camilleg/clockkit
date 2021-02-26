@@ -65,23 +65,22 @@ int PhaseLockedClock::getOffset()
 
 void PhaseLockedClock::run()
 {
-    // These are in usec.
-    const auto updateInterval = 100000.0;        // 10 Hz.  From the config file?
-    const auto variance = updateInterval * 0.1;  // +-10%
-    const auto base = updateInterval - variance * 0.5;
+    constexpr auto updateInterval_usec = 100000;              // 10 Hz.  From the config file?
+    constexpr auto variance_usec = updateInterval_usec / 10;  // +-5%, so +- 5 msec.
+    constexpr auto base_usec = updateInterval_usec - variance_usec / 2;
     while (!testCancel()) {  // ost::Thread::testCancel()
         update();
-        const auto random = (rand() % int(variance * 1000.0)) * 0.001;
-        const auto sleep_ms = int((base + random) * 0.001);
-        sleep(sleep_ms);  // ost::Thread::sleep()
+        const auto random_usec = rand() % variance_usec;
+        sleep((base_usec + random_usec) / 1000 /*msec*/);  // ost::Thread::sleep()
     }
     // There's no need to ost::Thread::exit().
 }
 
 void PhaseLockedClock::update()
 {
-    if (inSync_ && primaryClock_.getValue() - updatePrev_ > updatePanic_) {
-        // Last update too long ago.
+    // This logic is brittle, because of how inSync_ is used and set everywhere.
+    if (inSync_ && primaryClock_.getValue() > updatePrev_ + updatePanic_) {
+        // The previous update was too long ago.
         inSync_ = false;
     }
     if (inSync_) {
@@ -91,13 +90,15 @@ void PhaseLockedClock::update()
     else {
         setClock();
     }
-    if (inSync_ && updatePhase()) {
+    if (updatePhase()) {
         updatePrev_ = primaryClock_.getValue();
     }
 }
 
 bool PhaseLockedClock::updatePhase()
 {
+    if (!inSync_)
+        return false;
     try {
         enterMutex();
         const timestamp_t phase = referenceClock_.getPhase(variableFrequencyClock_);
@@ -114,14 +115,14 @@ bool PhaseLockedClock::updatePhase()
         primaryValue_ = primaryValue;
 
 #ifdef DEBUG
-        cout << "detected phase: " << ((int)phase) << endl;
+        cout << "detected phase: " << phase << endl;
 #endif
         return true;
     }
     catch (ClockException &e) {
         leaveMutex();
 #ifdef DEBUG
-        cout << "PLC handling clock exception: " << e.getMessage() << endl;
+        cout << "PhaseLockedClock caught exception: " << e.getMessage() << endl;
 #endif
         return false;
     }
@@ -138,29 +139,29 @@ bool PhaseLockedClock::updateClock()
 
     // Find the primary clock's frequency; filter for noise.
     const double primaryTicks = primaryValue_ - primaryValuePrev_;
-    const double primaryFrequency = 1e6 * primaryTicks / referenceElapsed;
+    const auto primaryFrequency = 1000000.0 * primaryTicks / referenceElapsed;
     primaryFrequencyAvg_ += (primaryFrequency - primaryFrequencyAvg_) * 0.1;
 #ifdef DEBUG
-    cout << "primary clock frequency average: " << ((int)primaryFrequencyAvg_) << endl;
+    cout << "primary clock frequency average: " << int(primaryFrequencyAvg_) << endl;
 #endif
 
     // todo: phasePanic_ unsigned, or timestamp_t phase_ unsigned, or abs().
     if (phase_ > phasePanic_ || phase_ < -phasePanic_) {
-        // The phase is too high, so declare the clock out of sync.
+        // The phase is too large.
         inSync_ = false;
         return false;
     }
 
     // Calculate the adjustment for the variable clock's frequency.
-    const double phaseDiff = phase_ * 0.1;
-    const double frequencyDiff = 1000000 - primaryFrequencyAvg_;
-    const double variableClockFrequency = 1000000 + (frequencyDiff + phaseDiff);
+    const auto phaseDiff = phase_ * 0.1;
+    const auto frequencyDiff = 1000000.0 - primaryFrequencyAvg_;
+    const int variableClockFrequency = 1000000 + frequencyDiff + phaseDiff;
 #ifdef DEBUG
-    cout << "using frequency: " << int(variableClockFrequency) << endl;
+    cout << "using frequency: " << variableClockFrequency << endl;
 #endif
 
     enterMutex();
-    variableFrequencyClock_.setFrequency((int)variableClockFrequency);
+    variableFrequencyClock_.setFrequency(variableClockFrequency);
     leaveMutex();
     return true;
 }

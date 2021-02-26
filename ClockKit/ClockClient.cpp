@@ -82,6 +82,7 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
 
 // We can't use a default value "bool acknowledge = acknowledge_"
 // because the base class's signature for getPhase has only the first arg.
+// Always false, while it's called from only ClockClient::getValue().
 timestamp_t ClockClient::getPhase(Clock& clock, bool acknowledge)
 {
     ++sequence_ %= 250;  // One byte.

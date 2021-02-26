@@ -21,8 +21,7 @@ class ClockPacket {
     enum { PACKET_LENGTH = 26 };
 
     // XXX is a single byte not a bit less for a sequence number?
-    const unsigned char
-        sequenceNumber_;  // Detects out-of-order packets and thus delayed responses.
+    const uint8_t sequenceNumber_;  // Detects out-of-order packets and thus delayed responses.
 
    private:
     Type type_;

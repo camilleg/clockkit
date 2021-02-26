@@ -4,7 +4,9 @@
 
 #include "ClockServer.h"
 #include "HighResolutionClock.h"
+#ifdef DEBUG
 #include "VariableFrequencyClock.h"
+#endif
 
 int main(int argc, char* argv[])
 {
