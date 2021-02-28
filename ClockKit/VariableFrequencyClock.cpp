@@ -18,8 +18,8 @@ VariableFrequencyClock::VariableFrequencyClock(Clock& src)
 
 timestamp_t VariableFrequencyClock::getValue()
 {
-    // Typically -2147483647 usec, or -35 minutes, obviously invalid.
-    static const auto invalid = -std::numeric_limits<int>::max();
+    // Typically -9223372036854775807 usec, or 293,000 years, obviously invalid.
+    constexpr auto invalid = -std::numeric_limits<timestamp_t>::max();
     if (rolledOver_)
         return invalid;
 

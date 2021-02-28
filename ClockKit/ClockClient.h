@@ -4,6 +4,7 @@
 #include "Clock.h"
 #include "ClockPacket.h"
 #include "Common.h"
+#include "limits"
 
 namespace dex {
 
@@ -37,6 +38,7 @@ class ClockClient : public Clock {
     // Get the ClockServer's "current" time.
     // Slower and less accurate than getPhase().
     // Calls getPhase(HighResolutionClock::instance()).
+    // Returns "invalid" on error.
     timestamp_t getValue();
 
     inline int getTimeout() const
@@ -63,8 +65,11 @@ class ClockClient : public Clock {
     // Kill the connected ClockServer.
     void die() const
     {
-        sendPacket(ClockPacket(ClockPacket::KILL, 0, 0));
+        (void)sendPacket(ClockPacket(ClockPacket::KILL, 0, 0));
     }
+
+    // Typically 9223372036854775807 usec, or 293,000 years, obviously invalid.
+    static constexpr auto invalid = std::numeric_limits<timestamp_t>::max();
 
    private:
     explicit ClockClient(ClockClient&);
@@ -76,11 +81,12 @@ class ClockClient : public Clock {
     bool acknowledge_;
     ost::UDPSocket* socket_;
 
-    void sendPacket(const ClockPacket&) const;
+    bool sendPacket(const ClockPacket&) const;
 
     // Receives the packet and sets the receipt time via the provided clock.
     ClockPacket receivePacket(Clock&);
 
+    // Returns "invalid" on error.
     timestamp_t getPhase(Clock&, bool acknowledge);
 
     /**

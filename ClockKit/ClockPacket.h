@@ -35,6 +35,9 @@ class ClockPacket {
     // Values are read from the buffer.
     explicit ClockPacket(uint8_t* buffer);
 
+    // Invalid.
+    explicit ClockPacket();
+
     // Write values to a buffer of PACKET_LENGTH bytes.
     void write(uint8_t* buffer) const;
 
@@ -45,6 +48,11 @@ class ClockPacket {
     inline void setType(Type t)
     {
         type_ = t;
+    }
+
+    inline bool invalid() const
+    {
+        return type_ == INVALID;
     }
 
     inline timestamp_t getClientRequestTime() const

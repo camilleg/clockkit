@@ -6,6 +6,15 @@
 
 namespace dex {
 
+ClockPacket::ClockPacket()
+    : sequenceNumber_(0)
+    , type_(INVALID)
+    , clientRequestTime_(0)
+    , serverReplyTime_(0)
+    , clientReceiveTime_(0)
+{
+}
+
 ClockPacket::ClockPacket(Type t, uint8_t n, timestamp_t crt)
     : sequenceNumber_(n)
     , type_(t)

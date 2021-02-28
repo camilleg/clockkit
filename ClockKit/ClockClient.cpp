@@ -25,17 +25,26 @@ ClockClient::ClockClient(ost::InetHostAddress addr, int port)
 timestamp_t ClockClient::getValue()
 {
     Clock& baseClock = HighResolutionClock::instance();
-    return baseClock.getValue() + getPhase(baseClock, false);
+    const auto phase = getPhase(baseClock, false);
+    if (phase == invalid) {
+#if 0
+        // With two clients, killing/restarting ckserver
+	// sometimes leaves one client out of sync for a long time
+	return invalid;
+#else
+        throw ClockException("out of sync for some reason");
+#endif
+    }
+    return baseClock.getValue() + phase;
     // primary clock = secondary clock + phase
 }
 
-void ClockClient::sendPacket(const ClockPacket& packet) const
+bool ClockClient::sendPacket(const ClockPacket& packet) const
 {
     constexpr auto length = ClockPacket::PACKET_LENGTH;
     uint8_t buffer[length];
     packet.write(buffer);
-    if (socket_->send(buffer, length) != length)
-        throw ClockException("could not send packet");
+    return socket_->send(buffer, length) == length;
 }
 
 ClockPacket ClockClient::receivePacket(Clock& clock)
@@ -53,16 +62,17 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
             if (++timeouts >= PROFILE)
                 exit(0);
 #endif
-            throw ClockException("timeout");
+            return ClockPacket();  // Timeout.
         }
 
         if (socket_->receive(buffer, length) != length)
-            throw ClockException("packet had wrong length");
+            return ClockPacket();  // Packet had wrong length.
 
         ClockPacket packet(buffer);
         if (packet.getType() == ClockPacket::KILL) {
             exit(0);
         }
+
         packet.setClientReceiveTime(clock.getValue());
         if (packet.sequenceNumber_ != sequence_) {
             cout << "ignoring out-of-order packet\n";
@@ -71,12 +81,11 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
             cout << "ignoring packet with wrong type\n";
         }
         else if (packet.getRTT() > timeout_) {
-            throw ClockException("response timed out");
+            return ClockPacket();  // Timeout.
         }
-        else {
-            lastRTT_ = packet.getRTT();
-            return packet;
-        }
+
+        lastRTT_ = packet.getRTT();
+        return packet;
     }
 }
 
@@ -87,11 +96,15 @@ timestamp_t ClockClient::getPhase(Clock& clock, bool acknowledge)
 {
     ++sequence_ %= 250;  // One byte.
     const ClockPacket p1(ClockPacket::REQUEST, sequence_, clock.getValue());
-    sendPacket(p1);
+    if (!sendPacket(p1))
+        return invalid;
     ClockPacket p2 = receivePacket(clock);
+    if (p2.invalid())
+        return invalid;
     if (acknowledge) {
         p2.setType(ClockPacket::ACKNOWLEDGE);
-        sendPacket(p2);
+        if (!sendPacket(p2))
+            return invalid;
     }
     return p2.getClockOffset();
 }
