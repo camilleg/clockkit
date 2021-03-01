@@ -28,9 +28,9 @@ int main(int argc, char* argv[])
         catch (dex::ClockException& e) {
             std::cout << "offset: OUT OF SYNC\n";
         }
-        ost::Thread::sleep(100);  // msec
+        ost::Thread::sleep(200);  // msec
         if (fTerminate) {
-            runtime -= 0.1;  // sec
+            runtime -= 0.2;  // sec
             if (runtime <= 0.0) {
                 clock->die();
                 break;

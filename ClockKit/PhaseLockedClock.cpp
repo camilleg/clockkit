@@ -65,7 +65,7 @@ int PhaseLockedClock::getOffset()
 
 void PhaseLockedClock::run()
 {
-    constexpr auto updateInterval_usec = 100000;              // 10 Hz.  From the config file?
+    constexpr auto updateInterval_usec = 200000;              // 5 Hz.  From the config file?
     constexpr auto variance_usec = updateInterval_usec / 10;  // +-5%, so +- 5 msec.
     constexpr auto base_usec = updateInterval_usec - variance_usec / 2;
     while (!testCancel()) {  // ost::Thread::testCancel()
