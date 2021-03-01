@@ -6,11 +6,11 @@ else
   port=4444
 fi
 
-srv=$(mktemp /tmp/clockkit.XXXXXX)
-cli=$(mktemp /tmp/clockkit.XXXXXX)
-conf=$(mktemp /tmp/clockkit.XXXXXX)
+conf=$(mktemp /tmp/clockkit.conf.XXX)
+srv=$(mktemp /tmp/clockkit.srv.XXX)
+cli=$(mktemp /tmp/clockkit.cli.XXX)
 # Clean up after all possible exits.
-trap "rm -f $srv $cli $conf" 0 2 3 15
+trap "rm -f $conf $srv $cli" 0 2 3 15
 
 sed "s/^port:.*/port:$port/" < ../clockkit.conf > $conf
 pkill -f 'tclsh ./ckphaselock.tcl'
