@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
         while (true) {
             try {
                 const timestamp_t now = client.getPhase(hires);
-                cout << "offset: " << now << "\trtt: " << client.getLastRTT() << endl;
+                cout << "offset: " << now << "\trtt: " << client.rtt() << endl;
             }
             catch (ClockException& e) {
             }

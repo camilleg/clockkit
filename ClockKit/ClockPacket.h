@@ -84,7 +84,7 @@ class ClockPacket {
 
     // Return the round trip time for the client-server correspondence.
     // XXX A round trip time is not really a timestamp; can't be negative
-    inline timestamp_t getRTT() const
+    inline timestamp_t rtt() const
     {
         return clientReceiveTime_ - clientRequestTime_;
     }
@@ -98,7 +98,7 @@ class ClockPacket {
     // Return the error bound on the clock offset calculation.
     inline timestamp_t getErrorBound() const
     {
-        return getRTT() / 2;
+        return rtt() / 2;
     }
 
     // Dump this packet to STDOUT, for debugging.

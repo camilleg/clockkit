@@ -9,7 +9,7 @@ namespace dex {
 
 ClockClient::ClockClient(ost::InetHostAddress addr, int port)
     : timeout_(1000)
-    , lastRTT_(0)
+    , rtt_(0u)
     , sequence_(0)
     , acknowledge_(false)
 
@@ -76,15 +76,18 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
         packet.setClientReceiveTime(clock.getValue());
         if (packet.sequenceNumber_ != sequence_) {
             cout << "ignoring out-of-order packet\n";
-        }
-        else if (packet.getType() != ClockPacket::REPLY) {
-            cout << "ignoring packet with wrong type\n";
-        }
-        else if (packet.getRTT() > timeout_) {
-            return ClockPacket();  // Timeout.
+            continue;
         }
 
-        lastRTT_ = packet.getRTT();
+        if (packet.getType() != ClockPacket::REPLY) {
+            cout << "ignoring packet with wrong type\n";
+            continue;
+        }
+
+        const auto rttPrev = packet.rtt();
+        if (rttPrev > timeout_)
+            return ClockPacket();  // Timeout.
+        rtt_ = rttPrev;
         return packet;
     }
 }

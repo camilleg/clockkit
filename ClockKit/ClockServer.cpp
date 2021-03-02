@@ -18,7 +18,7 @@ ClockServer::ClockServer(ost::InetAddress addr, ost::tpport_t port, Clock& clock
     , clock_(clock)
     , ackData_{std::map<std::string, Entry>()}
     , log_(false)
-    , lastUpdate_(clock_.getValue())
+    , tRecalculated_(clock_.getValue())
 {
 }
 
@@ -57,7 +57,7 @@ void ClockServer::run()
                         cerr << "ERR: sent incomplete packet.\n";
                     break;
                 case ClockPacket::ACKNOWLEDGE:
-                    updateEntry(peer.getHostname(), packet.getClockOffset(), packet.getRTT());
+                    updateEntry(peer.getHostname(), packet.getClockOffset(), packet.rtt());
                     break;
                 case ClockPacket::KILL:
                     return;  // Exit this thread.
@@ -80,9 +80,9 @@ void ClockServer::updateEntry(string addr, int offset, int rtt)
 
     cout << nowStr << '\t' << addr << '\t' << offset << '\t' << rtt << endl;
     // 1.0 seconds sets only how often to recalculate MAX_OFFSET.
-    if (now < lastUpdate_ + 1000000)
+    if (now < tRecalculated_ + 1000000)
         return;
-    lastUpdate_ = now;
+    tRecalculated_ = now;
 
     map<string, Entry>::iterator it;
 

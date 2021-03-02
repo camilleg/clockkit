@@ -45,30 +45,20 @@ class PhaseLockedClock : public Clock, private ost::Thread, private ost::Mutex {
         referenceClock_.die();
     }
 
-    /**
-     * Returns the value of this PhaseLockedClock.  If for some reason
-     * the clock has become out of sync with the refernce clock then
-     * this call will throw a ClockException.
-     */
+    // Value of this clock.
     timestamp_t getValue();
 
-    /**
-     * @return true iff the clock is in sync with the reference clock.
-     * This clock may become out of sync with the reference clock
-     * in a number of ways.  If the last update was too long gao,
-     * or the phase is detected to be too great, then the clock
-     * goes into out-of-sync mode and will throw a ClockException
-     * on any attempt to getValue() or getPhase()
-     */
+    // Returns true iff we're in sync with the reference clock.
+    // Sync becomes lost if the previous update was too long ago,
+    // or if the phase is detected to be too great.
+    // When out of sync, ClockException is thrown by
+    // getValue(), getPhase(), and getOffset().
     inline bool isSynchronized() const
     {
         return inSync_;
     }
 
-    /**
-     * @return the phase offset from the reference clock.
-     * - Throws a ClockException if out-of-sync.
-     */
+    // Phase offset from the reference clock.
     int getOffset();
 
     // If the phase of the PhaseLockedClock differs by more than this
@@ -81,11 +71,11 @@ class PhaseLockedClock : public Clock, private ost::Thread, private ost::Mutex {
         phasePanic_ = phasePanic;
     }
 
-    // If the last successful update was longer ago than this,
+    // If the previous successful update was longer ago than this,
     // the clock will be set to out-of-sync.
-    inline void setUpdatePanic(timestamp_t updatePanic)
+    inline void setUpdatePanic(timestamp_t usec)
     {
-        updatePanic_ = updatePanic;
+        updatePanic_ = usec;
     }
 
    protected:
@@ -95,10 +85,10 @@ class PhaseLockedClock : public Clock, private ost::Thread, private ost::Mutex {
     // Called by this object's thread, each update interval.
     void update();
 
-    // Tries to update the markers for the clocks.
+    // Update the clocks' markers.
     bool updatePhase();
 
-    // Tries to update the clock to slew it into step.
+    // Slew the clock into step.
     bool updateClock();
 
     /**
@@ -116,7 +106,7 @@ class PhaseLockedClock : public Clock, private ost::Thread, private ost::Mutex {
     Clock& referenceClock_;
     VariableFrequencyClock variableFrequencyClock_;
 
-    // Is the clock in sync?
+    // Are we in sync?
     bool inSync_;
 
     // Phase between the VFC and the reference clock.

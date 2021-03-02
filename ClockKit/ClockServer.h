@@ -25,7 +25,7 @@ class ClockServer : public ost::Thread {
     bool log_;
 
     static const timestamp_t SYSTEM_STATE_PURGE_TIME;
-    timestamp_t lastUpdate_;
+    timestamp_t tRecalculated_;
 
    public:
     // Provide requests for timestamps to clients via a UDP port.
