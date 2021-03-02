@@ -71,25 +71,23 @@ void ClockServer::run()
 void ClockServer::updateEntry(string addr, int offset, int rtt)
 {
     const auto now = clock_.getValue();
-    const auto nowStr = Timestamp::timestampToString(now);
-    ackData_[addr].time = now;
-    ackData_[addr].offset = offset;
-    ackData_[addr].rtt = rtt;
+    ackData_[addr] = {now, offset, rtt};
     if (!log_)
         return;
 
+    const auto nowStr = Timestamp::timestampToString(now);
     cout << nowStr << '\t' << addr << '\t' << offset << '\t' << rtt << endl;
     // 1.0 seconds sets only how often to recalculate MAX_OFFSET.
     if (now < tRecalculated_ + 1000000)
         return;
     tRecalculated_ = now;
 
-    map<string, Entry>::iterator it;
-
     // Purge old entries.
-    for (it = ackData_.begin(); it != ackData_.end();) {
-        const timestamp_t entryTime = (it->second).time;
-        if (now > entryTime + SYSTEM_STATE_PURGE_TIME) {
+    // Don't use erase+remove_if+lambda, because that fails with map;
+    // wait for C++20's std::erase_if.
+    const auto tPurge = now - SYSTEM_STATE_PURGE_TIME;
+    for (auto it = ackData_.begin(); it != ackData_.end();) {
+        if (it->second.time < tPurge) {
             it = ackData_.erase(it);
         }
         else {
@@ -98,13 +96,12 @@ void ClockServer::updateEntry(string addr, int offset, int rtt)
     }
 
     // Calculate maximum offset.
-    auto maxOffset = 0;
-    for (it = ackData_.begin(); it != ackData_.end(); ++it) {
-        const auto offset = abs((it->second).offset) + ((it->second).rtt / 2);
-        if (offset > maxOffset)
-            maxOffset = offset;
+    auto offsetMax = 0;
+    for (const auto& data : ackData_) {
+        const auto& entry = data.second;
+        offsetMax = max(offsetMax, abs(entry.offset) + entry.rtt / 2);
     }
-    cout << nowStr << '\t' << "MAX_OFFSET" << '\t' << maxOffset << '\t' << "---" << endl;
+    cout << nowStr << '\t' << "MAX_OFFSET" << '\t' << offsetMax << '\t' << "---" << endl;
 }
 
 }  // namespace dex
