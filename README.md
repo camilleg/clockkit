@@ -70,4 +70,4 @@ form are welcome nonetheless.
 - For profiling and code coverage, `sudo apt install gcovr`.  See also `man gcovr`.  
   To collect and print statistics, `make clean && make profile`, run some tests (but not test-bindings), `gcovr`.  
   To reset statistics before another profile, `make purge`.  
-  To cease profiling, `make clean purge && make`.
+  To cease profiling, `make purge && make`.
