@@ -37,9 +37,7 @@ bindings: all $(SWIGEXES)
 debug: override CFLAGS += -O0 -ggdb
 debug: all
 
-# 20 is the number to cleanly shut down the server and client after, in order
-# to generate gcov data files
-profile: CFLAGS += -fPIC --coverage -fprofile-arcs -ftest-coverage -O0 -DPROFILE=20
+profile: CFLAGS += -fPIC --coverage -fprofile-arcs -ftest-coverage -O0
 profile: $(EXES)
 
 test-bindings: test-python test-ruby test-tcl

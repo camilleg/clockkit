@@ -30,16 +30,7 @@ void ClockServer::run()
     constexpr auto length = ClockPacket::PACKET_LENGTH;
     uint8_t buffer[length];
 
-#ifdef PROFILE
-    // Exit cleanly after n iterations in order to generate gcov profile files
-    size_t iterations = 0u;
-#endif
-
     while (socket.isPending(ost::Socket::pendingInput, TIMEOUT_INF)) {
-#ifdef PROFILE
-        if (iterations++ >= PROFILE)
-            break;
-#endif
         const timestamp_t serverReplyTime = clock_.getValue();
         const ost::InetAddress peer =
             socket.getPeer();  // also sets up the socket to send back to the sender

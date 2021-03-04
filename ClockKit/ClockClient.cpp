@@ -52,16 +52,9 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
     constexpr auto length = ClockPacket::PACKET_LENGTH;
     uint8_t buffer[length];
     const auto timeoutMsec = std::max(1, timeout_ / 1000);
-#ifdef PROFILE
-    static size_t timeouts = 0u;
-#endif
 
     while (true) {
         if (!socket_->isPending(ost::Socket::pendingInput, timeoutMsec)) {
-#ifdef PROFILE
-            if (++timeouts >= PROFILE)
-                exit(0);
-#endif
             return ClockPacket();  // Timeout.
         }
 
