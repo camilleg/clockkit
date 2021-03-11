@@ -3,15 +3,10 @@
 #include <cc++/config.h>
 #include <stdio.h>
 
-#include <string>
-
-#include "Common.h"
-
 #if defined(__GLIBC__)
 #include <endian.h>
 #endif
 
-#include <array>
 #include <cstddef>
 
 const char* format = "<time %d %6d>";  // %i might misparse 0123 as octal.

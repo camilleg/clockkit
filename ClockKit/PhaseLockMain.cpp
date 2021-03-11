@@ -1,6 +1,5 @@
 #include "ConfigReader.h"
 #include "Exceptions.h"
-#include "PhaseLockedClock.h"
 
 int main(int argc, char* argv[])
 {

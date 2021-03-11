@@ -4,7 +4,6 @@
 #include "ConfigReader.h"
 #include "Exceptions.h"
 #include "HighResolutionClock.h"
-#include "PhaseLockedClock.h"
 #include "limits"
 
 dex::PhaseLockedClock* ckClock = nullptr;

@@ -1,14 +1,9 @@
 #include "ConfigReader.h"
 
-#include <cstdlib>
-#include <fstream>
 #include <iostream>
 
 #include "ClockClient.h"
-#include "Common.h"
-#include "Exceptions.h"
 #include "HighResolutionClock.h"
-#include "PhaseLockedClock.h"
 
 namespace dex {
 

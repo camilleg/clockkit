@@ -4,7 +4,6 @@
 #include <iostream>
 
 #include "ClockPacket.h"
-#include "HighResolutionClock.h"
 
 using namespace std;
 

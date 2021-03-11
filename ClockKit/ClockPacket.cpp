@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#include "Common.h"
-
 namespace dex {
 
 ClockPacket::ClockPacket()
@@ -49,10 +47,11 @@ void ClockPacket::write(uint8_t* buffer) const
 
 void ClockPacket::print() const
 {
-    std::cout << "--- PACKET ---" << std::endl
-              << "clientRequestTime: " << Timestamp::timestampToString(clientRequestTime_) << "\n"
-              << "serverReplyTime: " << Timestamp::timestampToString(serverReplyTime_) << "\n"
-              << "clientReceiveTime: " << Timestamp::timestampToString(clientReceiveTime_) << "\n";
+    std::cout << "--- PACKET ---"
+              << "\nclientRequestTime: " << Timestamp::timestampToString(clientRequestTime_)
+              << "\nserverReplyTime: " << Timestamp::timestampToString(serverReplyTime_)
+              << "\nclientReceiveTime: " << Timestamp::timestampToString(clientReceiveTime_)
+              << std::endl;
 }
 
 }  // namespace dex
