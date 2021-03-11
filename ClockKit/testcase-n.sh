@@ -34,14 +34,14 @@ done
 sleep 4
 killall -w ckserver ckphaselock
 
-a=$(tail -10 $srv | grep -c -P '<time \d+ \d+>\s')
+a=$(tail -10 $srv | grep -c -P '<time \d+ +\d+>\s')
 if [[ "$a" != "10" ]]; then
   exit 1
 fi
 
 for i in $(seq $n); do
   b=$(tail -20 ${cli[i]} | grep -c -P 'offset: [-\d]+')
-  c=$(tail -20 ${cli[i]} | grep -c -P 'time: <time \d+ \d+>')
+  c=$(tail -20 ${cli[i]} | grep -c -P 'time: <time \d+ +\d+>')
   if [[ "$b $c" != "10 10" ]]; then
     exit 2
   fi
