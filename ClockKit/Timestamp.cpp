@@ -14,7 +14,7 @@
 #include <array>
 #include <cstddef>
 
-const char* format = "<time %i %i>";
+const char* format = "<time %d %6d>";  // %i might misparse 0123 as octal.
 
 namespace dex {
 
@@ -29,7 +29,7 @@ std::string Timestamp::timestampToString(timestamp_t t)
 {
     const int sec = t / 1000000;
     const int usec = t % 1000000;
-    char buff[256];
+    char buff[100];
     sprintf(buff, format, sec, usec);
     return std::string(buff);
 }
