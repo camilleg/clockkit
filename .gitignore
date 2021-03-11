@@ -3,6 +3,7 @@ ClockKit/*.gcno
 ClockKit/*.o
 ClockKit/ckphaselock
 ClockKit/ckserver
+ClockKit/cktest-standalone
 ClockKit/python/clockkit.py
 ClockKit/*/wrap.c
 ClockKit/*/wrap.o

@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
     }
 
     const ost::InetAddress addr("0.0.0.0");
-    const int port = atoi(argv[1]);
+    const auto port = atoi(argv[1]);
 
 #ifdef DEBUG
     // A slow clock, for testing.
