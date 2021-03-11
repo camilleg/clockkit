@@ -17,7 +17,7 @@ PhaseLockedClock* PhaseLockedClockFromConfigFile(const std::string& filename)
     std::ifstream file(filename.c_str());
     if (!file.is_open()) {
         std::cerr << "failed to open config file '" << filename << "'\n";
-        return NULL;
+        return nullptr;
     }
 
     std::string server = "localhost";

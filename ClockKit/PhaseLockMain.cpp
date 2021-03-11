@@ -10,7 +10,7 @@ int main(int argc, char* argv[])
     }
 
     dex::PhaseLockedClock* clock = dex::PhaseLockedClockFromConfigFile(argv[1]);
-    if (clock == NULL) {
+    if (!clock) {
         std::cerr << argv[0] << ": failed to get a clock.\n";
         return 1;
     }
