@@ -8,7 +8,7 @@ RUBY   = $$(pkg-config --list-all | grep ruby-   | sort | tail -1 | sed 's/ .*//
 PYTHON = $$(pkg-config --list-all | grep python- | sort | tail -1 | sed 's/ .*//')
 # pkg-config doesn't know about tcl.
 
-OBJECTS = \
+OBJS = \
   ClockClient.o \
   ClockPacket.o \
   ClockServer.o \
@@ -41,6 +41,11 @@ debug: all
 profile: CFLAGS += -fPIC --coverage -fprofile-arcs -ftest-coverage -O0
 profile: $(EXES)
 
+# The *.d files are built by the rule for %.o:%.cpp via -MMD -MT -MF.
+# They define the .h dependencies of each .o file.
+DEPS := $(OBJS:.o=.d)
+-include $(DEPS)
+
 test-bindings: test-python test-ruby test-tcl
 
 # Different ports let these tests run simultaneously, via --jobs=99.
@@ -57,27 +62,27 @@ test-ruby: ckserver ruby/clockkit.so
 test-tcl: ckserver tcl/clockkit.so
 	cd tcl && ./testcase.sh 4470
 
-cktest-standalone: test-standalone.cpp $(OBJECTS)
+cktest-standalone: test-standalone.cpp $(OBJS)
 	$(CPP) $(CFLAGS) $^ $(LIBS) -o $@
 
-ckserver: ClockServerMain.cpp $(OBJECTS)
+ckserver: ClockServerMain.cpp $(OBJS)
 	$(CPP) $(CFLAGS) $^ $(LIBS) -o $@
 
-ckphaselock: PhaseLockMain.cpp $(OBJECTS)
+ckphaselock: PhaseLockMain.cpp $(OBJS)
 	$(CPP) $(CFLAGS) $^ $(LIBS) -o $@
 
 python/wrap.c:
 	$(SWIG) -python -o $@ clockkit.h
 python/wrap.o: python/wrap.c
 	$(CPP) -c $(CFLAGS) -I. $$(pkg-config --cflags $(PYTHON)) $? -o $@
-python/_clockkit.so: python/wrap.o $(OBJECTS)
+python/_clockkit.so: python/wrap.o $(OBJS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
 tcl/wrap.c:
 	$(SWIG) -tcl -o $@ clockkit.h
 tcl/wrap.o: tcl/wrap.c
 	$(CPP) -c $(CFLAGS) -I. -I/usr/include/tcl8.6 $? -o $@
-tcl/clockkit.so: tcl/wrap.o $(OBJECTS)
+tcl/clockkit.so: tcl/wrap.o $(OBJS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
 ruby/wrap.c:
@@ -86,16 +91,16 @@ ruby/wrap.c:
 	sed -i -e "s/ _wrap_ck/ (VALUE (*)(...))_wrap_ck/" $@
 ruby/wrap.o: ruby/wrap.c
 	$(CPP) -c $(CFLAGS) -Wno-pedantic -I. $$(pkg-config --cflags $(RUBY)) $? -o $@
-ruby/clockkit.so: ruby/wrap.o $(OBJECTS)
+ruby/clockkit.so: ruby/wrap.o $(OBJS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
 clean:
-	rm -rf $(EXES) $(SWIGEXES) $(OBJECTS) */wrap.o */wrap.c python/clockkit.py *.gcno *.gcov
+	rm -rf $(EXES) $(SWIGEXES) $(OBJS) $(DEPS) */wrap.o */wrap.c python/clockkit.py *.gcno *.gcov
 
 purge: clean
 	rm -rf *.gcda
 
-.cpp.o:
-	$(CPP) -c $(CFLAGS) $(INCLUDE) $< 
+%.o: %.cpp
+	$(CPP) -c $(CFLAGS) -MMD -MT $@ -MF $(patsubst %.o,%.d,$@) $<
 
 .PHONY: all profile bindings purge clean test-all test-30 test-standalone test-bindings test-python test-ruby test-tcl
