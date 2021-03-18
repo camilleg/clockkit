@@ -2,9 +2,6 @@
 // A self-contained program with threads for a server and some clients.
 // An example that does not read any config file.
 
-#include <cc++/socket.h>
-
-#include <cstdlib>
 #include <vector>
 
 #include "ClockClient.h"
@@ -39,34 +36,34 @@ int main(int argc, char* argv[])
     clock.setPhasePanic(5000);
     clock.setUpdatePanic(5000000);
 #endif
- 
+
     std::vector<ClockClient*> clients;
     std::vector<PhaseLockedClock*> clocks;
     for (auto i = 0; i < numClients; ++i) {
         auto cli = new ClockClient(ost::InetHostAddress("127.0.0.1"), port);
-	clients.push_back(cli);
-	auto clock = new PhaseLockedClock(clockHiRes, *cli);
-	clock->setPhasePanic(5000);
-	clock->setUpdatePanic(5000000);
-	clocks.push_back(clock);
+        clients.push_back(cli);
+        auto clock = new PhaseLockedClock(clockHiRes, *cli);
+        clock->setPhasePanic(5000);
+        clock->setUpdatePanic(5000000);
+        clocks.push_back(clock);
     }
 
     while (runtime > 0.0) {
         try {
-	    for (const auto clock: clocks)
-		std::cout << "offset: " << clock->getOffset()
-			  << "\ntime: " << Timestamp::timestampToString(clock->getValue())
-			  << std::endl;
+            for (const auto clock : clocks)
+                std::cout << "offset: " << clock->getOffset()
+                          << "\ntime: " << Timestamp::timestampToString(clock->getValue())
+                          << std::endl;
         }
         catch (ClockException& e) {
             std::cout << "offset: OUT OF SYNC\n";
         }
-	std::cout << std::endl;
-        ost::Thread::sleep(200);  // msec
-	runtime -= 0.2;  // sec
+        std::cout << std::endl;
+        const auto msec = 600;
+        ost::Thread::sleep(msec);
+        runtime -= msec * 0.001;
     }
-    for (const auto clock: clocks)
-	clock->die();
+    for (const auto clock : clocks) clock->die();
     server.join();
     return 0;
 }
