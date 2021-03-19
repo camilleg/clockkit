@@ -18,13 +18,13 @@ It was revised and moved to GitHub in 2020.
 
 The source code is licensed under the [Creative Commons 2.0 Attribution License](http://creativecommons.org/licenses/by/2.0).
 
-### To install:
+## To install:
 
 #### Ubuntu 20:
 `sudo apt install make g++ libcommoncpp2-dev swig tcl8.6-dev libpython3.8-dev ruby ruby2.7-dev`  
 `cd ClockKit && make`
 
-#### Ubuntu 18 or Raspberry Pi 3 (Debian):
+#### Ubuntu 18:<br>Raspberry Pi 3 (Debian):
 `sudo apt install make g++ libcommoncpp2-dev swig tcl8.6-dev libpython3.8-dev ruby ruby2.5-dev`  
 `cd ClockKit && make`
 
@@ -35,14 +35,13 @@ Proceed as with Ubuntu 18 or 20.
 (Native builds for older versions of Windows may return, but no older than XP.)
 
 ### To run a test on localhost:
-`cd ClockKit && make test-all`
+`cd ClockKit && make test`
 
-### To plot the accuracy of a simulated run:
+### To plot performance:
 `sudo apt install gnuplot`  
 `cd simulation && make`
 
-## Citing
-To cite this work, use:  
+## To cite:
 Camille Goudeseune and Braden Kowitz.  2004.  "Synchronous data collection from diverse hardware."  
 *Driving Simulation Conference - Europe (Conférence Simulation de Conduite)*, pp. 245-252. 
 
