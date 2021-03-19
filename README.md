@@ -1,41 +1,22 @@
-# Synchronous data collection from diverse hardware
+Clockkit provides timestamps to distributed networked PCs
+with guaranteed bounds on latency and jitter, typically under 10 microseconds,
+as described in the conference paper [Synchronous data collection from diverse hardware](dsceu04.pdf).
 
-*Camille Goudeseune and Braden Kowitz  
-Integrated Systems Laboratory, Beckman Institute, UIUC*
+It runs on Linux, Windows, and Raspi,
+and needs neither extra hardware nor elevated privileges.
 
-Software revised and published on GitHub in 2020.  
-Originally published in 2004 on [http://zx81.isl.uiuc.edu/camilleg/clockkit](https://web.archive.org/web/20041205064911/http://zx81.isl.uiuc.edu/camilleg/dsceu04.pdf) (defunct).
+It is intended to measure a system's realtime behavior,
+especially to provide a common time reference for events recorded by different sensors
+(audio, video, gamepad, GPS, SMS, MIDI, biometrics),
+and to trigger outputs (audio, video, LEDs, servos, motion bases).
 
-We describe an accurate open-source C++ distributed clock for networked
-commodity PCs.  With no extra hardware, this clock correlates sensor data
-(head- and eye-trackers, biometrics, captured video, driving simulator
-data) from multiple PC's with latency and jitter under 10 microseconds
-average, 100 microseconds worst case.  PC-driven actuators like motion
-bases and audio/visual/haptic warning systems are also controlled with
-the same accuracy.  This lets us accurately measure driver response time
-(brake at a stoplight, direct gaze at a hazard, answer a telephone).
+It did this originally for a full-motion driving simulator with eye tracking and a
+quickly churning set of other sensors and outputs, for over a decade.
 
-Hardware vendors often assume that system integration revolves around
-their own devices.  This clock synchronizes devices despite such assumptions.
-
-The clock is orders of magnitude more accurate than conventional methods
-in Microsoft Windows, even without real-time priority or busy-waiting.
-A Linux master clock provides a stable NTP time base.  Slave clocks,
-Linux or Windows, synchronize to the master clock by several mechanisms.
-Measuring round-trip ping times corrects for network latency.  In the
-slave's high-resolution clock, drift is predictively compensated for
-by second-order curve fitting while wraparound and jitter (e.g., from
-PCI bus contention) is trapped.  Performance degrades gracefully and
-measurably on unreliable networks.  Several phase-locked loops, within
-each slave and between slave and master, guarantee performance.
-
-Here is the 2004 [conference paper](dsceu04.pdf).
+Clockkit was originally published in 2004 on [http://zx81.isl.uiuc.edu/camilleg/clockkit](https://web.archive.org/web/20041205064911/http://zx81.isl.uiuc.edu/camilleg/dsceu04.pdf) (defunct).  
+It was revised and moved to GitHub in 2020.
 
 The source code is licensed under the [Creative Commons 2.0 Attribution License](http://creativecommons.org/licenses/by/2.0).
-
-To cite this work, use:  
-Camille Goudeseune and Braden Kowitz.  2004.  "Synchronous data collection from diverse hardware."  
-*Driving Simulation Conference - Europe (Conférence Simulation de Conduite)*, pp. 245-252. 
 
 ### To install:
 
@@ -60,6 +41,11 @@ Proceed as with Ubuntu 18 or 20.
 `sudo apt install gnuplot`  
 `cd simulation && make`
 
+## Citing
+To cite this work, use:  
+Camille Goudeseune and Braden Kowitz.  2004.  "Synchronous data collection from diverse hardware."  
+*Driving Simulation Conference - Europe (Conférence Simulation de Conduite)*, pp. 245-252. 
+
 ## Contributing
 The project is currently undergoing significant changes. Contributions of any
 form are welcome nonetheless.
@@ -71,3 +57,31 @@ form are welcome nonetheless.
   To collect and print statistics, `make clean && make profile`, run some tests (but not test-bindings), `gcovr`.  
   To reset statistics before another profile, `make purge`.  
   To cease profiling, `make purge && make`.
+
+## Roadmap
+When this software launched in 2004, lab software was pretty much restricted to
+desktop OSes.  But by now, labs and makerspaces use many more software
+development environments, especially for hardware I/O:
+Arduino, musl, Raspi, and smartphones to name a few.
+The choice of mature scripting languages has grown similarly.
+
+Also, private wired 10baseT subnets have been pretty much replaced by WLAN,
+with much more bandwidth but less predictable performance.
+
+Finally, since 2004, C++ standards have improved
+and software engineering in general has matured.
+
+Therefore, these steps are proposed.
+
+- Continue modernizing the code.
+- Clean up the interface to other languages.
+- Implement integration testing.
+- Make reproducible performance tests for some use cases.
+- Extend multiplatform support beyond POSIX, for other microarchitectures.
+- For some use cases, reduce energy consumption, file size, bandwidth.
+- To better exploit the strengths and manage the weaknesses of WLAN,
+replace the lower OSI layers of the generic network stack with
+specific ones for Wi-Fi, Bluetooth LE, Zigbee, 6LoWPAN, etc.
+- Throughout all these, insert passes for optimization.
+- Explore more distant use cases that need clock sync, such as
+high performance computing, logfile evaluation, and security breach detection.
