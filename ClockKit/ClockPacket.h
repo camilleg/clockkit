@@ -25,9 +25,9 @@ class ClockPacket {
 
    private:
     Type type_;
-    timestamp_t clientRequestTime_;  // Time on client host when packet is sent.
-    timestamp_t serverReplyTime_;    // Time on server when REQUEST packet is received.
-    timestamp_t clientReceiveTime_;  // Time on client when REPLY packet is received.
+    timestamp_t clientRequestTime_;  // Time on client when packet was sent.
+    timestamp_t serverReplyTime_;    // Time on server when REQUEST packet was received.
+    timestamp_t clientReceiveTime_;  // Time on client when REPLY packet was received.
 
    public:
     explicit ClockPacket(Type t, uint8_t seqNum, timestamp_t clientRequestTime);
@@ -83,7 +83,8 @@ class ClockPacket {
     }
 
     // Return the round trip time for the client-server correspondence.
-    // XXX A round trip time is not really a timestamp; can't be negative
+    // todo: complain if this is negative, which it should never be,
+    // but it's technically possible.
     inline timestamp_t rtt() const
     {
         return clientReceiveTime_ - clientRequestTime_;

@@ -16,9 +16,9 @@ class ClockServer : public ost::Thread {
     Clock& clock_;
 
     struct Entry {
-        timestamp_t time;
-        int offset;
-        int rtt;
+        timestamp_t time;    // "Now."
+        timestamp_t offset;  // From ClockPacket::getClockOffset().
+        timestamp_t rtt;     // From ClockPacket::rtt().
     };
     std::map<std::string, Entry> ackData_;
 
@@ -40,7 +40,7 @@ class ClockServer : public ost::Thread {
 
    protected:
     void run();
-    void updateEntry(std::string addr, int offset, int rtt);
+    void updateEntry(const std::string& addr, timestamp_t offset, timestamp_t rtt);
 };
 
 }  // namespace dex
