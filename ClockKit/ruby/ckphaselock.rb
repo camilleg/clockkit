@@ -6,7 +6,7 @@ Clockkit.ckInitialize ARGV[0]
 
 loop { 
   if Clockkit.ckInSync then
-    puts "offset: #{Clockkit.ckOffset}\ntime: #{Clockkit.ckTimeAsString}"
+    puts "offset: #{Clockkit.ckOffset}\n#{Clockkit.ckTimeAsString}"
   else
     puts "offset: OUT OF SYNC"
   end

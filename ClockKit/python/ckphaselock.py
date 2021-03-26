@@ -9,7 +9,7 @@ _clockkit.ckInitialize(sys.argv[1])
 
 while 1:
     if _clockkit.ckInSync():
-        print("offset:", _clockkit.ckOffset(), "\ntime:", _clockkit.ckTimeAsString())
+        print("offset:", _clockkit.ckOffset(), "\n", _clockkit.ckTimeAsString())
     else:
         print("offset: OUT OF SYNC")
     time.sleep(0.1)

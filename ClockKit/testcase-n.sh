@@ -40,8 +40,8 @@ if [[ "$a" != "10" ]]; then
 fi
 
 for i in $(seq $n); do
-  b=$(tail -20 ${cli[i]} | grep -c -P 'offset: [-\d]+')
-  c=$(tail -20 ${cli[i]} | grep -c -P 'time: <time \d+ +\d+>')
+  b=$(tail -20 ${cli[i]} | grep -c -P '<time \d+ +\d+>')
+  c=$(tail -20 ${cli[i]} | grep -c -P 'offset: [-\d]+')
   if [[ "$b $c" != "10 10" ]]; then
     exit 2
   fi

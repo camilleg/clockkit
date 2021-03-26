@@ -19,9 +19,8 @@ int main(int argc, char* argv[])
 
     while (true) {
         try {
-            std::cout << "offset: " << clock->getOffset()
-                      << "\ntime: " << dex::Timestamp::timestampToString(clock->getValue())
-                      << std::endl;
+            std::cout << "offset: " << clock->getOffset() << "\n"
+                      << dex::Timestamp::timestampToString(clock->getValue()) << std::endl;
             // endl flushes stdout, to show output even after Ctrl+C.
         }
         catch (dex::ClockException& e) {

@@ -11,7 +11,7 @@ while {1} {
   if {[ckInSync]} {
     set offset [ckOffset]
     set timestamp [ckTimeAsString]
-    puts "offset: $offset\ntime: $timestamp"
+    puts "offset: $offset\n$timestamp"
   } else {
     puts "offset: OUT OF SYNC"
   }

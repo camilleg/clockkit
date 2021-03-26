@@ -25,7 +25,7 @@ void ClockServer::run()
 {
     ost::UDPSocket socket(addr_, port_);
     if (log_)
-        cout << "time\thost\toffset\trtt" << endl;
+        cout << "time                     host    \toffset\tround-trip-time" << endl;
     constexpr auto length = ClockPacket::PACKET_LENGTH;
     uint8_t buffer[length];
 
@@ -66,8 +66,8 @@ void ClockServer::updateEntry(string addr, int offset, int rtt)
         return;
 
     const auto nowStr = Timestamp::timestampToString(now);
-    cout << nowStr << '\t' << addr << '\t' << offset << '\t' << rtt << endl;
-    // 1.0 seconds sets only how often to recalculate MAX_OFFSET.
+    cout << nowStr << ' ' << addr << '\t' << offset << '\t' << rtt << endl;
+    // 1.0 seconds sets only how often to recalculate offsetMax.
     if (now < tRecalculated_ + 1000000)
         return;
     tRecalculated_ = now;
@@ -91,7 +91,7 @@ void ClockServer::updateEntry(string addr, int offset, int rtt)
         const auto& entry = data.second;
         offsetMax = max(offsetMax, abs(entry.offset) + entry.rtt / 2);
     }
-    cout << nowStr << '\t' << "MAX_OFFSET" << '\t' << offsetMax << '\t' << "---" << endl;
+    cout << nowStr << ' ' << "offsetMax" << '\t' << offsetMax << '\t' << "---" << endl;
 }
 
 }  // namespace dex
