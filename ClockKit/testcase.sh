@@ -26,4 +26,29 @@ if [[ "$a $b $c" != "10 10 10" ]]; then
   echo "$0: unexpected outputs" >&2
   exit 1
 fi
-exit 0
+
+# Parse the end of $srv and $cli.
+
+# The timestamps of cli and srv should be close.
+a=$(( $(tail -1 $srv | ./parse.rb time) ))
+b=$(( $(tail -1 $cli | ./parse.rb time) ))
+diff=$(( $a - $b ))
+diffAbs=$(( ${diff#-} )) # Get absolute value by dropping the hyphen.
+if [[ $diffAbs -gt 300000 ]]; then
+  echo "$0: clocks too different" >&2
+  exit 1
+fi
+
+# offsetMax (already abs()'d) should be small.
+a=$(( $(tail -1 $srv | ./parse.rb offsetMax) ))
+if [[ $a -gt 500 ]]; then
+  echo "$0: offsetMax too large" >&2
+  exit 1
+fi
+
+# Final offset should be small.
+a=$(( $(grep offset $cli | tail -1 | ./parse.rb offset) ))
+if [[ $a -gt 50 ]]; then
+  echo "$0: final offset too large" >&2
+  exit 1
+fi
