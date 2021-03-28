@@ -18,11 +18,11 @@ SystemClock& SystemClock::instance()
     return instance_;
 }
 
+// Needs no mutex, because no state is stored,
+// and GetSystemTimeAsFileTime and gettimeofday are thread-safe.
 timestamp_t SystemClock::getValue()
 {
     timestamp_t time;
-    enterMutex();
-
 #ifdef WIN32
     FILETIME filetime;
     GetSystemTimeAsFileTime(&filetime);
@@ -37,8 +37,6 @@ timestamp_t SystemClock::getValue()
     gettimeofday(&now, 0);
     time = (now.tv_sec * 1000000) + now.tv_usec;
 #endif
-
-    leaveMutex();
     return time;
 }
 

@@ -1,13 +1,11 @@
 #pragma once
-#include <cc++/thread.h>  // for ost::Mutex
-
 #include "Clock.h"
 #include "Common.h"
 
 namespace dex {
 
 // A singleton system clock.
-class SystemClock : public Clock, private ost::Mutex {
+class SystemClock : public Clock {
    public:
     static SystemClock& instance();
     timestamp_t getValue();

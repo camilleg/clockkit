@@ -1,5 +1,5 @@
 #pragma once
-#include <cc++/thread.h>  // for ost::Thread, private ost::Mutex
+#include <cc++/thread.h>  // for ost::Thread
 
 #include "Clock.h"
 #include "VariableFrequencyClock.h"
@@ -18,7 +18,7 @@ namespace dex {
  * - Updates occur randomly at +-10% of the update interval,
  *   to not swamp the server with synchronous requests.
  */
-class PhaseLockedClock : public Clock, private ost::Thread, private ost::Mutex {
+class PhaseLockedClock : public Clock, private ost::Thread {
    public:
     /**
      * Creates a PhaseLockedClock around the provided primary and

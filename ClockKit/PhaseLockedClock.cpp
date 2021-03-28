@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <mutex>
 
 #include "Exceptions.h"
 
@@ -12,6 +13,9 @@ using std::endl;
 #endif
 
 namespace dex {
+
+// One mutex for *all* PLC's is too careful, but not a problem in practice.
+std::mutex mutexPLC;
 
 PhaseLockedClock::PhaseLockedClock(Clock &primary, Clock &reference)
     : Thread(2)  // high priority thread
@@ -37,14 +41,12 @@ timestamp_t PhaseLockedClock::getValue()
 {
     if (!inSync_)
         throw ClockException("PhaseLockedClock not in sync");
+    const std::lock_guard<std::mutex> lock(mutexPLC);
     try {
-        enterMutex();
         timestamp_t time = variableFrequencyClock_.getValue();
-        leaveMutex();
         return time;
     }
     catch (ClockException &e) {
-        leaveMutex();
 #ifdef DEBUG
         cout << "PhaseLockedClock picked up exception, now out of sync." << endl;
 #endif
@@ -57,10 +59,8 @@ int PhaseLockedClock::getOffset()
 {
     if (!inSync_)
         throw ClockException("PhaseLockedClock not in sync");
-    enterMutex();
-    const int offset = phase_;
-    leaveMutex();
-    return offset;
+    const std::lock_guard<std::mutex> lock(mutexPLC);
+    return phase_;
 }
 
 void PhaseLockedClock::run()
@@ -100,11 +100,11 @@ bool PhaseLockedClock::updatePhase()
     if (!inSync_)
         return false;
     try {
-        enterMutex();
+        mutexPLC.lock();
         const timestamp_t phase = referenceClock_.getPhase(variableFrequencyClock_);
         const timestamp_t variableValue = variableFrequencyClock_.getValue();
         const timestamp_t primaryValue = primaryClock_.getValue();
-        leaveMutex();
+        mutexPLC.unlock();
 
         phasePrev_ = phase_;
         variableValuePrev_ = variableValue_;
@@ -120,7 +120,6 @@ bool PhaseLockedClock::updatePhase()
         return true;
     }
     catch (ClockException &e) {
-        leaveMutex();
 #ifdef DEBUG
         cout << "PhaseLockedClock caught exception: " << e.getMessage() << endl;
 #endif
@@ -160,15 +159,14 @@ bool PhaseLockedClock::updateClock()
     cout << "using frequency: " << variableClockFrequency << endl;
 #endif
 
-    enterMutex();
+    const std::lock_guard<std::mutex> lock(mutexPLC);
     variableFrequencyClock_.setFrequency(variableClockFrequency);
-    leaveMutex();
     return true;
 }
 
 void PhaseLockedClock::setClock()
 {
-    enterMutex();
+    const std::lock_guard<std::mutex> lock(mutexPLC);
     try {
         variableFrequencyClock_.setValue(referenceClock_.getValue());
         inSync_ = true;
@@ -182,7 +180,6 @@ void PhaseLockedClock::setClock()
 #endif
         inSync_ = false;
     }
-    leaveMutex();
 }
 
 }  // namespace dex
