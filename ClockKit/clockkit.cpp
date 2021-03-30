@@ -2,7 +2,6 @@
 
 #include "ClockClient.h"
 #include "ConfigReader.h"
-#include "Exceptions.h"
 #include "HighResolutionClock.h"
 #include "limits"
 
@@ -19,25 +18,15 @@ dex::timestamp_t ckTimeAsValue()
 {
     if (!ckClock)
         return 0;  // "Zero usec since the epoch" is obviously invalid.
-    try {
-        return ckClock->getValue();
-    }
-    catch (dex::ClockException& e) {
-        return 0;
-    }
+    return ckClock->getValue();
 }
 
 const char* ckTimeAsString()
 {
     if (!ckClock)
         return "";
-    try {
-        ckTimeString = dex::Timestamp::timestampToString(ckClock->getValue());
-        return ckTimeString.c_str();
-    }
-    catch (dex::ClockException& e) {
-        return "";
-    }
+    ckTimeString = dex::Timestamp::timestampToString(ckClock->getValue());
+    return ckTimeString.c_str();
 }
 
 bool ckInSync()
@@ -53,10 +42,5 @@ int ckOffset()
     static const int invalid = std::numeric_limits<int>::max();
     if (!ckClock)
         return invalid;
-    try {
-        return ckClock->getOffset();
-    }
-    catch (dex::ClockException& e) {
-        return invalid;
-    }
+    return ckClock->getOffset();
 }

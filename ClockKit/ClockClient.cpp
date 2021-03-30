@@ -1,6 +1,5 @@
 #include "ClockClient.h"
 
-#include "Exceptions.h"
 #include "HighResolutionClock.h"
 
 using namespace std;
@@ -26,15 +25,8 @@ timestamp_t ClockClient::getValue()
 {
     Clock& baseClock = HighResolutionClock::instance();
     const auto phase = getPhase(baseClock, false);
-    if (phase == invalid) {
-#if 0
-        // With two clients, killing/restarting ckserver
-	// sometimes leaves one client out of sync for a long time
-	return invalid;
-#else
-        throw ClockException("out of sync for some reason");
-#endif
-    }
+    if (phase == invalid)
+        return invalid;
     return baseClock.getValue() + phase;
     // primary clock = secondary clock + phase
 }

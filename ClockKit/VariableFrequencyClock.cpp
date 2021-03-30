@@ -1,6 +1,5 @@
 #include "VariableFrequencyClock.h"
 
-#include "Exceptions.h"
 #include "limits"
 
 namespace dex {
@@ -18,8 +17,8 @@ VariableFrequencyClock::VariableFrequencyClock(Clock& src)
 
 timestamp_t VariableFrequencyClock::getValue()
 {
-    // Typically -9223372036854775807 usec, or 293,000 years, obviously invalid.
-    constexpr auto invalid = -std::numeric_limits<timestamp_t>::max();
+    // Typically 9223372036854775807 usec, or 293,000 years, obviously invalid.
+    constexpr auto invalid = std::numeric_limits<timestamp_t>::max();
     if (rolledOver_)
         return invalid;
 
@@ -28,7 +27,7 @@ timestamp_t VariableFrequencyClock::getValue()
         rolledOver_ = true;
         return invalid;
     }
-    return marker_ + ticksSrc * frequency_ / frequencySrc_;
+    return marker_ + ticksSrc * frequency_ / double(frequencySrc_);
 }
 
 void VariableFrequencyClock::setValue(timestamp_t t)

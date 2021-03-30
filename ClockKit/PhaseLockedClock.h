@@ -51,8 +51,6 @@ class PhaseLockedClock : public Clock, private ost::Thread {
     // Returns true iff we're in sync with the reference clock.
     // Sync becomes lost if the previous update was too long ago,
     // or if the phase is detected to be too great.
-    // When out of sync, ClockException is thrown by
-    // getValue(), getPhase(), and getOffset().
     inline bool isSynchronized() const
     {
         return inSync_;
@@ -121,7 +119,7 @@ class PhaseLockedClock : public Clock, private ost::Thread {
     timestamp_t primaryValue_;
     timestamp_t primaryValuePrev_;
 
-    // Average frequency of the primary clock w.r.t the reference clock.
+    // Average frequency, in Hz, of the primary clock w.r.t the reference clock.
     double primaryFrequencyAvg_;
 
     // See setPhasePanic() and setUpdatePanic().

@@ -13,7 +13,6 @@ OBJS = \
   ClockPacket.o \
   ClockServer.o \
   ConfigReader.o \
-  Exceptions.o \
   PhaseLockedClock.o \
   SystemClock.o \
   Timestamp.o \

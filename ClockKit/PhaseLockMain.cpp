@@ -1,5 +1,4 @@
 #include "ConfigReader.h"
-#include "Exceptions.h"
 
 int main(int argc, char* argv[])
 {
@@ -18,14 +17,9 @@ int main(int argc, char* argv[])
     auto runtime = fTerminate ? atof(argv[2]) : 0.0;
 
     while (true) {
-        try {
-            std::cout << "offset: " << clock->getOffset() << "\n"
-                      << dex::Timestamp::timestampToString(clock->getValue()) << std::endl;
-            // endl flushes stdout, to show output even after Ctrl+C.
-        }
-        catch (dex::ClockException& e) {
-            std::cout << "offset: OUT OF SYNC\n";
-        }
+        std::cout << "offset: " << clock->getOffset() << "\n"
+                  << dex::Timestamp::timestampToString(clock->getValue()) << std::endl;
+        // endl flushes stdout, to show output even after Ctrl+C.
         ost::Thread::sleep(200);  // msec
         if (fTerminate) {
             runtime -= 0.2;  // sec

@@ -6,7 +6,6 @@
 
 #include "ClockClient.h"
 #include "ClockServer.h"
-#include "Exceptions.h"
 #include "HighResolutionClock.h"
 #include "PhaseLockedClock.h"
 
@@ -49,14 +48,9 @@ int main(int argc, char* argv[])
     }
 
     while (runtime > 0.0) {
-        try {
-            for (const auto clock : clocks)
-                std::cout << "offset: " << clock->getOffset() << "\n"
-                          << Timestamp::timestampToString(clock->getValue()) << std::endl;
-        }
-        catch (ClockException& e) {
-            std::cout << "offset: OUT OF SYNC\n";
-        }
+        for (const auto clock : clocks)
+            std::cout << "offset: " << clock->getOffset() << "\n"
+                      << Timestamp::timestampToString(clock->getValue()) << std::endl;
         std::cout << std::endl;
         const auto msec = 600;
         ost::Thread::sleep(msec);

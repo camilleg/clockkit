@@ -10,8 +10,6 @@ namespace dex {
 
 /**
  * A clock that gets its time over the network from a ClockServer.
- * This class will throw a ClockException if there are problems communicating
- * with the ClockServer.
  *
  * To get the time, the clock sends a timestamped packet to to the server.
  * The server responds with its current time.  The client then timestamps
@@ -94,7 +92,6 @@ class ClockClient : public Clock {
      * the ClockServer clock.
      * This call is the most accurate in getting timing
      * information from a ClockServer.
-     * - Throws ClockException on network timeout.
      *
      * If set to send acknowledgments, this call will send
      * back information to the ClockServer on the phase

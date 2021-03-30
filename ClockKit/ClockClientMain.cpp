@@ -4,7 +4,6 @@
 #include <cc++/thread.h>
 
 #include "ClockClient.h"
-#include "Exceptions.h"
 #include "HighResolutionClock.h"
 
 using namespace std;
@@ -17,7 +16,7 @@ int main(int argc, char* argv[])
         return 1;
     }
     const ost::InetHostAddress addr(argv[1]);
-    const int port = atoi(argv[2]);
+    const auto port = atoi(argv[2]);
     cout << "Starting client for " << addr.getHostname() << ":" << port << "\n";
 
     Clock& hires = HighResolutionClock::instance();
@@ -27,12 +26,8 @@ int main(int argc, char* argv[])
         client.setAcknowledge(true);
 
         while (true) {
-            try {
-                const timestamp_t now = client.getPhase(hires);
-                cout << "offset: " << now << "\trtt: " << client.rtt() << endl;
-            }
-            catch (ClockException& e) {
-            }
+            const timestamp_t now = client.getPhase(hires);
+            cout << "offset: " << now << "\trtt: " << client.rtt() << endl;
             ost::Thread::sleep(1000);
         }
     }
