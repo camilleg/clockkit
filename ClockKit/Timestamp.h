@@ -5,11 +5,7 @@
 namespace dex {
 
 // Microseconds since the Unix epoch.
-#ifdef WIN32
-using timestamp_t = __int64;
-#else
 using timestamp_t = int64_t;
-#endif
 
 class Timestamp {
    public:
