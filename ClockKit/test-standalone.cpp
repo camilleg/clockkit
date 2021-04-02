@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
     while (runtime > 0.0) {
         for (const auto clock : clocks)
             std::cout << "offset: " << clock->getOffset() << "\n"
-                      << Timestamp::timestampToString(clock->getValue()) << std::endl;
+                      << timestampToString(clock->getValue()) << std::endl;
         std::cout << std::endl;
         const auto msec = 600;
         ost::Thread::sleep(msec);

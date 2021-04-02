@@ -63,7 +63,7 @@ void ClockServer::updateEntry(const string& addr, timestamp_t offset, timestamp_
     if (!log_)
         return;
     const auto now = clock_.getValue();
-    const auto nowStr = Timestamp::timestampToString(now);
+    const auto nowStr = timestampToString(now);
     cout << nowStr << ' ' << addr << '\t' << offset << '\t' << rtt << endl;
     ackData_[addr] = {now, offset, rtt};
     // 1.0 seconds sets only how often to recalculate offsetMax.

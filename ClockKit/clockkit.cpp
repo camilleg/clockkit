@@ -24,7 +24,7 @@ const char* ckTimeAsString()
 {
     if (!ckClock)
         return "";
-    ckTimeString = dex::Timestamp::timestampToString(ckClock->getValue());
+    ckTimeString = dex::timestampToString(ckClock->getValue());
     return ckTimeString.c_str();
 }
 

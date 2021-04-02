@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 
     while (true) {
         std::cout << "offset: " << clock->getOffset() << "\n"
-                  << dex::Timestamp::timestampToString(clock->getValue()) << std::endl;
+                  << dex::timestampToString(clock->getValue()) << std::endl;
         // endl flushes stdout, to show output even after Ctrl+C.
         ost::Thread::sleep(200);  // msec
         if (fTerminate) {
