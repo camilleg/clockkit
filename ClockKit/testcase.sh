@@ -18,7 +18,7 @@ trap "rm -f $srv $cli $conf" 0 2 3 15
 sed "s/^port:.*/port:$port/" < clockkit.conf > $conf
 killall -q -w ckserver ckphaselock
 ./ckserver $port > $srv &
-./ckphaselock $conf 2 > $cli
+./ckphaselock $conf 3 > $cli
 a=$(tail -10 $srv | grep -c -P '<time \d+ +\d+>\s')
 b=$(tail -20 $cli | grep -c -P '<time \d+ +\d+>')
 c=$(tail -20 $cli | grep -c -P 'offset: [-\d]+')
