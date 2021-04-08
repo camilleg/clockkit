@@ -1,5 +1,6 @@
 #pragma once
-#include <cc++/thread.h>  // for ost::Thread
+//#include <cc++/thread.h>  // for ost::Thread
+#include <thread>
 
 #include "Clock.h"
 #include "VariableFrequencyClock.h"
@@ -18,7 +19,7 @@ namespace dex {
  * - Updates occur randomly at +-10% of the update interval,
  *   to not swamp the server with synchronous requests.
  */
-class PhaseLockedClock : public Clock, private ost::Thread {
+class PhaseLockedClock : public Clock {
    public:
     /**
      * Creates a PhaseLockedClock around the provided primary and
@@ -34,10 +35,7 @@ class PhaseLockedClock : public Clock, private ost::Thread {
      * Cleans up all resources associated with this Clock and
      * stops the thread associated with this Active Object
      */
-    ~PhaseLockedClock()
-    {
-        terminate();
-    }
+    ~PhaseLockedClock() = default;
 
     // Kill the ClockClient and its ClockServer.
     void die()
@@ -76,10 +74,10 @@ class PhaseLockedClock : public Clock, private ost::Thread {
         updatePanic_ = usec;
     }
 
-   protected:
-    // Called when the thread for this Active Object is started.
+    // Call e.g. when creating a new std::thread
     void run();
 
+   protected:
     // Called by this object's thread, each update interval.
     void update();
 

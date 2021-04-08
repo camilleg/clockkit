@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <mutex>
+#include <thread>
 
 #ifdef DEBUG
 // The extra output from these cout<<'s breaks "make test".
@@ -19,8 +20,7 @@ std::mutex mutexPLC;
 static constexpr auto invalid = std::numeric_limits<timestamp_t>::max();
 
 PhaseLockedClock::PhaseLockedClock(Clock &primary, Clock &reference)
-    : Thread(2)  // high priority thread
-    , primaryClock_(primary)
+    : primaryClock_(primary)
     , referenceClock_(reference)
     , variableFrequencyClock_(primary)
     , inSync_(false)
@@ -35,7 +35,6 @@ PhaseLockedClock::PhaseLockedClock(Clock &primary, Clock &reference)
     , updatePanic_(5000000)
     , updatePrev_(0)
 {
-    start();
 }
 
 timestamp_t PhaseLockedClock::getValue()
@@ -59,10 +58,11 @@ void PhaseLockedClock::run()
     constexpr auto updateInterval_usec = 200000;              // 5 Hz.  From the config file?
     constexpr auto variance_usec = updateInterval_usec / 10;  // +-5%, so +- 5 msec.
     constexpr auto base_usec = updateInterval_usec - variance_usec / 2;
-    while (!testCancel()) {  // ost::Thread::testCancel()
+    // TODO find replacement for `while (!testCancel()) {  // ost::Thread::testCancel()`
+    while (true) {
         update();
         const auto random_usec = rand() % variance_usec;
-        sleep((base_usec + random_usec) / 1000 /*msec*/);  // ost::Thread::sleep()
+        std::this_thread::sleep_for(std::chrono::microseconds(base_usec + random_usec));
     }
     // There's no need to ost::Thread::exit().
 }

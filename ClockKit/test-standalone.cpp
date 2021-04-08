@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
     auto& clockHiRes = HighResolutionClock::instance();
     ClockServer* server = new ClockServer(ost::InetAddress("0.0.0.0"), port, clockHiRes);
     server->setLogging(true);
-    std::thread t{&ClockServer::run, server};
+    std::thread th_server{&ClockServer::run, server};
 
 #if 0
     // For just one cli, pointers aren't needed.
@@ -39,6 +39,7 @@ int main(int argc, char* argv[])
 
     std::vector<ClockClient*> clients;
     std::vector<PhaseLockedClock*> clocks;
+    std::vector<std::thread> threads;
     for (auto i = 0; i < numClients; ++i) {
         auto cli = new ClockClient(ost::InetHostAddress("127.0.0.1"), port);
         clients.push_back(cli);
@@ -46,6 +47,7 @@ int main(int argc, char* argv[])
         clock->setPhasePanic(5000);
         clock->setUpdatePanic(5000000);
         clocks.push_back(clock);
+        threads.push_back(std::thread{&PhaseLockedClock::run, clock});
     }
 
     while (runtime > 0.0) {
@@ -54,10 +56,23 @@ int main(int argc, char* argv[])
                       << timestampToString(clock->getValue()) << std::endl;
         std::cout << std::endl;
         const auto msec = 600;
-        ost::Thread::sleep(msec);
+        std::this_thread::sleep_for(std::chrono::milliseconds(msec));
         runtime -= msec * 0.001;
     }
-    for (const auto clock : clocks) clock->die();
-    t.join();
+
+    for (const auto clock : clocks) {
+        clock->die();
+        delete clock;
+    }
+
+    for (const auto client : clients) delete client;
+
+    th_server.join();
+    delete server;
+
+    // Forcefully terminate all threads
+    // XXX a bit of an ugly exit though, the clean termination requires
+    // probably the use of `native_handle()`
+    std::terminate();
     return 0;
 }
