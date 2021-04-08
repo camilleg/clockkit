@@ -2,6 +2,7 @@
 // A self-contained program with threads for a server and some clients.
 // An example that does not read any config file.
 
+#include <thread>
 #include <vector>
 
 #include "ClockClient.h"
@@ -22,9 +23,9 @@ int main(int argc, char* argv[])
     auto runtime = atof(argv[3]);
 
     auto& clockHiRes = HighResolutionClock::instance();
-    ClockServer server(ost::InetAddress("0.0.0.0"), port, clockHiRes);
-    server.setLogging(true);
-    server.start();
+    ClockServer* server = new ClockServer(ost::InetAddress("0.0.0.0"), port, clockHiRes);
+    server->setLogging(true);
+    std::thread t{&ClockServer::run, server};
 
 #if 0
     // For just one cli, pointers aren't needed.
@@ -57,6 +58,6 @@ int main(int argc, char* argv[])
         runtime -= msec * 0.001;
     }
     for (const auto clock : clocks) clock->die();
-    server.join();
+    t.join();
     return 0;
 }

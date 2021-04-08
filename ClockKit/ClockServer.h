@@ -1,7 +1,9 @@
 #pragma once
 #include <cc++/socket.h>  // for ost::lotsastuff
+
 #include <map>
 #include <string>
+
 #include "Clock.h"
 
 namespace dex {
@@ -9,7 +11,7 @@ namespace dex {
 // A network server for a local clock.
 // It stores responses from the clients on the state of their synchronization.
 // To start the server's thread (run()), call start().
-class ClockServer : public ost::Thread {
+class ClockServer {
    private:
     const ost::InetAddress addr_;
     const ost::tpport_t port_;
@@ -38,8 +40,9 @@ class ClockServer : public ost::Thread {
         log_ = log;
     }
 
-   protected:
     void run();
+
+   protected:
     void updateEntry(const std::string& addr, timestamp_t offset, timestamp_t rtt);
 };
 

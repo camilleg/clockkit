@@ -1,6 +1,7 @@
 #include <cc++/socket.h>
 
 #include <cstdlib>
+#include <thread>
 
 #include "ClockServer.h"
 #include "HighResolutionClock.h"
@@ -25,12 +26,14 @@ int main(int argc, char* argv[])
 #else
     auto& clock(dex::HighResolutionClock::instance());
 #endif
-    dex::ClockServer server(addr, port, clock);
+    dex::ClockServer* server = new dex::ClockServer(addr, port, clock);
 
-    server.setLogging(true);
+    server->setLogging(true);
     // todo: There's only one thread.  If one thread per client
     // wouldn't be better, why not omit this single thread?
-    server.start();
-    server.join();
+    std::thread s{&dex::ClockServer::run, server};
+    s.join();
+
+    delete server;
     return 0;
 }
