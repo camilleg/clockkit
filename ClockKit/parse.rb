@@ -12,12 +12,12 @@ when 'time'
 when 'offset'
   # Filter "offset: 19" into a usec value 19.
   abort "#$0: unexpected input '#{L}'" if L.size < 2
-  puts L[1].to_i
+  puts L[1].to_i.abs
 
 when 'offsetMax'
   # Filter "<time 1616776087 109179> offsetMax\t179\t---" into a usec value 179.
   abort "#$0: unexpected input '#{L}'" if L.size < 5
-  puts L[4].to_i
+  puts L[4].to_i.abs
 
 else
   abort "#$0: unexpected command '#{ARGV[1]}'"
