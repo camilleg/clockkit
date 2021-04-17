@@ -1,4 +1,5 @@
 #include "ConfigReader.h"
+#include "limits"
 
 int main(int argc, char* argv[])
 {
@@ -15,9 +16,15 @@ int main(int argc, char* argv[])
 
     const auto fTerminate = argc == 3;
     auto runtime = fTerminate ? atof(argv[2]) : 0.0;
+    if (fTerminate && runtime <= 0.0) {
+        clock->die();
+        return 0;
+    }
 
     while (true) {
-        std::cout << "offset: " << clock->getOffset() << "\n"
+        static const auto invalid = std::numeric_limits<int>::max();
+        const auto offset = clock->getOffset();
+        std::cout << "offset: " << (offset == invalid ? "invalid" : std::to_string(offset)) << "\n"
                   << dex::timestampToString(clock->getValue()) << std::endl;
         // endl flushes stdout, to show output even after Ctrl+C.
         ost::Thread::sleep(200);  // msec
