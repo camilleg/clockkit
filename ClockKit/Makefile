@@ -54,6 +54,8 @@ test-30: ckserver ckphaselock
 	./testcase-n.sh 30 4430
 test-standalone: cktest-standalone
 	./$? 4480 5 3 > /dev/null
+test-remote: ckphaselock
+	./test2hosts.sh
 test-python: ckserver python/_clockkit.so
 	cd python && ./testcase.sh 4450
 test-ruby: ckserver ruby/clockkit.so
