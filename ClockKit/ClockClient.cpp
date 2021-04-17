@@ -2,6 +2,8 @@
 
 #include "HighResolutionClock.h"
 
+// #define DEBUG
+
 using namespace std;
 
 namespace dex {
@@ -47,12 +49,20 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
 
     while (true) {
         if (!socket_->isPending(ost::Socket::pendingInput, timeoutMsec)) {
+#ifdef DEBUG
+            cerr << "timed out waiting for packet after " << timeoutMsec << " ms\n";
+#endif
             return ClockPacket();  // Timeout.
         }
 
-        if (socket_->receive(buffer, length) != length)
+        if (socket_->receive(buffer, length) != length) {
+            cerr << "ignoring wrong-length packet\n";
             return ClockPacket();  // Packet had wrong length.
+        }
 
+#ifdef DEBUG
+        cerr << "got packet\n";
+#endif
         ClockPacket packet(buffer);
         if (packet.getType() == ClockPacket::KILL) {
             exit(0);
@@ -60,12 +70,13 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
 
         packet.setClientReceiveTime(clock.getValue());
         if (packet.sequenceNumber_ != sequence_) {
-            cout << "ignoring out-of-order packet\n";
+            cerr << "ignoring out-of-order packet " << int(packet.sequenceNumber_) << "; expected "
+                 << int(sequence_) << "\n";
             continue;
         }
 
         if (packet.getType() != ClockPacket::REPLY) {
-            cout << "ignoring packet with wrong type\n";
+            cerr << "ignoring packet with wrong type\n";
             continue;
         }
 
