@@ -1,11 +1,11 @@
 #include "clockkit.h"
 #include <atomic>
+#include <limits>
 #include <thread>
 
 #include "ClockClient.h"
 #include "ConfigReader.h"
 #include "HighResolutionClock.h"
-#include "limits"
 
 // Hide locals in this anonymous namespace, not by declaring static.
 // To verify: readelf -sW clockkit.o | c++filt -t | grep -v UND

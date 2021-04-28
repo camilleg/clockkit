@@ -1,7 +1,6 @@
 #pragma once
 #include <atomic>
 
-#include "Clock.h"
 #include "VariableFrequencyClock.h"
 
 namespace dex {
