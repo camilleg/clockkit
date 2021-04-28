@@ -26,7 +26,7 @@ BraceWrapping:
   SplitEmptyNamespace:   true
 BreakBeforeBraces: Stroustrup
 BreakConstructorInitializers: BeforeComma
-ColumnLimit: 100
+ColumnLimit: 120
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth: 4
 IndentWidth: 4
