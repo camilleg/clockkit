@@ -1,3 +1,4 @@
+#include <atomic>
 #include <iostream>
 #include <thread>
 
@@ -12,20 +13,19 @@ int main(int argc, char* argv[])
     }
 
     dex::PhaseLockedClock* clock = dex::PhaseLockedClockFromConfigFile(argv[1]);
-    std::thread th_clock{&dex::PhaseLockedClock::run, clock};
     if (!clock) {
         std::cerr << argv[0] << ": failed to get a clock.\n";
         return 1;
     }
+    std::atomic_bool end_clocks(false);
+    std::thread th_clock(&dex::PhaseLockedClock::run, clock, std::ref(end_clocks));
 
     const auto fTerminate = argc == 3;
     auto runtime = fTerminate ? atof(argv[2]) : 0.0;
     if (fTerminate && runtime <= 0.0) {
-        clock->die();
-        return 0;
+        end_clocks = true;
     }
-
-    while (true) {
+    while (!end_clocks) {
         static const auto invalid = std::numeric_limits<int>::max();
         const auto offset = clock->getOffset();
         std::cout << "offset: " << (offset == invalid ? "invalid" : std::to_string(offset)) << "\n"
@@ -35,10 +35,11 @@ int main(int argc, char* argv[])
         if (fTerminate) {
             runtime -= 0.2;  // sec
             if (runtime <= 0.0) {
-                clock->die();
-                break;
+                end_clocks = true;
             }
         }
     }
+    clock->die();
+    th_clock.join();
     return 0;
 }

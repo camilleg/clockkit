@@ -38,11 +38,17 @@ bool ClockClient::sendPacket(const ClockPacket& packet) const
     constexpr auto length = ClockPacket::PACKET_LENGTH;
     uint8_t buffer[length];
     packet.write(buffer);
+#ifdef DEBUG
+    cerr << "sending packet " << packet.getType() << "\n";
+#endif
     return socket_->send(buffer, length) == length;
 }
 
 ClockPacket ClockClient::receivePacket(Clock& clock)
 {
+#ifdef DEBUG
+    cerr << "expecting packet\n";
+#endif
     constexpr auto length = ClockPacket::PACKET_LENGTH;
     uint8_t buffer[length];
     const auto timeoutMsec = std::max(1, timeout_ / 1000);
@@ -60,10 +66,10 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
             return ClockPacket();  // Packet had wrong length.
         }
 
-#ifdef DEBUG
-        cerr << "got packet\n";
-#endif
         ClockPacket packet(buffer);
+#ifdef DEBUG
+        cerr << "got packet " << packet.getType() << "\n";
+#endif
         if (packet.getType() == ClockPacket::KILL) {
             exit(0);
         }

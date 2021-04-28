@@ -1,7 +1,5 @@
-#include <cc++/socket.h>
-
+#include <cc++/socket.h>  // Only for ost::InetAddress.
 #include <cstdlib>
-#include <thread>
 
 #include "ClockServer.h"
 #include "HighResolutionClock.h"
@@ -15,8 +13,6 @@ int main(int argc, char* argv[])
         std::cerr << "usage: " << argv[0] << " <port>\n";
         return 1;
     }
-
-    const ost::InetAddress addr("0.0.0.0");
     const auto port = atoi(argv[1]);
 
 #ifdef DEBUG
@@ -26,14 +22,8 @@ int main(int argc, char* argv[])
 #else
     auto& clock(dex::HighResolutionClock::instance());
 #endif
-    dex::ClockServer* server = new dex::ClockServer(addr, port, clock);
-
-    server->setLogging(true);
-    // todo: There's only one thread.  If one thread per client
-    // wouldn't be better, why not omit this single thread?
-    std::thread s{&dex::ClockServer::run, server};
-    s.join();
-
-    delete server;
+    dex::ClockServer server(ost::InetAddress("0.0.0.0"), port, clock);
+    server.setLogging(true);
+    server.run();
     return 0;
 }

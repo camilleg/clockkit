@@ -23,56 +23,55 @@ int main(int argc, char* argv[])
     auto runtime = atof(argv[3]);
 
     auto& clockHiRes = HighResolutionClock::instance();
-    ClockServer* server = new ClockServer(ost::InetAddress("0.0.0.0"), port, clockHiRes);
-    server->setLogging(true);
-    std::thread th_server{&ClockServer::run, server};
+    ClockServer server(ost::InetAddress("0.0.0.0"), port, clockHiRes);
+    server.setLogging(true);
+    std::thread th_server(&ClockServer::run, &server);
 
 #if 0
     // For just one cli, pointers aren't needed.
     ClockClient client(ost::InetHostAddress("127.0.0.1"), port);
     client.setTimeout(1000);
     client.setAcknowledge(true);
-    PhaseLockedClock clock(clockHiRes, client);
-    clock.setPhasePanic(5000);
-    clock.setUpdatePanic(5000000);
+    PhaseLockedClock plc(clockHiRes, client);
+    plc.setPhasePanic(5000);
+    plc.setUpdatePanic(5000000);
 #endif
 
+    std::atomic_bool end_clocks(false);
     std::vector<ClockClient*> clients;
     std::vector<PhaseLockedClock*> clocks;
     std::vector<std::thread> threads;
     for (auto i = 0; i < numClients; ++i) {
         auto cli = new ClockClient(ost::InetHostAddress("127.0.0.1"), port);
+        // Don't bother to clients.emplace_back(), because ClockClient's
+        // private copy constructor causes baroque workarounds,
+        // https://stackoverflow.com/q/17007977/2097284, or maybe std::move.
         clients.push_back(cli);
-        auto clock = new PhaseLockedClock(clockHiRes, *cli);
-        clock->setPhasePanic(5000);
-        clock->setUpdatePanic(5000000);
-        clocks.push_back(clock);
-        threads.push_back(std::thread{&PhaseLockedClock::run, clock});
+        auto plc = new PhaseLockedClock(clockHiRes, *cli);
+        plc->setPhasePanic(5000);
+        plc->setUpdatePanic(5000000);
+        clocks.push_back(plc);
+        threads.emplace_back(&PhaseLockedClock::run, plc, std::ref(end_clocks));
     }
 
     while (runtime > 0.0) {
-        for (const auto clock : clocks)
-            std::cout << "offset: " << clock->getOffset() << "\n"
-                      << timestampToString(clock->getValue()) << std::endl;
+        for (const auto plc : clocks)
+            std::cout << "offset: " << plc->getOffset() << "\n"
+                      << timestampToString(plc->getValue()) << std::endl;
         std::cout << std::endl;
         const auto msec = 600;
         std::this_thread::sleep_for(std::chrono::milliseconds(msec));
         runtime -= msec * 0.001;
     }
 
-    for (const auto clock : clocks) {
-        clock->die();
-        delete clock;
+    for (const auto plc : clocks) {
+        plc->die();
+        delete plc;
     }
-
+    end_clocks = true;
+    for (auto& thread : threads) thread.join();
     for (const auto client : clients) delete client;
 
     th_server.join();
-    delete server;
-
-    // Forcefully terminate all threads
-    // XXX a bit of an ugly exit though, the clean termination requires
-    // probably the use of `native_handle()`
-    std::terminate();
     return 0;
 }

@@ -1,6 +1,5 @@
 #pragma once
-//#include <cc++/thread.h>  // for ost::Thread
-#include <thread>
+#include <atomic>
 
 #include "Clock.h"
 #include "VariableFrequencyClock.h"
@@ -16,25 +15,14 @@ namespace dex {
  *
  * - Assumes the primary and reference clocks run at 1000000 Hz.
  * - The update interval is initially set at 1 second.
- * - Updates occur randomly at +-10% of the update interval,
- *   to not swamp the server with synchronous requests.
+ * - It varies randomly +-10%,
+ *   to not swamp the server with simultaneous requests.
  */
 class PhaseLockedClock : public Clock {
    public:
-    /**
-     * Creates a PhaseLockedClock around the provided primary and
-     * reference clocks.
-     *
-     * This is an Active Object.  So, when it is created a thread
-     * is started to manage it.  When the object is deleted, the thread
-     * will be suspended.
-     */
+    // Construct a PhaseLockedClock around a primary and reference clock.
     explicit PhaseLockedClock(Clock& primary, Clock& reference);
 
-    /**
-     * Cleans up all resources associated with this Clock and
-     * stops the thread associated with this Active Object
-     */
     ~PhaseLockedClock() = default;
 
     // Kill the ClockClient and its ClockServer.
@@ -43,10 +31,9 @@ class PhaseLockedClock : public Clock {
         referenceClock_.die();
     }
 
-    // Value of this clock.
     timestamp_t getValue();
 
-    // Returns true iff we're in sync with the reference clock.
+    // Return whether we're in sync with our reference clock.
     // Sync becomes lost if the previous update was too long ago,
     // or if the phase is detected to be too great.
     inline bool isSynchronized() const
@@ -54,13 +41,13 @@ class PhaseLockedClock : public Clock {
         return inSync_;
     }
 
-    // Phase offset from the reference clock.
+    // Phase offset from our reference clock.
     int getOffset();
 
-    // If the phase of the PhaseLockedClock differs by more than this
-    // from the reference clock's, the clock will be set to out-of-sync.
-    // Call this or setUpdatePanic() while the clock is running, to compensate
-    // for a crystal drifting due to temperature change (handheld or mobile),
+    // If our PhaseLockedClock's phase differs from our reference
+    // clock's by more than this, we get set to out of sync.
+    // Call this or setUpdatePanic(), to compensate for a crystal
+    // drifting due to temperature change (handheld or mobile),
     // or for bandwidth change (failing hotspot, WLAN degradation).
     inline void setPhasePanic(timestamp_t phasePanic)
     {
@@ -68,30 +55,27 @@ class PhaseLockedClock : public Clock {
     }
 
     // If the previous successful update was longer ago than this,
-    // the clock will be set to out-of-sync.
+    // we will be set to out-of-sync.
     inline void setUpdatePanic(timestamp_t usec)
     {
         updatePanic_ = usec;
     }
 
-    // Call e.g. when creating a new std::thread
-    void run();
+    // Call update() periodically, until the caller sets the flag to true.
+    void run(std::atomic_bool&);
 
    protected:
-    // Called by this object's thread, each update interval.
+    // Called periodically by run().
+    // Call updatePhase() and updateClock().
     void update();
 
-    // Update the clocks' markers.
+    // Update our clocks' markers.
     bool updatePhase();
 
-    // Slew the clock into step.
+    // Slew into step.
     bool updateClock();
 
-    /**
-     * Sets the clock to the reference clock,
-     * to get the clock back into sync.
-     * This does not slew the clock.  It does a hard reset.
-     */
+    // Hard-reset to our reference clock, to regain sync.
     void setClock();
 
    private:
@@ -105,7 +89,7 @@ class PhaseLockedClock : public Clock {
     // Are we in sync?
     bool inSync_;
 
-    // Phase between the VFC and the reference clock.
+    // Phase between the VFC and our reference clock.
     timestamp_t phase_;
     timestamp_t phasePrev_;
 
@@ -117,7 +101,7 @@ class PhaseLockedClock : public Clock {
     timestamp_t primaryValue_;
     timestamp_t primaryValuePrev_;
 
-    // Average frequency, in Hz, of the primary clock w.r.t the reference clock.
+    // Average frequency, in Hz, of our primary clock w.r.t our reference clock.
     double primaryFrequencyAvg_;
 
     // See setPhasePanic() and setUpdatePanic().

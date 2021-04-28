@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require './clockkit'
 
-abort "Usage: #$0 configfile" if ARGV.size != 1
+abort "Usage: #$0 configfile" unless ARGV.size == 1
 Clockkit.ckInitialize ARGV[0]
 
 loop { 

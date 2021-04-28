@@ -53,18 +53,16 @@ int PhaseLockedClock::getOffset()
     return phase_;
 }
 
-void PhaseLockedClock::run()
+void PhaseLockedClock::run(std::atomic_bool &end_clocks)
 {
     constexpr auto updateInterval_usec = 200000;              // 5 Hz.  From the config file?
     constexpr auto variance_usec = updateInterval_usec / 10;  // +-5%, so +- 5 msec.
     constexpr auto base_usec = updateInterval_usec - variance_usec / 2;
-    // TODO find replacement for `while (!testCancel()) {  // ost::Thread::testCancel()`
-    while (true) {
+    while (!end_clocks) {
         update();
         const auto random_usec = rand() % variance_usec;
         std::this_thread::sleep_for(std::chrono::microseconds(base_usec + random_usec));
     }
-    // There's no need to ost::Thread::exit().
 }
 
 void PhaseLockedClock::update()
