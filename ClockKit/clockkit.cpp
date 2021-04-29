@@ -27,12 +27,12 @@ void test_ok(const char* func)
 
 // Prefix externally visible functions with ck.
 
-void ckInitialize(const char* path)
+void ckInitialize(const char* filename)
 {
     if (!plc) {
-        dex::ConfigReader config{};
-        if (path != nullptr)
-            config.readFrom(std::string(path));
+        dex::ConfigReader config;
+        if (filename)
+            config.readFrom(filename);
         plc = config.buildClock();
     }
     test_ok("ckInitialize");

@@ -7,20 +7,20 @@
 
 namespace dex {
 
-bool ConfigReader::readFrom(std::string filename)
+bool ConfigReader::readFrom(const char* filename)
 {
-    std::ifstream file(filename.c_str());
+    std::ifstream file(filename);
     if (!file.good())
         return false;
 
     // Values only initialized to have a sane empty state, these should never
     // make it into the object
     // XXX maybe use asserts here
-    std::string server = "";
-    unsigned int port = 0;
-    unsigned int timeout = 0;
-    unsigned int phasePanic = 0;
-    unsigned int updatePanic = 0;
+    std::string server;
+    auto port = 0u;
+    auto timeout = 0u;
+    auto phasePanic = 0u;
+    auto updatePanic = 0u;
     bool found = false;
 
     while (!file.eof()) {
@@ -56,15 +56,13 @@ bool ConfigReader::readFrom(std::string filename)
     file.close();
     if (!found)
         return false;
-    else {
-        // Only overwrite values if the full config has been parsed correctly
-        this->server = server;
-        this->port = port;
-        this->timeout = timeout;
-        this->phasePanic = phasePanic;
-        this->updatePanic = updatePanic;
-    }
 
+    // Overwrite values only if the full config parsed ok.
+    this->server = server;
+    this->port = port;
+    this->timeout = timeout;
+    this->phasePanic = phasePanic;
+    this->updatePanic = updatePanic;
     return true;
 }
 

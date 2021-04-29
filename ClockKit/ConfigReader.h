@@ -6,26 +6,24 @@
 namespace dex {
 class ConfigReader {
    public:
-    // All default values are defined here
+    // Defaults.
     static const std::string defaultServer;
-    static const unsigned int defaultPort = 4444;
-    static const unsigned int defaultTimeout = 1000;
-    static const unsigned int defaultPhasePanic = 5000;
-    static const unsigned int defaultUpdatePanic = 5000000;
+    static const auto defaultPort = 4444u;
+    static const auto defaultTimeout = 1000u;
+    static const auto defaultPhasePanic = 5000u;
+    static const auto defaultUpdatePanic = 5000000u;
 
-    // Default ctor initializes default values
+    // This default ctor initializes the default values.
     explicit inline ConfigReader()
-        : server{std::string{"localhost"}}
+        : server{"localhost"}
         , port{defaultPort}
         , timeout{defaultTimeout}
         , phasePanic{defaultPhasePanic}
-        , updatePanic{defaultUpdatePanic}
-        , path{""} {};
+        , updatePanic{defaultUpdatePanic} {};
 
     ~ConfigReader() = default;
 
-    // Delete copy ctor as clocks with the same config only lead to trouble and
-    // are not useful
+    // No copy ctor, because clocks with duplicate configs are dangerous, not useful.
     ConfigReader(const ConfigReader&) = delete;
 
     std::string server;
@@ -34,17 +32,14 @@ class ConfigReader {
     unsigned int phasePanic;
     unsigned int updatePanic;
 
-    // Prints the currently held values to stdout
+    // Print the current values to stdout.
     void print();
 
-    // Read values from given file, only returns true if the config could be
-    // successfully read **and** parsed
-    bool readFrom(std::string);
+    // Read values from a config file.
+    // Returns true iff the config was read *and* parsed.
+    bool readFrom(const char*);
 
-    // Use the values in the reader to get a clock
+    // Make a clock from the reader's values.
     PhaseLockedClock* buildClock();
-
-   private:
-    std::string path;
 };
 }  // namespace dex
