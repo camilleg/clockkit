@@ -13,7 +13,7 @@ namespace dex {
 class ClockServer {
    private:
     const ost::InetAddress addr_;
-    const ost::tpport_t port_;
+    const int port_;
     Clock& clock_;
 
     struct Entry {
@@ -32,7 +32,7 @@ class ClockServer {
     // Provide requests for timestamps to clients via a UDP port.
     // To accept connections from clients on *any* local address,
     // set InetAddress to 0.0.0.0.
-    ClockServer(ost::InetAddress addr, ost::tpport_t port, Clock& clock);
+    ClockServer(ost::InetAddress addr, int port, Clock& clock);
 
     void setLogging(bool log)
     {

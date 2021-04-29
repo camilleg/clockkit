@@ -11,7 +11,7 @@ namespace dex {
 
 const timestamp_t ClockServer::SYSTEM_STATE_PURGE_TIME = 1500000;  // usec
 
-ClockServer::ClockServer(ost::InetAddress addr, ost::tpport_t port, Clock& clock)
+ClockServer::ClockServer(ost::InetAddress addr, int port, Clock& clock)
     : addr_(addr)
     , port_(port)
     , clock_(clock)
@@ -31,8 +31,7 @@ void ClockServer::run()
 
     while (socket.isPending(ost::Socket::pendingInput, TIMEOUT_INF)) {
         const timestamp_t serverReplyTime = clock_.getValue();
-        const ost::InetAddress peer =
-            socket.getPeer();  // also sets up the socket to send back to the sender
+        const ost::InetAddress peer = socket.getPeer();  // also sets up the socket to send back to the sender
         if (socket.receive(buffer, length) != length) {
             cerr << "ERR: packet had wrong length.\n";
         }
