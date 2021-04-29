@@ -17,3 +17,5 @@ while {1} {
   }
   after 100
 }
+
+ckTerminate

@@ -13,3 +13,5 @@ while 1:
     else:
         print("offset: OUT OF SYNC")
     time.sleep(0.1)
+
+_clockkit.ckTerminate()

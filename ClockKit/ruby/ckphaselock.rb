@@ -12,3 +12,5 @@ loop {
   end
   sleep 0.1
 }
+
+Clockkit.ckTerminate

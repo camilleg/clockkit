@@ -39,7 +39,11 @@ void ckInitialize(const char* filename)
     th_clock = new std::thread(&dex::PhaseLockedClock::run, plc, std::ref(end_clocks));
 }
 
-// Add void ckTerminate() to kill the thread cleanly, so */testcase.sh needn't pkill?
+void ckTerminate()
+{
+    if (plc)
+        delete plc;
+}
 
 dex::timestamp_t ckTimeAsValue()
 {
