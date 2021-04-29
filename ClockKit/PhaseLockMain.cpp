@@ -12,7 +12,17 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    dex::PhaseLockedClock* clock = dex::PhaseLockedClockFromConfigFile(argv[1]);
+    // Creates a default config
+    dex::ConfigReader config{};
+
+    // Overwrites values with those from the file iff parsed correctly
+    if (!config.readFrom(argv[1]))
+        std::cerr << "error parsing config '" << argv[1] << "'\n";
+
+    dex::PhaseLockedClock* clock = config.buildClock();
+
+    // Print the used values before a possible failure
+    config.print();
     if (!clock) {
         std::cerr << argv[0] << ": failed to get a clock.\n";
         return 1;

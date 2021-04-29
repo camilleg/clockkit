@@ -7,20 +7,21 @@
 
 namespace dex {
 
-PhaseLockedClock* PhaseLockedClockFromConfigFile(const std::string& filename)
+bool ConfigReader::readFrom(std::string filename)
 {
     std::ifstream file(filename.c_str());
-    if (!file.is_open()) {
-        std::cerr << "failed to open config file '" << filename << "'\n";
-        return nullptr;
-    }
+    if (!file.good())
+        return false;
 
-    std::string server = "localhost";
-    auto port = 4444;
-    auto timeout = 1000;
-    auto phasePanic = 5000;
-    auto updatePanic = 5000000;
-    auto found = false;
+    // Values only initialized to have a sane empty state, these should never
+    // make it into the object
+    // XXX maybe use asserts here
+    std::string server = "";
+    unsigned int port = 0;
+    unsigned int timeout = 0;
+    unsigned int phasePanic = 0;
+    unsigned int updatePanic = 0;
+    bool found = false;
 
     while (!file.eof()) {
         std::string line;
@@ -54,23 +55,38 @@ PhaseLockedClock* PhaseLockedClockFromConfigFile(const std::string& filename)
     }
     file.close();
     if (!found)
-        std::cerr << "using defaults because of useless config file '" << filename << "'\n";
+        return false;
+    else {
+        // Only overwrite values if the full config has been parsed correctly
+        this->server = server;
+        this->port = port;
+        this->timeout = timeout;
+        this->phasePanic = phasePanic;
+        this->updatePanic = updatePanic;
+    }
 
-    // TODO separate printing from object creation
+    return true;
+}
+
+PhaseLockedClock* ConfigReader::buildClock()
+{
+    const ost::InetHostAddress addr(this->server.c_str());
+    ClockClient* client = new ClockClient(addr, this->port);
+    client->setTimeout(this->timeout);
+    client->setAcknowledge(true);
+    PhaseLockedClock* plc = new PhaseLockedClock(HighResolutionClock::instance(), *client);
+    plc->setPhasePanic(this->phasePanic);
+    plc->setUpdatePanic(this->updatePanic);
+    return plc;
+}
+
+void ConfigReader::print()
+{
     std::cout << "config [server:" << server << "]\n"
               << "config [port:" << port << "]\n"
               << "config [timeout:" << timeout << "]\n"
               << "config [phasePanic:" << phasePanic << "]\n"
               << "config [updatePanic:" << updatePanic << "]" << std::endl;
-
-    const ost::InetHostAddress addr(server.c_str());
-    ClockClient* client = new ClockClient(addr, port);
-    client->setTimeout(timeout);
-    client->setAcknowledge(true);
-    PhaseLockedClock* plc = new PhaseLockedClock(HighResolutionClock::instance(), *client);
-    plc->setPhasePanic(phasePanic);
-    plc->setUpdatePanic(updatePanic);
-    return plc;
 }
 
 }  // namespace dex

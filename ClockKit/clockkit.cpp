@@ -1,4 +1,5 @@
 #include "clockkit.h"
+
 #include <atomic>
 #include <limits>
 #include <thread>
@@ -28,8 +29,12 @@ void test_ok(const char* func)
 
 void ckInitialize(const char* path)
 {
-    if (!plc)
-        plc = dex::PhaseLockedClockFromConfigFile(std::string(path));
+    if (!plc) {
+        dex::ConfigReader config{};
+        if (path != nullptr)
+            config.readFrom(std::string(path));
+        plc = config.buildClock();
+    }
     test_ok("ckInitialize");
     th_clock = new std::thread(&dex::PhaseLockedClock::run, plc, std::ref(end_clocks));
 }
