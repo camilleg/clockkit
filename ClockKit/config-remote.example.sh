@@ -2,7 +2,8 @@
 # Copy this to config-remote.sh and edit it.
 # Then test2hosts.sh can run.
 
-# A host that you can ssh to without a password prompt.
+# A host that you can ssh to with credentials,
+# instead of with a password prompt.
 host=myhost.mydomain.com
 
 # On $host, the port that sshd listens to.  Usually 22.

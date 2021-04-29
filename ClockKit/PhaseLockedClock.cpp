@@ -55,7 +55,7 @@ int PhaseLockedClock::getOffset()
 
 void PhaseLockedClock::run(std::atomic_bool &end_clocks)
 {
-    constexpr auto updateInterval_usec = 200000;              // 5 Hz.  From the config file?
+    constexpr auto updateInterval_usec = 200000;              // 5 Hz.  Set this in constructor?
     constexpr auto variance_usec = updateInterval_usec / 10;  // +-5%, so +- 5 msec.
     constexpr auto base_usec = updateInterval_usec - variance_usec / 2;
     while (!end_clocks) {
@@ -148,16 +148,15 @@ bool PhaseLockedClock::updateClock()
     cout << "primary clock's frequency average = " << int(primaryFrequencyAvg_) << endl;
 #endif
 
-    // Calculate the adjustment for the variable clock's frequency.
+    // Adjust the variable clock's frequency.
     const auto phaseDiff = phase_ * 0.1;
     const auto frequencyDiff = 1000000.0 - primaryFrequencyAvg_;
     const int variableClockFrequency = 1000000 + frequencyDiff + phaseDiff;
+    const std::lock_guard<std::mutex> lock(mutexPLC);
+    variableFrequencyClock_.setFrequency(variableClockFrequency);
 #ifdef DEBUG
     cout << "frequency = " << variableClockFrequency << endl;
 #endif
-
-    const std::lock_guard<std::mutex> lock(mutexPLC);
-    variableFrequencyClock_.setFrequency(variableClockFrequency);
     return true;
 }
 
