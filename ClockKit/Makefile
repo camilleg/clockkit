@@ -1,6 +1,7 @@
 MAKEFLAGS += --jobs=99
 CPP = c++
-# -fPIC is for */*.so.
+# -fPIC is only to make $(SWIGEXES).
+# -fpic would be smaller and faster, but that is only for gcc.
 CFLAGS = -O3 -fPIC -std=c++11 -Wall -Werror -Weffc++
 LIBS = -lccgnu2 -lpthread -ldl
 SWIG = swig -Wallkw -Werror
@@ -37,7 +38,7 @@ bindings: all $(SWIGEXES)
 debug: override CFLAGS += -O0 -ggdb
 debug: all
 
-profile: CFLAGS += -fPIC --coverage -fprofile-arcs -ftest-coverage -O0
+profile: CFLAGS += --coverage -fprofile-arcs -ftest-coverage -O0
 profile: $(EXES)
 
 # The *.d files are built by the rule for %.o:%.cpp via -MMD -MT -MF.
