@@ -1,4 +1,4 @@
-ClockKit/*.d
+ClockKit/.dependencies/*.d
 ClockKit/*.gcda
 ClockKit/*.gcno
 ClockKit/*.o

@@ -41,9 +41,9 @@ debug: all
 profile: CFLAGS += --coverage -fprofile-arcs -ftest-coverage -O0
 profile: $(EXES)
 
-# The *.d files are built by the rule for %.o:%.cpp via -MMD -MT -MF.
+# .dependencies/*.d are built by the %.o:%.cpp rule, via -MMD -MT -MF.
 # They define the .h dependencies of each .o file.
-DEPS := $(OBJS:.o=.d)
+DEPS := $(patsubst %.o,.dependencies/%.d,$(OBJS)) # $(OBJS:.o=.d)
 -include $(DEPS)
 
 test-bindings: test-python test-ruby test-tcl
@@ -103,6 +103,6 @@ purge: clean
 	rm -rf *.gcda
 
 %.o: %.cpp
-	$(CPP) -c $(CFLAGS) -MMD -MT $@ -MF $(patsubst %.o,%.d,$@) $<
+	$(CPP) -c $(CFLAGS) -MMD -MT $@ -MF $(patsubst %.o,.dependencies/%.d,$@) $<
 
 .PHONY: all profile bindings purge clean test-all test-30 test-standalone test-bindings test-python test-ruby test-tcl
