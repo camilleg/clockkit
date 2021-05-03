@@ -25,7 +25,9 @@ void test_ok(const char* func)
 }
 }  // namespace
 
-// Prefix externally visible functions with ck.
+// Prefix externally visible functions with ck, meaning ClockKit.
+// This is especially for languages like Tcl, which invoke these functions
+// as bare names, not qualified by the name of their containing module.
 
 void ckInitialize(const char* filename)
 {
