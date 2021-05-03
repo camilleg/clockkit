@@ -73,21 +73,21 @@ ckserver: ClockServerMain.cpp $(OBJS)
 ckphaselock: PhaseLockMain.cpp $(OBJS)
 	$(CPP) $(CFLAGS) $^ $(LIBS) -o $@
 
-python/wrap.c:
+python/wrap.c: clockkit.h
 	$(SWIG) -python -o $@ clockkit.h
 python/wrap.o: python/wrap.c
 	$(CPP) -c $(CFLAGS) -I. $$(pkg-config --cflags $(PYTHON)) $? -o $@
 python/_clockkit.so: python/wrap.o $(OBJS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
-tcl/wrap.c:
+tcl/wrap.c: clockkit.h
 	$(SWIG) -tcl -o $@ clockkit.h
 tcl/wrap.o: tcl/wrap.c
 	$(CPP) -c $(CFLAGS) -I. -I/usr/include/tcl8.6 $? -o $@
 tcl/clockkit.so: tcl/wrap.o $(OBJS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
-ruby/wrap.c:
+ruby/wrap.c: clockkit.h
 	$(SWIG) -ruby -o $@ clockkit.h
 	# In lines starting with rb_define_module_function, cast _wrap_ck's to (VALUE (*)(...)).
 	sed -i -e "s/ _wrap_ck/ (VALUE (*)(...))_wrap_ck/" $@
