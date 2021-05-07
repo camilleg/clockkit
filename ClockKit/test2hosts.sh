@@ -32,7 +32,7 @@ a=$(tail -10 $srv | grep -c -P '<time \d+ +\d+>\s')
 b=$(tail -20 $cli | grep -c -P '<time \d+ +\d+>')
 c=$(tail -20 $cli | grep -c -P 'offset: [-\d]+')
 if [[ "$a $b $c" != "10 10 10" ]]; then
-  echo "$0: unexpected outputs" >&2
+  echo "$0 $1: unexpected outputs" >&2
   # Save the output, to debug.
   cp $srv /tmp/clockkit-failed-srv.txt
   cp $cli /tmp/clockkit-failed-cli.txt
@@ -50,20 +50,20 @@ b=$(( $(tail -1 $cli | ./parse.rb time) ))
 diff=$(( $a - $b ))
 diffAbs=$(( ${diff#-} )) # Get absolute value by dropping the hyphen.
 if [[ $diffAbs -gt 300000 ]]; then
-  echo "$0: clocks too different" >&2
+  echo "$0 $1: clocks too different" >&2
   exit 1
 fi
 
 # The biggest offset (already abs()'d) should be small.
 a=$(( $(tail -1 $srv | ./parse.rb offsetMax) ))
 if [[ $a -gt 50000 ]]; then
-  echo "$0: offsetMax $a too large" >&2
+  echo "$0 $1: offsetMax $a too large" >&2
   exit 1
 fi
 
 # The final offset's abs() should be small.
 a=$(( $(grep offset $cli | tail -1 | ./parse.rb offset) ))
 if [[ $a -gt 10000 ]]; then
-  echo "$0: final offset $a too large" >&2
+  echo "$0 $1: final offset $a too large" >&2
   exit 1
 fi
