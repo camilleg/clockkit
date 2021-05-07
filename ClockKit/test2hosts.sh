@@ -1,11 +1,15 @@
 #!/bin/bash
 # Ensure that one server and one client run, on different hosts, and print plausible output.
 
-if [ ! -s config-remote.sh ]; then
-  echo "$0: Please copy config-remote.example.sh to config-remote.sh and edit it."
+if [[ $# -ne 1 ]]; then
+  echo "usage: $0 <configfile.sh>" >&2
   exit 1
 fi
-. config-remote.sh
+if [ ! -s $1 ]; then
+  echo "$0: Please copy config-remote.example.sh to $1 and edit it."
+  exit 1
+fi
+. $1
 
 srv=$(mktemp /tmp/clockkit.XXXXXX)
 cli=$(mktemp /tmp/clockkit.XXXXXX)
@@ -18,7 +22,7 @@ sed -e "s/^server:.*/server:$host/" \
     -e "s/^timeout:.*/timeout:${timeout_msec}000/" \
     < clockkit.conf > $conf
 killall -q -w ckphaselock
-ssh="ssh -p $sshport $host"
+ssh="ssh -p $sshport -o ConnectTimeout=2 $host" # Abort after 2 seconds.
 ./ckphaselock $conf 0 > /dev/null # Kill any ckserver already listening to $host:$port.
 $ssh $dirRemote/ckserver $port > $srv &
 sleep 1.8 # Reduce timeouts during startup.
@@ -50,14 +54,14 @@ if [[ $diffAbs -gt 300000 ]]; then
   exit 1
 fi
 
-# offsetMax (already abs()'d) should be small.
+# The biggest offset (already abs()'d) should be small.
 a=$(( $(tail -1 $srv | ./parse.rb offsetMax) ))
 if [[ $a -gt 50000 ]]; then
   echo "$0: offsetMax $a too large" >&2
   exit 1
 fi
 
-# Final offset's abs() should be small.
+# The final offset's abs() should be small.
 a=$(( $(grep offset $cli | tail -1 | ./parse.rb offset) ))
 if [[ $a -gt 10000 ]]; then
   echo "$0: final offset $a too large" >&2

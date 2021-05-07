@@ -51,18 +51,23 @@ test-bindings: test-python test-ruby test-tcl
 # Different ports let these tests run simultaneously, via --jobs=99.
 test: ckserver ckphaselock
 	./testcase.sh 4440
-test-30: ckserver ckphaselock
-	./testcase-n.sh 30 4430
 test-standalone: cktest-standalone
 	./$? 4480 5 3 > /dev/null
-test-remote: ckphaselock
-	./test2hosts.sh
+test-30: ckserver ckphaselock
+	./testcase-n.sh 30 4430
+
 test-python: ckserver python/_clockkit.so
 	cd python && ./testcase.sh 4450
 test-ruby: ckserver ruby/clockkit.so
 	cd ruby && ./testcase.sh 4460
 test-tcl: ckserver tcl/clockkit.so
 	cd tcl && ./testcase.sh 4470
+
+test-remote: ckphaselock
+	./test2hosts.sh config-remote.sh
+test-remote2: ckphaselock
+	./test2hosts.sh config-remote2.sh
+# Don't generalize this here.  Instead, manually ./test2hosts.sh config-myOtherHost.sh.
 
 cktest-standalone: test-standalone.cpp $(OBJS)
 	$(CPP) $(CFLAGS) $^ $(LIBS) -o $@
