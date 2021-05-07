@@ -5,12 +5,11 @@ as described in the conference paper [Synchronous data collection from diverse h
 It runs on Linux, Windows, and Raspi,
 and needs neither extra hardware nor elevated privileges.
 
-It is intended to measure a system's realtime behavior,
-especially to provide a common time reference for events recorded by different sensors
+It can measure a system's realtime behavior,
+by providing a common time reference for events recorded by different sensors
 (audio, video, gamepad, GPS, SMS, MIDI, biometrics),
-and to trigger outputs (audio, video, LEDs, servos, motion bases).
-
-It did this originally for a full-motion driving simulator with eye tracking and a
+and for triggering outputs (audio, video, LEDs, servos, motion bases).  
+It did this originally for a full-motion [driving simulator](https://web.archive.org/web/20170517201424/http://www.isl.uiuc.edu/Labs/Driving%20Simulator/Driving%20Simulator.html) with eye tracking and a
 quickly churning set of other sensors and outputs, for over a decade.
 
 Clockkit was originally published in 2004 on [http://zx81.isl.uiuc.edu/camilleg/clockkit](https://web.archive.org/web/20041205064911/http://zx81.isl.uiuc.edu/camilleg/dsceu04.pdf) (defunct).  
