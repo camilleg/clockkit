@@ -5,7 +5,7 @@
 %}
 #endif
 
-#include "Common.h"
+#include "Timestamp.h"
 
 extern void ckInitialize(const char*);
 extern void ckTerminate();

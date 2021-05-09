@@ -9,17 +9,8 @@ namespace dex {
 
 SystemClock SystemClock::instance_;
 
-SystemClock::SystemClock()
-{
-}
-
-SystemClock& SystemClock::instance()
-{
-    return instance_;
-}
-
 // Needs no mutex, because no state is stored,
-// and GetSystemTimeAsFileTime and gettimeofday are thread-safe.
+// and because GetSystemTimeAsFileTime and gettimeofday are thread-safe.
 timestamp_t SystemClock::getValue()
 {
     timestamp_t time;
