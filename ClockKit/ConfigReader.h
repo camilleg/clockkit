@@ -1,30 +1,35 @@
 #pragma once
 #include <string>
 
+#include "ClockClient.h"
 #include "PhaseLockedClock.h"
 
 namespace dex {
 class ConfigReader {
    public:
-    // Defaults.
-    static const std::string defaultServer;
     static const auto defaultPort = 4444u;
     static const auto defaultTimeout = 1000u;
     static const auto defaultPhasePanic = 5000u;
     static const auto defaultUpdatePanic = 5000000u;
 
-    // This default ctor initializes the default values.
     explicit inline ConfigReader()
         : server{"localhost"}
         , port{defaultPort}
         , timeout{defaultTimeout}
         , phasePanic{defaultPhasePanic}
-        , updatePanic{defaultUpdatePanic} {};
+        , updatePanic{defaultUpdatePanic}
+        , client_(nullptr){};
 
-    ~ConfigReader() = default;
+    // Don't let this be called before destructing the PhaseLockedClock that uses client_.
+    ~ConfigReader()
+    {
+        delete client_;
+    }
 
-    // No copy ctor, because clocks with duplicate configs are dangerous, not useful.
+    // No copy ctor or assignment operator,
+    // because clocks with duplicate configs are dangerous, not useful.
     ConfigReader(const ConfigReader&) = delete;
+    ConfigReader& operator=(const ConfigReader&) = delete;
 
     std::string server;
     unsigned int port;
@@ -40,6 +45,10 @@ class ConfigReader {
     bool readFrom(const char*);
 
     // Make a clock from the reader's values.
+    // The caller owns the returned pointer, and is responsible for deleting it.
     PhaseLockedClock* buildClock();
+
+   private:
+    ClockClient* client_;
 };
 }  // namespace dex

@@ -20,6 +20,7 @@ namespace dex {
 class PhaseLockedClock : public Clock {
    public:
     // Construct a PhaseLockedClock around a primary and reference clock.
+    // Don't destruct either of those before destructing this, lest this segfault.
     explicit PhaseLockedClock(Clock& primary, Clock& reference);
 
     ~PhaseLockedClock() = default;

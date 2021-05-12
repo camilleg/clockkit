@@ -2,7 +2,6 @@
 
 #include <iostream>
 
-#include "ClockClient.h"
 #include "HighResolutionClock.h"
 
 namespace dex {
@@ -69,10 +68,10 @@ bool ConfigReader::readFrom(const char* filename)
 PhaseLockedClock* ConfigReader::buildClock()
 {
     const ost::InetHostAddress addr(this->server.c_str());
-    ClockClient* client = new ClockClient(addr, this->port);
-    client->setTimeout(this->timeout);
-    client->setAcknowledge(true);
-    PhaseLockedClock* plc = new PhaseLockedClock(HighResolutionClock::instance(), *client);
+    client_ = new ClockClient(addr, this->port);
+    client_->setTimeout(this->timeout);
+    client_->setAcknowledge(true);
+    PhaseLockedClock* plc = new PhaseLockedClock(HighResolutionClock::instance(), *client_);
     plc->setPhasePanic(this->phasePanic);
     plc->setUpdatePanic(this->updatePanic);
     return plc;
