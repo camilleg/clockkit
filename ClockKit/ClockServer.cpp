@@ -9,8 +9,6 @@ using namespace std;
 
 namespace dex {
 
-const timestamp_t ClockServer::SYSTEM_STATE_PURGE_TIME = 1500000;  // usec
-
 ClockServer::ClockServer(ost::InetAddress addr, int port, Clock& clock)
     : addr_(addr)
     , port_(port)
@@ -49,7 +47,7 @@ void ClockServer::run()
                     updateEntry(peer.getHostname(), packet.getClockOffset(), packet.rtt());
                     break;
                 case ClockPacket::KILL:
-                    return;  // Exit this thread.
+                    return;
                 default:
                     cerr << "ERR: packet had wrong type.\n";
             }
@@ -73,6 +71,7 @@ void ClockServer::updateEntry(const string& addr, timestamp_t offset, timestamp_
     // Purge old entries.
     // Don't use erase+remove_if+lambda, because that fails with map;
     // wait for C++20's std::erase_if.
+    const timestamp_t SYSTEM_STATE_PURGE_TIME = 1500000;  // usec
     const auto tPurge = now - SYSTEM_STATE_PURGE_TIME;
     for (auto it = ackData_.begin(); it != ackData_.end();) {
         if (it->second.time < tPurge) {
@@ -83,7 +82,7 @@ void ClockServer::updateEntry(const string& addr, timestamp_t offset, timestamp_
         }
     }
 
-    // Calculate maximum offset.
+    // Calculate the maximum offset.
     timestamp_t offsetMax = 0L;
     for (const auto& data : ackData_) {
         const auto& entry = data.second;

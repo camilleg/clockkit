@@ -9,7 +9,6 @@ namespace dex {
 
 // A network server for a local clock.
 // It stores responses from the clients on the state of their synchronization.
-// To start the server's thread (run()), call start().
 class ClockServer {
    private:
     const ost::InetAddress addr_;
@@ -25,7 +24,7 @@ class ClockServer {
 
     bool log_;
 
-    static const timestamp_t SYSTEM_STATE_PURGE_TIME;
+    // The most recent time that offsetMax was recalculated.
     timestamp_t tRecalculated_;
 
    public:
