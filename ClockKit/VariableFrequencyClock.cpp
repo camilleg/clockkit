@@ -6,8 +6,8 @@ namespace dex {
 
 VariableFrequencyClock::VariableFrequencyClock(Clock& src)
     : clockSrc_(src)
-    , frequencySrc_(1000000)
-    , frequency_(1000000)
+    , frequencySrc_(1000000.0)
+    , frequency_(1000000.0)
     , markerSrc_(clockSrc_.getValue())
     , marker_(0)
     , rolledOver_(false)
@@ -27,7 +27,7 @@ timestamp_t VariableFrequencyClock::getValue()
         rolledOver_ = true;
         return invalid;
     }
-    return marker_ + ticksSrc * frequency_ / double(frequencySrc_);
+    return marker_ + ticksSrc * frequency_ / frequencySrc_;
 }
 
 void VariableFrequencyClock::setValue(timestamp_t t)
@@ -43,11 +43,11 @@ void VariableFrequencyClock::updateMarkers()
         setValue(getValue());
 }
 
-void VariableFrequencyClock::setFrequency(int freq)
+void VariableFrequencyClock::setFrequency(double freq)
 {
     updateMarkers();
     // A nonpositive frequency is silently ignored.
-    if (freq > 0)
+    if (freq > 0.0)
         frequency_ = freq;
 }
 

@@ -21,16 +21,17 @@ class VariableFrequencyClock : public Clock {
     // Sets the current time (the clock's value).
     void setValue(timestamp_t);
 
-    inline int getFrequency() const
+    // todo: unused yet, but define in Clock, for a VFC based on another VFC.
+    inline double getFrequency() const
     {
         return frequency_;
     }
-    void setFrequency(int);
+    void setFrequency(double);
 
    private:
     Clock& clockSrc_;
-    timestamp_t frequencySrc_;
-    timestamp_t frequency_;
+    double frequencySrc_;
+    double frequency_;
     timestamp_t markerSrc_;
     timestamp_t marker_;
     bool rolledOver_;
