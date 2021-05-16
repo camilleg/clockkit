@@ -86,17 +86,10 @@ class ClockClient : public Clock {
     // Returns "invalid" on error.
     timestamp_t getPhase(Clock&, bool acknowledge);
 
-    /**
-     * Returns the phase between a local clock and
-     * the ClockServer clock.
-     * This call is the most accurate in getting timing
-     * information from a ClockServer.
-     *
-     * If set to send acknowledgments, this call will send
-     * back information to the ClockServer on the phase
-     * difference of the two clocks.
-     */
    public:
+    // Phase between a local clock and a ClockServer's clock.
+    // Reports the phase to the server, if acknowledge_.
+    // The most accurate way to get timing from a ClockServer.
     inline timestamp_t getPhase(Clock& clock)
     {
         return getPhase(clock, acknowledge_);

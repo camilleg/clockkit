@@ -8,8 +8,8 @@ class ClockPacket {
    public:
     // - INVALID: uninitialized.
     // - REQUEST: Client sends packet to server requesting current time.
-    // - REPLY: Server sends client the current time.
-    // - ACKNOWLEDGE: Client sends server the status of its synchronization.
+    // - REPLY: Server sends client the current time, after a REQUEST.
+    // - ACKNOWLEDGE: Client sends server the status of its synchronization, from getPhase().
     // - KILL: terminate client and server.
     enum Type { INVALID = 0, REQUEST, REPLY, ACKNOWLEDGE, KILL };
 
@@ -20,25 +20,28 @@ class ClockPacket {
     // - total : 26 bytes
     enum { PACKET_LENGTH = 26 };
 
-    // XXX is a single byte not a bit less for a sequence number?
-    const uint8_t sequenceNumber_;  // Detects out-of-order packets and thus delayed responses.
+    // Detects out-of-order packets and thus delayed responses.
+    // (A byte isn't too small, because even at 10 packets per second,
+    // this detects packets as much as 25 seconds late,
+    // which is much larger than the typical tolerance of a fraction of a second.)
+    const uint8_t sequenceNumber_;
 
    private:
     Type type_;
-    timestamp_t clientRequestTime_;  // Time on client when packet was sent.
-    timestamp_t serverReplyTime_;    // Time on server when REQUEST packet was received.
-    timestamp_t clientReceiveTime_;  // Time on client when REPLY packet was received.
+    timestamp_t clientRequestTime_;  // Time on client when it sent a REQUEST packet.
+    timestamp_t serverReplyTime_;    // Time on server when it got that REQUEST packet.
+    timestamp_t clientReceiveTime_;  // Time on client when it got the corresponding REPLY packet.
 
    public:
     explicit ClockPacket(Type t, uint8_t seqNum, timestamp_t clientRequestTime);
 
-    // Values are read from the buffer.
+    // Unpack buffer into member variables.
     explicit ClockPacket(uint8_t* buffer);
 
     // Invalid.
     explicit ClockPacket();
 
-    // Write values to a buffer of PACKET_LENGTH bytes.
+    // Write member variables to a buffer of PACKET_LENGTH bytes.
     void write(uint8_t* buffer) const;
 
     inline Type getType() const
@@ -55,6 +58,7 @@ class ClockPacket {
         return type_ == INVALID;
     }
 
+#ifdef UNUSED
     inline timestamp_t getClientRequestTime() const
     {
         return clientRequestTime_;
@@ -68,35 +72,36 @@ class ClockPacket {
     {
         return serverReplyTime_;
     }
-    inline void setServerReplyTime(timestamp_t t)
-    {
-        serverReplyTime_ = t;
-    }
-
     inline timestamp_t getClientReceiveTime() const
     {
         return clientReceiveTime_;
+    }
+#endif
+
+    inline void setServerReplyTime(timestamp_t t)
+    {
+        serverReplyTime_ = t;
     }
     inline void setClientReceiveTime(timestamp_t t)
     {
         clientReceiveTime_ = t;
     }
 
-    // Return the round trip time for the client-server correspondence.
-    // todo: complain if this is negative, which it should never be,
-    // but it's technically possible.
+    // Round trip time for the client-server correspondence.
+    // Todo: complain if this is negative, which it should never be,
+    // but is technically possible.
     inline timestamp_t rtt() const
     {
         return clientReceiveTime_ - clientRequestTime_;
     }
 
-    // Return the estimated offset between the client and server clocks.
+    // Estimated offset between the client and server clocks.
     timestamp_t getClockOffset() const
     {
         return serverReplyTime_ + getErrorBound() - clientReceiveTime_;
     }
 
-    // Return the error bound on the clock offset calculation.
+    // Error bound on the calculation of clock offset.
     inline timestamp_t getErrorBound() const
     {
         return rtt() / 2;

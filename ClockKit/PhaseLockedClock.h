@@ -108,6 +108,7 @@ class PhaseLockedClock : public Clock {
     timestamp_t phasePanic_;
     timestamp_t updatePanic_;
 
+    // When updatePhase() last succeeded.
     timestamp_t updatePrev_;
 };
 

@@ -24,7 +24,7 @@ class ClockServer {
 
     bool log_;
 
-    // The most recent time that offsetMax was recalculated.
+    // When offsetMax was most recently recalculated.
     timestamp_t tRecalculated_;
 
    public:
