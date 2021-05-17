@@ -2,7 +2,7 @@ MAKEFLAGS += --jobs=99
 CPP = c++
 # -fPIC is only to make $(SWIGEXES).
 # -fpic would be smaller and faster, but that is only for gcc.
-CFLAGS = -O3 -fPIC -std=c++11 -Wall -Werror -Weffc++
+CFLAGS = -O3 -fPIC -std=c++14 -Wall -Werror -Weffc++
 LIBS = -lccgnu2 -lpthread -ldl
 SWIG = swig -Wallkw -Werror
 RUBY   = $$(pkg-config --list-all | grep ruby-   | sort | tail -1 | sed 's/ .*//')
