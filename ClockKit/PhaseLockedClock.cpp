@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <mutex>
+#include <random>
 #include <thread>
 
 #ifdef DEBUG
@@ -55,13 +56,13 @@ int PhaseLockedClock::getOffset()
 
 void PhaseLockedClock::run(std::atomic_bool &end_clocks)
 {
-    constexpr auto updateInterval_usec = 200000;              // 5 Hz.  Set this in constructor?
-    constexpr auto variance_usec = updateInterval_usec / 10;  // +-5%, so +- 5 msec.
-    constexpr auto base_usec = updateInterval_usec - variance_usec / 2;
+    std::uniform_real_distribution<double> vary(0.95, 1.05);  // +-5%
+    std::default_random_engine randNumGen;
+    randNumGen.seed(std::random_device{}());
     while (!end_clocks) {
         update();
-        const auto random_usec = rand() % variance_usec;
-        std::this_thread::sleep_for(std::chrono::microseconds(base_usec + random_usec));
+        using namespace std::chrono_literals;
+        std::this_thread::sleep_for(200ms * vary(randNumGen));
     }
 }
 

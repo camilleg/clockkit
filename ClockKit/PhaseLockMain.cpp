@@ -5,6 +5,8 @@
 
 #include "ConfigReader.h"
 
+using namespace std::chrono_literals;
+
 int main(int argc, char* argv[])
 {
     if (argc != 2 && argc != 3) {
@@ -28,8 +30,8 @@ int main(int argc, char* argv[])
     }
 
     const auto fTerminate = argc == 3;
-    auto runtime = fTerminate ? atof(argv[2]) : 0.0;  // sec
-    std::atomic_bool end_clocks(fTerminate && runtime <= 0.0);
+    std::chrono::microseconds runtime(fTerminate ? int64_t(1000000 * atof(argv[2])) : 0);
+    std::atomic_bool end_clocks(fTerminate && runtime.count() <= 0);
     std::thread th_clock(&dex::PhaseLockedClock::run, clock, std::ref(end_clocks));
 
     while (!end_clocks) {
@@ -38,10 +40,10 @@ int main(int argc, char* argv[])
         std::cout << "offset: " << (offset == invalid ? "invalid" : std::to_string(offset)) << "\n"
                   << dex::timestampToString(clock->getValue()) << std::endl;
         // endl flushes stdout, to show output even after Ctrl+C.
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        std::this_thread::sleep_for(200ms);
         if (fTerminate) {
-            runtime -= 0.2;  // sec
-            if (runtime <= 0.0) {
+            runtime -= 200ms;
+            if (runtime.count() <= 0) {
                 end_clocks = true;
             }
         }
