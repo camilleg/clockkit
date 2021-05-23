@@ -71,15 +71,15 @@ and software engineering in general has matured.
 
 Therefore, these steps are proposed.
 
-- Continue modernizing the code.
+- Keep modernizing the code.
 - Clean up the interface to other languages.
 - Implement integration testing.
 - Make reproducible performance tests for some use cases.
 - Extend multiplatform support beyond POSIX, for other microarchitectures.
 - For some use cases, reduce energy consumption, file size, bandwidth.
 - To better exploit the strengths and manage the weaknesses of WLAN,
-replace the lower OSI layers of the generic network stack with
+replace the generic network stack's lower OSI layers with
 specific ones for Wi-Fi, Bluetooth LE, Zigbee, 6LoWPAN, etc.
-- Throughout all these, insert passes for optimization.
+- Throughout all these, insert optimization passes.
 - Explore more distant use cases that need clock sync, such as
 high performance computing, logfile evaluation, and security breach detection.
