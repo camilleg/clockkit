@@ -30,6 +30,14 @@ void test_ok(const char* func)
 // This is especially for languages like Tcl, which invoke these functions
 // as bare names, not qualified by the name of their containing module.
 
+static void atexit_handler()
+{
+#ifdef DEBUG
+    std::cerr << "clockkit.cpp: atexit.\n";
+#endif
+    ckTerminate();
+}
+
 void ckInitialize(const char* filename)
 {
     if (!plc) {
@@ -38,13 +46,22 @@ void ckInitialize(const char* filename)
         plc = config.buildClock();
     }
     test_ok("ckInitialize");
+#ifdef DEBUG
+    std::cerr << "clockkit.cpp: atexit registered.\n";
+#endif
+    (void)std::atexit(atexit_handler); // Call ckTerminate even if pkill'ed, i.e., got a SIGTERM.
     th_clock = new std::thread(&dex::PhaseLockedClock::run, plc, std::ref(end_clocks));
 }
 
 void ckTerminate()
 {
-    if (plc)
+#ifdef DEBUG
+    std::cerr << "clockkit.cpp: ckTerminate.\n";
+#endif
+    if (plc) {
         delete plc;
+        plc = nullptr;
+    }
 }
 
 dex::timestamp_t ckTimeAsValue()
