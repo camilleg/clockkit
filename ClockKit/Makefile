@@ -92,9 +92,9 @@ tcl/wrap.o: tcl/wrap.c
 tcl/clockkit.so: tcl/wrap.o $(OBJS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
+# The sed casts _wrap_ck's to (VALUE (*)(...)) in lines starting with rb_define_module_function.
 ruby/wrap.c: clockkit.h
 	$(SWIG) -ruby -o $@ clockkit.h
-	# In lines starting with rb_define_module_function, cast _wrap_ck's to (VALUE (*)(...)).
 	sed -i -e "s/ _wrap_ck/ (VALUE (*)(...))_wrap_ck/" $@
 ruby/wrap.o: ruby/wrap.c
 	$(CPP) -c $(CFLAGS) -Wno-pedantic -I. $$(pkg-config --cflags $(RUBY)) $? -o $@
