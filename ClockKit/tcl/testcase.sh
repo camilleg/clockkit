@@ -13,12 +13,10 @@ cli=$(mktemp /tmp/clockkit.cli.XXX)
 trap "rm -f $conf $srv $cli" 0 2 3 15
 
 sed "s/^port:.*/port:$port/" < ../clockkit.conf > $conf
-pkill -f 'tclsh ./ckphaselock.tcl'
+pkill -f "tclsh ./ckphaselock.tcl $conf 2"
 pkill -f "ckserver $port"
 ../ckserver $port > $srv &
-./ckphaselock.tcl $conf > $cli &
-sleep 2
-pkill -f 'tclsh ./ckphaselock.tcl'
+./ckphaselock.tcl $conf 2 > $cli
 pkill -f "ckserver $port"
 sed -i '/EXCEPTION/d' $cli
 a=$(tail -10 $srv | grep -c -P '<time \d+ +\d+>\s')

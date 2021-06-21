@@ -13,13 +13,11 @@ cli=$(mktemp /tmp/clockkit.cli.XXX)
 trap "rm -f $conf $srv $cli" 0 2 3 15
 
 sed "s/^port:.*/port:$port/" < ../clockkit.conf > $conf
-pkill -f 'python3 ./ckphaselock.py'
+pkill -f "python3 ./ckphaselock.py $conf 2"
 pkill -f "ckserver $port" # How to wait for it to die, like killall -w ?  Busywait until pgrep -c reports zero?
 export PYTHONUNBUFFERED=TRUE # Show print()s even after pkill.
 ../ckserver $port > $srv &
-./ckphaselock.py $conf > $cli &
-sleep 2
-pkill -f 'python3 ./ckphaselock.py'
+./ckphaselock.py $conf 2 > $cli
 pkill -f "ckserver $port"
 sed -i '/EXCEPTION/d' $cli
 a=$(tail -10 $srv | grep -c -P '<time \d+ +\d+>\s')

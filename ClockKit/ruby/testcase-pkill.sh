@@ -13,10 +13,12 @@ cli=$(mktemp /tmp/clockkit.cli.XXX)
 trap "rm -f $conf $srv $cli" 0 2 3 15
 
 sed "s/^port:.*/port:$port/" < ../clockkit.conf > $conf
-pkill -f "ruby ./ckphaselock.rb $conf 2"
+pkill -f "ruby ./ckphaselock.rb $conf 0"
 pkill -f "ckserver $port"
 ../ckserver $port > $srv &
-./ckphaselock.rb $conf 2 > $cli
+./ckphaselock.rb $conf 0 > $cli &
+sleep 2
+pkill -f "ruby ./ckphaselock.rb $conf 0"
 pkill -f "ckserver $port"
 a=$(tail -10 $srv | grep -c -P '<time \d+ +\d+>\s')
 b=$(tail -20 $cli | grep -c -P '<time \d+ +\d+>')

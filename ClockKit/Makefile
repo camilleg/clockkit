@@ -46,7 +46,7 @@ profile: $(EXES)
 DEPS := $(patsubst %.o,.dependencies/%.d,$(OBJS)) # $(OBJS:.o=.d)
 -include $(DEPS)
 
-test-bindings: test-python test-ruby test-tcl
+test-bindings: test-python test-python2 test-ruby test-ruby2 test-tcl test-tcl2
 
 # Different ports let these tests run simultaneously, via --jobs=99.
 test: ckserver ckphaselock
@@ -58,10 +58,16 @@ test-30: ckserver ckphaselock
 
 test-python: ckserver python/_clockkit.so
 	cd python && ./testcase.sh 4450
+test-python2: ckserver python/_clockkit.so
+	cd python && ./testcase-pkill.sh 4452
 test-ruby: ckserver ruby/clockkit.so
 	cd ruby && ./testcase.sh 4460
+test-ruby2: ckserver ruby/clockkit.so
+	cd ruby && ./testcase-pkill.sh 4462
 test-tcl: ckserver tcl/clockkit.so
 	cd tcl && ./testcase.sh 4470
+test-tcl2: ckserver tcl/clockkit.so
+	cd tcl && ./testcase-pkill.sh 4472
 
 test-remote: ckphaselock
 	./test2hosts.sh config-remote.sh
