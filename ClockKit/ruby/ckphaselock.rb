@@ -26,4 +26,9 @@ while sec_remaining > 0.0
   # STDERR.puts sec_remaining
 end
 
-Clockkit.ckTerminate
+if terminate
+  # Also kill ckserver.
+  Clockkit.ckKill
+else
+  Clockkit.ckTerminate
+end

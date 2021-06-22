@@ -15,9 +15,10 @@ trap "rm -f $conf $srv $cli" 0 2 3 15
 sed "s/^port:.*/port:$port/" < ../clockkit.conf > $conf
 pkill -f "tclsh ./ckphaselock.tcl $conf 2"
 pkill -f "ckserver $port"
+set -m # Enable fg.
 ../ckserver $port > $srv &
 ./ckphaselock.tcl $conf 2 > $cli
-pkill -f "ckserver $port"
+fg 2> /dev/null # Wait for ckserver to die, although it's probably already terminated.
 sed -i '/EXCEPTION/d' $cli
 a=$(tail -10 $srv | grep -c -P '<time \d+ +\d+>\s')
 b=$(tail -20 $cli | grep -c -P '<time \d+ +\d+>')

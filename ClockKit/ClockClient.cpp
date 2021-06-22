@@ -71,7 +71,7 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
         cerr << "got packet " << packet.getType() << "\n";
 #endif
         if (packet.getType() == ClockPacket::KILL) {
-            exit(0);
+            exit(0);  // todo: kill just the ClockClient, not the entire process?  That's too harsh.
         }
 
         packet.setClientReceiveTime(clock.getValue());

@@ -36,4 +36,9 @@ while {$sec_remaining > 0.0} {
   # puts stderr $sec_remaining
 }
 
-ckTerminate
+if {$terminate} {
+  # Also kill ckserver.
+  ckKill
+} else {
+  ckTerminate
+}

@@ -15,9 +15,10 @@ trap "rm -f $conf $srv $cli" 0 2 3 15
 sed "s/^port:.*/port:$port/" < ../clockkit.conf > $conf
 pkill -f "ruby ./ckphaselock.rb $conf 2"
 pkill -f "ckserver $port"
+set -m # Enable fg.
 ../ckserver $port > $srv &
 ./ckphaselock.rb $conf 2 > $cli
-pkill -f "ckserver $port"
+fg 2> /dev/null # Wait for ckserver to die, although it's probably already terminated.
 a=$(tail -10 $srv | grep -c -P '<time \d+ +\d+>\s')
 b=$(tail -20 $cli | grep -c -P '<time \d+ +\d+>')
 c=$(tail -20 $cli | grep -c -P 'offset: [-\d]+')

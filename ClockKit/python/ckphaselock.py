@@ -34,4 +34,8 @@ while sec_remaining > 0.0:
         sec_remaining -= 0.1
     # print(sec_remaining, file=sys.stderr)
 
-_clockkit.ckTerminate()
+if terminate:
+    # Also kill ckserver.
+    _clockkit.ckKill()
+else:
+    _clockkit.ckTerminate()

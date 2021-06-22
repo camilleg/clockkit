@@ -64,6 +64,15 @@ void ckTerminate()
     }
 }
 
+void ckKill()
+{
+#ifdef DEBUG
+    std::cerr << "clockkit.cpp: ckKill.\n";
+#endif
+    if (plc)
+      plc->die();
+}
+
 dex::timestamp_t ckTimeAsValue()
 {
     test_ok("ckTimeAsValue");

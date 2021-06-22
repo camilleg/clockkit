@@ -45,7 +45,8 @@ class ConfigReader {
     bool readFrom(const char*);
 
     // Make a clock from the reader's values.
-    // The caller owns the returned pointer, and is responsible for deleting it.
+    // The caller owns the returned pointer (which cannot be nullptr),
+    // and is responsible for deleting it.
     PhaseLockedClock* buildClock();
 
    private:
