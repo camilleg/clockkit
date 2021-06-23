@@ -19,7 +19,7 @@ export PYTHONUNBUFFERED=TRUE # Show print()s even after pkill.
 set -m # Enable fg.
 ../ckserver $port > $srv &
 ./ckphaselock.py $conf 2 > $cli
-fg 2> /dev/null # Wait for ckserver to die, although it's probably already terminated.
+fg 2>/dev/null >/dev/null # Wait for ckserver to die, although it's probably already terminated.
 sed -i '/EXCEPTION/d' $cli
 a=$(tail -10 $srv | grep -c -P '<time \d+ +\d+>\s')
 b=$(tail -20 $cli | grep -c -P '<time \d+ +\d+>')
