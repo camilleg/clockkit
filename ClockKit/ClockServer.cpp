@@ -31,26 +31,25 @@ void ClockServer::run()
         const timestamp_t serverReplyTime = clock_.getValue();
         const ost::InetAddress peer = socket.getPeer();  // also sets up the socket to send back to the sender
         if (socket.receive(buffer, length) != length) {
-            cerr << "ERR: packet had wrong length.\n";
+            cerr << "ClockServer got packet with wrong length.\n";
+            continue;
         }
-        else {
-            ClockPacket packet(buffer);
-            switch (packet.getType()) {
-                case ClockPacket::REQUEST:
-                    packet.setServerReplyTime(serverReplyTime);
-                    packet.setType(ClockPacket::REPLY);
-                    packet.write(buffer);
-                    if (socket.send(buffer, length) != length)
-                        cerr << "ERR: sent incomplete packet.\n";
-                    break;
-                case ClockPacket::ACKNOWLEDGE:
-                    updateEntry(peer.getHostname(), packet.getClockOffset(), packet.rtt());
-                    break;
-                case ClockPacket::KILL:
-                    return;
-                default:
-                    cerr << "ERR: packet had wrong type.\n";
-            }
+        ClockPacket packet(buffer);
+        switch (packet.getType()) {
+            case ClockPacket::REQUEST:
+                packet.setServerReplyTime(serverReplyTime);
+                packet.setType(ClockPacket::REPLY);
+                packet.write(buffer);
+                if (socket.send(buffer, length) != length)
+                    cerr << "ClockServer sent incomplete packet.\n";
+                break;
+            case ClockPacket::ACKNOWLEDGE:
+                updateEntry(peer.getHostname(), packet.getClockOffset(), packet.rtt());
+                break;
+            case ClockPacket::KILL:
+                return;
+            default:
+                cerr << "ClockServer got packet with wrong type.\n";
         }
     }
 }
