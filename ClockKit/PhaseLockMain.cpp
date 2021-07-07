@@ -23,8 +23,8 @@ int main(int argc, char* argv[])
     // Print the values before a possible failure.
     config.print();
 
-    dex::PhaseLockedClock* clock = config.buildClock();
-    if (!clock) {
+    dex::PhaseLockedClock* plc = config.buildClock();
+    if (!plc) {
         std::cerr << argv[0] << ": failed to get a clock.\n";
         return 1;
     }
@@ -32,13 +32,13 @@ int main(int argc, char* argv[])
     const auto fTerminate = argc == 3;
     std::chrono::microseconds runtime(fTerminate ? int64_t(1000000 * atof(argv[2])) : 0);
     std::atomic_bool end_clocks(fTerminate && runtime.count() <= 0);
-    std::thread th_clock(&dex::PhaseLockedClock::run, clock, std::ref(end_clocks));
+    std::thread th_clock(&dex::PhaseLockedClock::run, plc, std::ref(end_clocks));
 
     while (!end_clocks) {
         static const auto invalid = std::numeric_limits<int>::max();
-        const auto offset = clock->getOffset();
+        const auto offset = plc->getOffset();
         std::cout << "offset: " << (offset == invalid ? "invalid" : std::to_string(offset)) << "\n"
-                  << dex::timestampToString(clock->getValue()) << std::endl;
+                  << dex::timestampToString(plc->getValue()) << std::endl;
         // endl flushes stdout, to show output even after Ctrl+C.
         std::this_thread::sleep_for(200ms);
         if (fTerminate) {
@@ -49,8 +49,8 @@ int main(int argc, char* argv[])
         }
     }
 
-    clock->die();
+    plc->die();
     th_clock.join();
-    delete clock;
+    delete plc;
     return 0;
 }
