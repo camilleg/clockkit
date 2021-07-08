@@ -23,16 +23,6 @@ ClockClient::ClockClient(ost::InetHostAddress addr, int port)
     socket_->setPeer(addr, port);
 }
 
-timestamp_t ClockClient::getValue()
-{
-    Clock& baseClock = HighResolutionClock::instance();
-    const auto phase = getPhase(baseClock, false);
-    if (phase == invalid)
-        return invalid;
-    return baseClock.getValue() + phase;
-    // primary clock = secondary clock + phase
-}
-
 bool ClockClient::sendPacket(const ClockPacket& packet) const
 {
     constexpr auto length = ClockPacket::PACKET_LENGTH;
@@ -58,12 +48,13 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
 #ifdef DEBUG
             cerr << "timed out waiting for packet after " << timeoutMsec << " ms\n";
 #endif
-            return ClockPacket();  // Timeout.
+            return ClockPacket();
         }
-
         if (socket_->receive(buffer, length) != length) {
+#ifdef DEBUG
             cerr << "ignoring wrong-length packet\n";
-            return ClockPacket();  // Packet had wrong length.
+#endif
+            return ClockPacket();
         }
 
         ClockPacket packet(buffer);
@@ -76,13 +67,16 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
 
         packet.setClientReceiveTime(clock.getValue());
         if (packet.sequenceNumber_ != sequence_) {
-            cerr << "ignoring out-of-order packet " << int(packet.sequenceNumber_) << "; expected "
-                 << int(sequence_) << "\n";
+#ifdef DEBUG
+            cerr << "ignoring out-of-order packet " << int(packet.sequenceNumber_) << "; expected " << int(sequence_)
+                 << "\n";
+#endif
             continue;
         }
-
         if (packet.getType() != ClockPacket::REPLY) {
+#ifdef DEBUG
             cerr << "ignoring packet with wrong type\n";
+#endif
             continue;
         }
 
@@ -92,6 +86,16 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
         rtt_ = rttPrev;
         return packet;
     }
+}
+
+timestamp_t ClockClient::getValue()
+{
+    Clock& baseClock = HighResolutionClock::instance();
+    const auto phase = getPhase(baseClock, false);
+    if (phase == invalid)
+        return invalid;
+    return baseClock.getValue() + phase;
+    // primary clock = secondary clock + phase
 }
 
 // We can't use a default value "bool acknowledge = acknowledge_"
