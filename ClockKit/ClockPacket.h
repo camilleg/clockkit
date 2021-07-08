@@ -52,6 +52,7 @@ class ClockPacket {
     {
         type_ = t;
     }
+    const char* getTypeName() const;  // Prettyprint type_.
 
     inline bool invalid() const
     {

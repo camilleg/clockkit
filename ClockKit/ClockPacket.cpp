@@ -45,6 +45,12 @@ void ClockPacket::write(uint8_t* buffer) const
     std::copy(t.begin(), t.end(), buffer + 18);
 }
 
+const char* ClockPacket::getTypeName() const
+{
+    static const char* names[KILL + 1] = {"INVALID", "REQUEST", "REPLY", "ACKNOWLEDGE", "KILL"};
+    return (type_ < 0 || type_ > KILL) ? "CORRUPT" : names[type_];
+}
+
 void ClockPacket::print() const
 {
     std::cout << "--- PACKET ---"
