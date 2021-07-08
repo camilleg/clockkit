@@ -25,19 +25,19 @@ ClockClient::ClockClient(ost::InetHostAddress addr, int port)
 
 bool ClockClient::sendPacket(const ClockPacket& packet) const
 {
+#ifdef DEBUG
+    cerr << "\nsending " << packet.getTypeName() << "\n";
+#endif
     constexpr auto length = ClockPacket::PACKET_LENGTH;
     uint8_t buffer[length];
     packet.write(buffer);
-#ifdef DEBUG
-    cerr << "sending packet " << packet.getType() << "\n";
-#endif
     return socket_->send(buffer, length) == length;
 }
 
 ClockPacket ClockClient::receivePacket(Clock& clock)
 {
 #ifdef DEBUG
-    cerr << "expecting packet\n";
+    cerr << "expecting...\n";
 #endif
     constexpr auto length = ClockPacket::PACKET_LENGTH;
     uint8_t buffer[length];
@@ -56,16 +56,15 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
 #endif
             return ClockPacket();
         }
+        const auto now = clock.getValue();  // Before anything else.
 
         ClockPacket packet(buffer);
 #ifdef DEBUG
-        cerr << "got packet " << packet.getType() << "\n";
+        cerr << "got " << packet.getTypeName() << "\n";
 #endif
         if (packet.getType() == ClockPacket::KILL) {
             exit(0);  // todo: kill just the ClockClient, not the entire process?  That's too harsh.
         }
-
-        packet.setClientReceiveTime(clock.getValue());
         if (packet.sequenceNumber_ != sequence_) {
 #ifdef DEBUG
             cerr << "ignoring out-of-order packet " << int(packet.sequenceNumber_) << "; expected " << int(sequence_)
@@ -75,15 +74,20 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
         }
         if (packet.getType() != ClockPacket::REPLY) {
 #ifdef DEBUG
-            cerr << "ignoring packet with wrong type\n";
+            cerr << "ignoring non-reply packet\n";
 #endif
             continue;
         }
 
-        const auto rttPrev = packet.rtt();
-        if (rttPrev > timeout_)
-            return ClockPacket();  // Timeout.
-        rtt_ = rttPrev;
+        packet.setClientReceiveTime(now);
+        const auto rtt = packet.rtt();
+        if (rtt > timeout_) {
+#ifdef DEBUG
+            cerr << "ignoring reply that arrived more than " << timeout_ << " usec later\n";
+#endif
+            return ClockPacket();
+        }
+        rtt_ = rtt;
         return packet;
     }
 }
@@ -104,18 +108,17 @@ timestamp_t ClockClient::getValue()
 timestamp_t ClockClient::getPhase(Clock& clock, bool acknowledge)
 {
     ++sequence_ %= 250;  // One byte.
-    const ClockPacket p1(ClockPacket::REQUEST, sequence_, clock.getValue());
-    if (!sendPacket(p1))
+    if (!sendPacket(ClockPacket(ClockPacket::REQUEST, sequence_, clock.getValue())))
         return invalid;
-    ClockPacket p2 = receivePacket(clock);
-    if (p2.invalid())
+    ClockPacket packet(receivePacket(clock));
+    if (packet.invalid())
         return invalid;
     if (acknowledge) {
-        p2.setType(ClockPacket::ACKNOWLEDGE);
-        if (!sendPacket(p2))
+        packet.setType(ClockPacket::ACKNOWLEDGE);
+        if (!sendPacket(packet))
             return invalid;
     }
-    return p2.getClockOffset();
+    return packet.getClockOffset();
 }
 
 }  // namespace dex

@@ -21,24 +21,24 @@ ClockServer::ClockServer(ost::InetAddress addr, int port, Clock& clock)
 
 void ClockServer::run()
 {
-    ost::UDPSocket socket(addr_, port_);
     if (log_)
         cout << "time                     host    \toffset\tround-trip-time" << endl;
     constexpr auto length = ClockPacket::PACKET_LENGTH;
     uint8_t buffer[length];
+    ost::UDPSocket socket(addr_, port_);
 
     while (socket.isPending(ost::Socket::pendingInput, TIMEOUT_INF)) {
-        const timestamp_t serverReplyTime = clock_.getValue();
+        const auto now = clock_.getValue();              // Before anything else.
         const ost::InetAddress peer = socket.getPeer();  // also sets up the socket to send back to the sender
         if (socket.receive(buffer, length) != length) {
-            cerr << "ClockServer got packet with wrong length.\n";
+            cerr << "ClockServer ignored packet with wrong length.\n";
             continue;
         }
         ClockPacket packet(buffer);
         switch (packet.getType()) {
             case ClockPacket::REQUEST:
-                packet.setServerReplyTime(serverReplyTime);
                 packet.setType(ClockPacket::REPLY);
+                packet.setServerReplyTime(now);
                 packet.write(buffer);
                 if (socket.send(buffer, length) != length)
                     cerr << "ClockServer sent incomplete packet.\n";
@@ -49,7 +49,7 @@ void ClockServer::run()
             case ClockPacket::KILL:
                 return;
             default:
-                cerr << "ClockServer got packet with wrong type.\n";
+                cerr << "ClockServer ignored packet with unknown type.\n";
         }
     }
 }
