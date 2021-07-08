@@ -18,9 +18,6 @@ namespace dex {
  * Because of this, getPhase() should really be used on a ClockClient.
  * However, getValue() can be used.  getValue() calculates the current time
  * by using the HighFrequencyClock as a timekeeper.
- *
- * Calls to ClientClock may take some time since a server response
- * is required.
  */
 class ClockClient : public Clock {
    public:
@@ -52,11 +49,21 @@ class ClockClient : public Clock {
         return rtt_;
     }
 
-    // If true, getPhase() will send the server ACKNOWLEDGE packets,
-    // so it can track a distributed clock's total error bound.
+    // If true, when getPhase() is called externally (from PhaseLockedClock.cpp)
+    // instead of internally by getValue(),
+    // it finishes by sending the server an ACKNOWLEDGE packet,
+    // for the server to track the total error bound.
     inline void setAcknowledge(bool acknowledge)
     {
         acknowledge_ = acknowledge;
+    }
+
+    // Phase between a local clock and a ClockServer's clock.
+    // Reports the phase to the server, if acknowledge_.
+    // The most accurate way to get timing from a ClockServer.
+    inline timestamp_t getPhase(Clock& clock)
+    {
+        return getPhase(clock, acknowledge_);
     }
 
     // Kill the connected ClockServer.
@@ -81,19 +88,11 @@ class ClockClient : public Clock {
     bool sendPacket(const ClockPacket&) const;
 
     // Receives the packet and sets the receipt time via the provided clock.
+    // On error, the returned packet's type is INVALID.
     ClockPacket receivePacket(Clock&);
 
     // Returns "invalid" on error.
     timestamp_t getPhase(Clock&, bool acknowledge);
-
-   public:
-    // Phase between a local clock and a ClockServer's clock.
-    // Reports the phase to the server, if acknowledge_.
-    // The most accurate way to get timing from a ClockServer.
-    inline timestamp_t getPhase(Clock& clock)
-    {
-        return getPhase(clock, acknowledge_);
-    }
 };
 
 }  // namespace dex
