@@ -5,27 +5,20 @@
 
 namespace dex {
 
-/**
- * This class synchronizes one oscillator based on another.
- * It has a primary clock and a reference clock.
- * It creates a VariableFrequencyClock around the primary clock.
- * It spawns a thread that periodically measures these clocks' phase,
- * to keep them in sync.
- *
- * - Assumes the primary and reference clocks run at 1000000 Hz.
- * - The update interval is initially set at 1 second.
- * - It varies randomly +-10%,
- *   to not swamp the server with simultaneous requests.
- */
+// This class reads two clocks, primaryClock_ and referenceClock_,
+// both assumed to run at 1000000 Hz.
+// primaryClock_ is usually a HighResolutionClock.
+// referenceClock_ is usually a ClockClient.
+// It makes a VariableFrequencyClock, whose phase and frequency
+// it keeps locked to those of referenceClock_.
 class PhaseLockedClock : public Clock {
    public:
-    // Construct a PhaseLockedClock around a primary and reference clock.
-    // Don't destruct either of those before destructing this, lest this segfault.
+    // Destroy the primary and reference clocks only after destroying this, lest this segfault.
     explicit PhaseLockedClock(Clock& primary, Clock& reference);
 
     ~PhaseLockedClock() = default;
 
-    // Kill the ClockClient and its ClockServer.
+    // Kill the referenceClock_, which is likely a ClockClient, and its ClockServer.
     void die()
     {
         referenceClock_.die();
@@ -33,78 +26,72 @@ class PhaseLockedClock : public Clock {
 
     timestamp_t getValue();
 
-    // Return whether we're in sync with our reference clock.
-    // Sync becomes lost if the previous update was too long ago,
-    // or if the phase is detected to be too great.
+    // Return whether we're in sync with referenceClock_.
+    // Sync becomes lost if the vfc's previous update was too long ago,
+    // or if the vfc's offset relative to referenceClock_ becomes too large.
     inline bool isSynchronized() const
     {
         return inSync_;
     }
 
-    // Phase offset from our reference clock.
+    // Phase offset of vfc relative to referenceClock_, i.e., phase_.
     int getOffset();
 
-    // If our PhaseLockedClock's phase differs from our reference
-    // clock's by more than this, we get set to out of sync.
-    // Call this or setUpdatePanic(), to compensate for a crystal
-    // drifting due to temperature change (handheld or mobile),
-    // or for bandwidth change (failing hotspot, WLAN degradation).
     inline void setPhasePanic(timestamp_t phasePanic)
     {
         phasePanic_ = phasePanic;
     }
 
-    // If the previous successful update was longer ago than this,
-    // we will be set to out-of-sync.
     inline void setUpdatePanic(timestamp_t usec)
     {
         updatePanic_ = usec;
     }
 
-    // Call update() periodically, until the caller sets the flag to true.
+    // Call update() periodically, until the caller sets the arg to true.
     void run(std::atomic_bool&);
 
    protected:
     // Called periodically by run().
-    // Call updatePhase() and updateClock().
+    // Calls updatePhase() and updateClock() to adjust the vfc.
     void update();
 
-    // Update our clocks' markers.
     bool updatePhase();
-
-    // Slew into step.
     bool updateClock();
 
-    // Hard-reset to our reference clock, to regain sync.
+    // Hard-reset to referenceClock_, to regain sync.
     void setClock();
 
    private:
-    explicit PhaseLockedClock(PhaseLockedClock& c);
-    PhaseLockedClock& operator=(PhaseLockedClock& rhs);
+    explicit PhaseLockedClock(PhaseLockedClock&);
+    PhaseLockedClock& operator=(PhaseLockedClock&);
 
     Clock& primaryClock_;
     Clock& referenceClock_;
     VariableFrequencyClock variableFrequencyClock_;
 
-    // Are we in sync?
+    timestamp_t primaryValue() const
+    {
+        return primaryClock_.getValue();
+    }
+
     bool inSync_;
 
-    // Phase between the VFC and our reference clock.
+    // Phase between vfc and referenceClock_.
     timestamp_t phase_;
     timestamp_t phasePrev_;
 
-    // VFC's value.
+    // Value of vfc.
     timestamp_t variableValue_;
     timestamp_t variableValuePrev_;
 
-    // Primary clock's value.
+    // Value of primaryClock_.
     timestamp_t primaryValue_;
     timestamp_t primaryValuePrev_;
 
-    // Average frequency, in Hz, of our primary clock w.r.t our reference clock.
+    // Average frequency of primaryClock_, in Hz.
     double primaryFrequencyAvg_;
 
-    // See setPhasePanic() and setUpdatePanic().
+    // Thresholds set by setPhasePanic() and setUpdatePanic().
     timestamp_t phasePanic_;
     timestamp_t updatePanic_;
 

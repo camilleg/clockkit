@@ -14,7 +14,9 @@ using std::endl;
 
 namespace dex {
 
-// One mutex for *all* PLC's is too careful, but not a problem in practice.
+// A guard for the vfc and refclock's getPhase().
+// One mutex for *all* PLCs may be too careful in practice,
+// but it lets multiple PLCs use the same reference clock.
 std::mutex mutexPLC;
 
 // Typically 9223372036854775807 usec, or 293,000 years, obviously invalid.
@@ -31,7 +33,7 @@ PhaseLockedClock::PhaseLockedClock(Clock &primary, Clock &reference)
     , variableValuePrev_{0}
     , primaryValue_{0}
     , primaryValuePrev_{0}
-    , primaryFrequencyAvg_(1000000)
+    , primaryFrequencyAvg_(1000000.0)
     , phasePanic_(5000)
     , updatePanic_(5000000)
     , updatePrev_(0)
@@ -50,12 +52,12 @@ int PhaseLockedClock::getOffset()
 {
     if (!inSync_)
         return std::numeric_limits<int>::max();  // == clockkit.cpp ckOffset() int invalid.
-    const std::lock_guard<std::mutex> lock(mutexPLC);
     return phase_;
 }
 
 void PhaseLockedClock::run(std::atomic_bool &end_clocks)
 {
+    // Smear how often we update(), to not overload the server with simultaneous requests.
     std::uniform_real_distribution<double> vary(0.95, 1.05);  // +-5%
     std::default_random_engine randNumGen;
     randNumGen.seed(std::random_device{}());
@@ -68,8 +70,8 @@ void PhaseLockedClock::run(std::atomic_bool &end_clocks)
 
 void PhaseLockedClock::update()
 {
-    // This logic is brittle, because of how inSync_ is used and set everywhere.
-    if (inSync_ && primaryClock_.getValue() > updatePrev_ + updatePanic_) {
+    // This logic is brittle, because of how inSync_ is used and set willy-nilly.
+    if (inSync_ && primaryValue() > updatePrev_ + updatePanic_) {
         // The previous update was too long ago.
         inSync_ = false;
     }
@@ -81,7 +83,7 @@ void PhaseLockedClock::update()
         setClock();
     }
     if (updatePhase()) {
-        updatePrev_ = primaryClock_.getValue();
+        updatePrev_ = primaryValue();
     }
 }
 
@@ -90,13 +92,13 @@ bool PhaseLockedClock::updatePhase()
     if (!inSync_)
         return false;
     mutexPLC.lock();
-    const timestamp_t phase = referenceClock_.getPhase(variableFrequencyClock_);
-    const timestamp_t variableValue = variableFrequencyClock_.getValue();
-    const timestamp_t primaryValue = primaryClock_.getValue();
+    const auto phase = referenceClock_.getPhase(variableFrequencyClock_);
+    const auto variableValue = variableFrequencyClock_.getValue();
+    const auto tmp = primaryValue();  // Not guarded by the mutex.  But read all 3 numbers at once.
     mutexPLC.unlock();
     if (phase == invalid) {
 #ifdef DEBUG
-        cout << "phase invalid; lost sync" << endl;
+        cout << "lost sync: problem with referenceClock_" << endl;
 #endif
         inSync_ = false;
         return false;
@@ -106,9 +108,9 @@ bool PhaseLockedClock::updatePhase()
     variableValuePrev_ = variableValue_;
     primaryValuePrev_ = primaryValue_;
 
-    phase_ = phase;
+    phase_ = phase;  // Not invalid, because that was just checked.
     variableValue_ = variableValue;
-    primaryValue_ = primaryValue;
+    primaryValue_ = tmp;
 
 #ifdef DEBUG
     cout << "phase := " << phase << endl;
@@ -120,7 +122,7 @@ bool PhaseLockedClock::updateClock()
 {
     if (phase_ == invalid) {
 #ifdef DEBUG
-        cout << "sync lost: phase invalid" << endl;
+        cout << "lost sync: invalid phase" << endl;
 #endif
         inSync_ = false;
         return false;
@@ -129,22 +131,25 @@ bool PhaseLockedClock::updateClock()
     if (phase_ > phasePanic_ || phase_ < -phasePanic_) {
         // The phase is too large.
 #ifdef DEBUG
-        cout << "sync lost: " << phase_ << " > " << phasePanic_ << endl;
+        cout << "lost sync: " << phase_ << " > " << phasePanic_ << endl;
 #endif
         inSync_ = false;
         return false;
     }
 
     // todo: tidy this mishmash of int usec and double.
-    // Calculate the elapsed time in seconds on the reference clock.
-    const timestamp_t referenceValuePrev = variableValuePrev_ + phasePrev_;
-    const timestamp_t referenceValue = variableValue_ + phase_;
-    const double referenceElapsed = referenceValue - referenceValuePrev;
+    {
+        // Measure referenceClock_'s elapsed time.
+        const auto referenceValuePrev = variableValuePrev_ + phasePrev_;
+        const auto referenceValue = variableValue_ + phase_;
+        const double referenceElapsed = referenceValue - referenceValuePrev;
 
-    // Estimate the primary clock's frequency; average away noise with an IIR filter.
-    const double primaryTicks = primaryValue_ - primaryValuePrev_;
-    const auto primaryFrequency = 1000000.0 * primaryTicks / referenceElapsed;
-    primaryFrequencyAvg_ += (primaryFrequency - primaryFrequencyAvg_) * 0.1;
+        // Estimate the primary clock's frequency.
+        // Average away noise with an IIR filter.
+        const auto ticks = primaryValue_ - primaryValuePrev_;
+        const auto primaryFrequency = 1000000.0 * ticks / referenceElapsed;
+        primaryFrequencyAvg_ += (primaryFrequency - primaryFrequencyAvg_) * 0.1;
+    }
 #ifdef DEBUG
     cout << "primary clock's frequency average = " << int(primaryFrequencyAvg_) << endl;
 #endif
@@ -153,22 +158,22 @@ bool PhaseLockedClock::updateClock()
     const auto phaseDiff = phase_ * 0.1;
     const auto frequencyDiff = 1000000.0 - primaryFrequencyAvg_;
     const int variableClockFrequency = 1000000 + frequencyDiff + phaseDiff;
+#ifdef DEBUG
+    cout << "frequency := " << variableClockFrequency << endl;
+#endif
     const std::lock_guard<std::mutex> lock(mutexPLC);
     variableFrequencyClock_.setFrequency(variableClockFrequency);
-#ifdef DEBUG
-    cout << "frequency = " << variableClockFrequency << endl;
-#endif
     return true;
 }
 
 void PhaseLockedClock::setClock()
 {
+#ifdef DEBUG
+    cout << "resyncing" << endl;
+#endif
+    inSync_ = true;
     const std::lock_guard<std::mutex> lock(mutexPLC);
     variableFrequencyClock_.setValue(referenceClock_.getValue());
-    inSync_ = true;
-#ifdef DEBUG
-    cout << "resynced" << endl;
-#endif
 }
 
 }  // namespace dex
