@@ -41,11 +41,6 @@ debug: all
 profile: CFLAGS += --coverage -fprofile-arcs -ftest-coverage -O0
 profile: $(EXES)
 
-# .dependencies/*.d are built by the %.o:%.cpp rule, via -MMD -MT -MF.
-# They define the .h dependencies of each .o file.
-DEPS := $(patsubst %.o,.dependencies/%.d,$(OBJS)) # $(OBJS:.o=.d)
--include $(DEPS)
-
 test-bindings: test-python test-python2 test-ruby test-ruby2 test-tcl test-tcl2
 
 # Different ports let these tests run simultaneously, via --jobs=99.
@@ -108,12 +103,17 @@ ruby/clockkit.so: ruby/wrap.o $(OBJS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
 clean:
-	rm -rf $(EXES) $(SWIGEXES) $(OBJS) $(DEPS) */wrap.o */wrap.c python/clockkit.py *.gcno *.gcov
+	rm -rf $(EXES) $(SWIGEXES) $(OBJS) .depend */wrap.o */wrap.c python/clockkit.py *.gcno *.gcov
 
 purge: clean
 	rm -rf *.gcda
 
+DEPENDFLAGS = -MMD -MT $@ -MF $(patsubst %.o,.depend/%.d,$@)
 %.o: %.cpp
-	$(CPP) -c $(CFLAGS) -MMD -MT $@ -MF $(patsubst %.o,.dependencies/%.d,$@) $<
+	@mkdir -p .depend
+	$(CPP) -c $(CFLAGS) $(DEPENDFLAGS) $<
+
+# .depend/*.d is built by the %.o:%.cpp rule.
+-include $(patsubst %.o,.depend/%.d,$(OBJS))
 
 .PHONY: all profile bindings purge clean test-all test-30 test-standalone test-bindings test-python test-ruby test-tcl
