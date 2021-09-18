@@ -1,5 +1,14 @@
 #!/bin/bash
 # Ensure that one server and one client run, on different hosts, and print plausible output.
+#
+# This script runs the server (ckserver) on a remote host specified in a config file
+# (named config-remote.sh, if called by "make test-remote"),
+# and the client (ckphaselock) on localhost.
+# It parses their timestamps, and warns if they differ too much.
+# After a few seconds, it kills both the server and the client.
+#
+# For a simpler example of syncing two hosts,
+# in README.md see the section "To sync host B to host A."
 
 if [[ $# -ne 1 ]]; then
   echo "usage: $0 <configfile.sh>" >&2

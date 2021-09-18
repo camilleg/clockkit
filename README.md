@@ -12,7 +12,7 @@ and for triggering outputs (audio, video, LEDs, servos, motion bases).
 It did this originally for a full-motion [driving simulator](https://web.archive.org/web/20170517201424/http://www.isl.uiuc.edu/Labs/Driving%20Simulator/Driving%20Simulator.html) with eye tracking and a
 quickly churning set of other sensors and outputs, for over a decade.
 
-Clockkit was originally published in 2004 on [http://zx81.isl.uiuc.edu/camilleg/clockkit](https://web.archive.org/web/20041205064911/http://zx81.isl.uiuc.edu/camilleg/dsceu04.pdf) (defunct).  
+Clockkit was published in 2004 on [http://zx81.isl.uiuc.edu/camilleg/clockkit](https://web.archive.org/web/20041205064911/http://zx81.isl.uiuc.edu/camilleg/dsceu04.pdf) (defunct).  
 It was revised and moved to GitHub in 2020.
 
 The source code is licensed under the [Creative Commons 2.0 Attribution License](http://creativecommons.org/licenses/by/2.0).
@@ -35,6 +35,17 @@ Proceed as with Ubuntu 18 or 20.
 
 ### To run a test on localhost:
 `cd ClockKit && make test`
+
+### To sync host B to host A:
+On host A, `ckserver 4567`  
+On host B:  
+- `cp clockkit.conf my-clockkit.conf`
+- Edit `my-clockkit.conf`.  Set the `server` to host A, e.g., `192.168.1.1` or `myhost.example.com`.  Set the `port` to 4567, or whatever port you told ckserver to use.  
+- `./ckphaselock my-clockkit.conf`  
+(`make test-remote` automates this, using an ssh key.)
+
+Of course, these steps for host B can be repeated on other hosts C, D, E,... to sync them all.
+Remember that "syncing" here means providing synchronized timestamps, *not* adjusting the hosts' own clocks.
 
 ### To plot performance:
 `sudo apt install gnuplot`  

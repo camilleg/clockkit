@@ -21,7 +21,7 @@ dirRemote=/foo/bar/clockkit/ClockKit
 
 # On $host, the port on which ckserver will listen.
 # You may need to poke holes in firewalls for this UDP port, e.g.,
-# ufw allow 4444/udp comment ClockKit
+# ufw allow 4567/udp comment ClockKit
 port=4567
 
 # The timeout for localhost's ./ckphaselock connecting to $host.
