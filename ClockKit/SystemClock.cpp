@@ -4,6 +4,7 @@
 #else
 #include <sys/time.h>
 #endif
+#include <limits>
 
 namespace dex {
 
@@ -13,22 +14,17 @@ SystemClock SystemClock::instance_;
 // and because GetSystemTimeAsFileTime and gettimeofday are thread-safe.
 timestamp_t SystemClock::getValue()
 {
-    timestamp_t time;
 #ifdef WIN32
     FILETIME filetime;
     GetSystemTimeAsFileTime(&filetime);
-    // convert to a 64bit int.
-    time = (filetime.dwHighDateTime << 32) | filetime.dwLowDateTime;
-    // Convert from 100 ns to usec.
-    time /= 10;
-    // Convert from windows epoch to unix epoch.
-    time -= 11644473600000000;
+    // Convert to a 64bit int, from 100 ns to usec,
+    // then from windows epoch to unix epoch.
+    return ((filetime.dwHighDateTime << 32) | filetime.dwLowDateTime) / 10 - 11644473600000000;
 #else
+    static constexpr auto invalid = std::numeric_limits<timestamp_t>::max();
     timeval now;
-    gettimeofday(&now, 0);
-    time = (now.tv_sec * 1000000) + now.tv_usec;
+    return gettimeofday(&now, nullptr) < 0 ? invalid : now.tv_sec * 1000000 + now.tv_usec;
 #endif
-    return time;
 }
 
 }  // namespace dex
