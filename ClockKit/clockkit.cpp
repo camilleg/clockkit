@@ -42,14 +42,17 @@ void ckInitialize(const char* filename)
 {
     if (!plc) {
         if (filename)
-            config.readFrom(filename);
+            if (!config.readFrom(filename)) {
+                std::cerr << "clockkit.cpp: failed to parse config file '" << filename << "'.\n";
+                return;
+            }
         plc = config.buildClock();
     }
     test_ok("ckInitialize");
 #ifdef DEBUG
     std::cerr << "clockkit.cpp: atexit registered.\n";
 #endif
-    (void)std::atexit(atexit_handler); // Call ckTerminate even if pkill'ed, i.e., got a SIGTERM.
+    (void)std::atexit(atexit_handler);  // Call ckTerminate even if pkill'ed, i.e., got a SIGTERM.
     th_clock = new std::thread(&dex::PhaseLockedClock::run, plc, std::ref(end_clocks));
 }
 
@@ -58,10 +61,8 @@ void ckTerminate()
 #ifdef DEBUG
     std::cerr << "clockkit.cpp: ckTerminate.\n";
 #endif
-    if (plc) {
-        delete plc;
-        plc = nullptr;
-    }
+    delete plc;
+    plc = nullptr;
 }
 
 void ckKill()
@@ -70,7 +71,7 @@ void ckKill()
     std::cerr << "clockkit.cpp: ckKill.\n";
 #endif
     if (plc)
-      plc->die();
+        plc->die();
 }
 
 dex::timestamp_t ckTimeAsValue()

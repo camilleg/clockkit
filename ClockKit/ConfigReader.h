@@ -26,16 +26,15 @@ class ConfigReader {
         delete client_;
     }
 
-    // No copy ctor or assignment operator,
-    // because clocks with duplicate configs are dangerous, not useful.
+    // Another clock with the same config would be dangerous, not useful.
     ConfigReader(const ConfigReader&) = delete;
     ConfigReader& operator=(const ConfigReader&) = delete;
 
     std::string server;
-    unsigned int port;
-    unsigned int timeout;
-    unsigned int phasePanic;
-    unsigned int updatePanic;
+    unsigned port;
+    unsigned timeout;
+    unsigned phasePanic;
+    unsigned updatePanic;
 
     // Print the current values to stdout.
     void print();

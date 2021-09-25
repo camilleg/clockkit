@@ -19,8 +19,6 @@ int main(int argc, char* argv[])
         std::cerr << argv[0] << ": failed to parse config file '" << argv[1] << "'.\n";
         return 1;
     }
-
-    // Print the values before a possible failure.
     config.print();
 
     dex::PhaseLockedClock* plc = config.buildClock();
@@ -36,7 +34,7 @@ int main(int argc, char* argv[])
 
     while (!end_clocks) {
         static const auto invalid = std::numeric_limits<int>::max();
-        const auto offset = plc->getOffset();
+        const auto offset = plc->getOffset();  // In microseconds.
         std::cout << "offset: " << (offset == invalid ? "invalid" : std::to_string(offset)) << "\n"
                   << dex::timestampToString(plc->getValue()) << std::endl;
         // endl flushes stdout, to show output even after Ctrl+C.
