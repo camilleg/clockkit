@@ -2,8 +2,6 @@
 #include "Clock.h"
 
 namespace dex {
-
-// A singleton system clock.
 class SystemClock : public Clock {
    public:
     static SystemClock& instance()
@@ -11,16 +9,13 @@ class SystemClock : public Clock {
         return instance_;
     }
     timestamp_t getValue();
+    SystemClock(SystemClock&) = delete;
+    SystemClock& operator=(SystemClock&) = delete;
 
    private:
-    // Constructor is private.  Use SystemClock::instance() instead.
-    // Copy constructor and assignment operator are private and unimplemented.
     SystemClock()
     {
-    }
-    SystemClock(SystemClock& c);
-    SystemClock& operator=(SystemClock& rhs);
+    }  // Singleton.  Use SystemClock::instance() instead.
     static SystemClock instance_;
 };
-
 }  // namespace dex
