@@ -3,7 +3,7 @@ CPP = c++
 
 # -fPIC is only to make $(SWIGEXES).
 # -fpic would be smaller and faster, but that is only for gcc.
-CFLAGS = -O3 -fPIC -std=c++14 -Wall -Werror -Weffc++
+CFLAGS = -O3 -fPIC -Wall -Werror -Weffc++
 
 # Optional file containing debugging options for CFLAGS and LDFLAGS.
 -include Rules.debug
@@ -118,7 +118,7 @@ DEPENDFLAGS = -MMD -MT $@ -MF $(patsubst %.o,.depend/%.d,$@)
 	@mkdir -p .depend
 	$(CPP) -c $(CFLAGS) $(DEPENDFLAGS) $<
 
-# .depend/*.d is built by the %.o:%.cpp rule.
+# .depend/*.d is built by %.o:%.cpp.
 -include $(patsubst %.o,.depend/%.d,$(OBJS))
 
 .PHONY: all profile bindings purge clean test-all test-30 test-standalone test-bindings test-python test-ruby test-tcl
