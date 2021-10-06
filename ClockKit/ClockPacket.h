@@ -28,12 +28,12 @@ class ClockPacket {
 
    private:
     Type type_;
-    timestamp_t clientRequestTime_;  // Time on client when it sent a REQUEST packet.
-    timestamp_t serverReplyTime_;    // Time on server when it got that REQUEST packet.
-    timestamp_t clientReceiveTime_;  // Time on client when it got the corresponding REPLY packet.
+    tp clientRequestTime_;  // Time on client when it sent a REQUEST packet.
+    tp serverReplyTime_;    // Time on server when it got that REQUEST packet.
+    tp clientReceiveTime_;  // Time on client when it got the corresponding REPLY packet.
 
    public:
-    explicit ClockPacket(Type t, uint8_t seqNum, timestamp_t clientRequestTime);
+    explicit ClockPacket(Type t, uint8_t seqNum = 0, tp clientRequestTime = tpInvalid);
 
     // Unpack buffer into member variables.
     explicit ClockPacket(uint8_t* buffer);
@@ -60,30 +60,30 @@ class ClockPacket {
     }
 
 #ifdef UNUSED
-    inline timestamp_t getClientRequestTime() const
+    inline tp getClientRequestTime() const
     {
         return clientRequestTime_;
     }
-    inline void setClientRequestTime(timestamp_t t)
+    inline void setClientRequestTime(tp t)
     {
         clientRequestTime_ = t;
     }
 
-    inline timestamp_t getServerReplyTime() const
+    inline tp getServerReplyTime() const
     {
         return serverReplyTime_;
     }
-    inline timestamp_t getClientReceiveTime() const
+    inline tp getClientReceiveTime() const
     {
         return clientReceiveTime_;
     }
 #endif
 
-    inline void setServerReplyTime(timestamp_t t)
+    inline void setServerReplyTime(tp t)
     {
         serverReplyTime_ = t;
     }
-    inline void setClientReceiveTime(timestamp_t t)
+    inline void setClientReceiveTime(tp t)
     {
         clientReceiveTime_ = t;
     }
@@ -91,19 +91,19 @@ class ClockPacket {
     // Round trip time for the client-server correspondence.
     // Todo: complain if this is negative, which it should never be,
     // but is technically possible.
-    inline timestamp_t rtt() const
+    inline dur rtt() const
     {
         return clientReceiveTime_ - clientRequestTime_;
     }
 
     // Estimated offset between the client and server clocks.
-    timestamp_t getClockOffset() const
+    dur getClockOffset() const
     {
         return serverReplyTime_ + getErrorBound() - clientReceiveTime_;
     }
 
     // Error bound on the calculation of clock offset.
-    inline timestamp_t getErrorBound() const
+    inline dur getErrorBound() const
     {
         return rtt() / 2;
     }

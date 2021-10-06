@@ -11,7 +11,7 @@
 #include "PhaseLockedClock.h"
 
 using namespace dex;
-using namespace std::chrono_literals;
+using namespace std::chrono;
 
 int main(int argc, char* argv[])
 {
@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
     }
     const auto port = atoi(argv[1]);
     const auto numClients = atoi(argv[2]);
-    std::chrono::microseconds runtime(int64_t(1000000 * atof(argv[3])));
+    microseconds runtime(int64_t(1000000 * atof(argv[3])));
 
     auto& clockHiRes = HighResolutionClock::instance();
     ClockServer server(ost::InetAddress("0.0.0.0"), port, clockHiRes);
@@ -49,15 +49,16 @@ int main(int argc, char* argv[])
         // https://stackoverflow.com/q/17007977/2097284, or maybe std::move.
         clients.push_back(cli);
         auto plc = new PhaseLockedClock(clockHiRes, *cli);
-        plc->setPhasePanic(5000);
-        plc->setUpdatePanic(5000000);
+        plc->setPhasePanic(5ms);
+        plc->setUpdatePanic(5s);
         clocks.push_back(plc);
         threads.emplace_back(&PhaseLockedClock::run, plc, std::ref(end_clocks));
     }
 
     while (runtime.count() > 0) {
         for (const auto plc : clocks)
-            std::cout << "offset: " << plc->getOffset() << "\n" << timestampToString(plc->getValue()) << std::endl;
+            std::cout << "offset: " << UsecFromDur(plc->getOffset()) << "\n"
+                      << timestampToString(plc->getValue()) << std::endl;
         std::cout << std::endl;
         constexpr auto wait = 600ms;
         std::this_thread::sleep_for(wait);

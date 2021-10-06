@@ -3,14 +3,17 @@
 %{
 #include "clockkit.h"
 %}
+%include <stdint.i>
+%include <typemaps.i>
+%apply int64_t& INOUT { int64_t& idx };
 #endif
 
-#include "Timestamp.h"
+#include <stdint.h>  // for int64_t
 
 extern void ckInitialize(const char*);
 extern void ckTerminate();
-extern dex::timestamp_t ckTimeAsValue();
+extern int64_t ckTimeAsValue();
 extern const char* ckTimeAsString();
 extern bool ckInSync();
-extern int ckOffset();
+extern int64_t ckOffset();
 extern void ckKill();

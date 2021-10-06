@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 #ifdef DEBUG
     // A slow clock, for testing.
     dex::VariableFrequencyClock clock(dex::HighResolutionClock::instance());
-    clock.setFrequency(1000000 - 2000);
+    clock.setFrequency(1000000.0 - 2000.0);
 #else
     auto& clock(dex::HighResolutionClock::instance());
 #endif

@@ -7,18 +7,18 @@ namespace dex {
 ClockPacket::ClockPacket()
     : sequenceNumber_(0)
     , type_(INVALID)
-    , clientRequestTime_(0)
-    , serverReplyTime_(0)
-    , clientReceiveTime_(0)
+    , clientRequestTime_(tpInvalid)
+    , serverReplyTime_(tpInvalid)
+    , clientReceiveTime_(tpInvalid)
 {
 }
 
-ClockPacket::ClockPacket(Type t, uint8_t n, timestamp_t crt)
+ClockPacket::ClockPacket(Type t, uint8_t n, tp crt)
     : sequenceNumber_(n)
     , type_(t)
     , clientRequestTime_(crt)
-    , serverReplyTime_(0)
-    , clientReceiveTime_(0)
+    , serverReplyTime_(tpInvalid)
+    , clientReceiveTime_(tpInvalid)
 {
 }
 

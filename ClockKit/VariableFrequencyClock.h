@@ -16,10 +16,10 @@ class VariableFrequencyClock : public Clock {
     // the clock starts at zero) if the source clock moves backwards,
     // such as a counter that wrapped around.
     // If that happens, call setValue().
-    timestamp_t getValue();
+    tp getValue();
 
     // Sets the current time (the clock's value).
-    void setValue(timestamp_t);
+    void setValue(tp);
 
     // todo: unused yet, but define in Clock, for a VFC based on another VFC.
     inline double getFrequency() const
@@ -32,8 +32,8 @@ class VariableFrequencyClock : public Clock {
     Clock& clockSrc_;
     double frequencySrc_;
     double frequency_;
-    timestamp_t markerSrc_;
-    timestamp_t marker_;
+    tp markerSrc_;
+    tp marker_;
     bool rolledOver_;
     void updateMarkers();
 };

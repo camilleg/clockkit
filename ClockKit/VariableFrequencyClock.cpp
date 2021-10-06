@@ -1,5 +1,3 @@
-#include <limits>
-
 #include "VariableFrequencyClock.h"
 
 namespace dex {
@@ -9,28 +7,25 @@ VariableFrequencyClock::VariableFrequencyClock(Clock& src)
     , frequencySrc_(1000000.0)
     , frequency_(1000000.0)
     , markerSrc_(clockSrc_.getValue())
-    , marker_(0)
+    , marker_(TpFromUsec(0))
     , rolledOver_(false)
 {
-    // setValue(0); would also work, but -Werror=effc++ says to do this in the initializer list.
+    // setValue(TpFromUsec(0)) works too, but -Werror=effc++ prefers the initializer list.
 }
 
-timestamp_t VariableFrequencyClock::getValue()
+tp VariableFrequencyClock::getValue()
 {
-    // Typically 9223372036854775807 usec, or 293,000 years, obviously invalid.
-    constexpr auto invalid = std::numeric_limits<timestamp_t>::max();
     if (rolledOver_)
-        return invalid;
-
-    const timestamp_t ticksSrc = clockSrc_.getValue() - markerSrc_;
+        return tpInvalid;
+    const auto ticksSrc = UsecFromDur(clockSrc_.getValue() - markerSrc_);
     if (ticksSrc < 0) {
         rolledOver_ = true;
-        return invalid;
+        return tpInvalid;
     }
-    return marker_ + ticksSrc * frequency_ / frequencySrc_;
+    return marker_ + DurFromUsec(ticksSrc * (frequency_ / frequencySrc_));
 }
 
-void VariableFrequencyClock::setValue(timestamp_t t)
+void VariableFrequencyClock::setValue(tp t)
 {
     marker_ = t;
     markerSrc_ = clockSrc_.getValue();

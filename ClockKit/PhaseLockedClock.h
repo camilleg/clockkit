@@ -24,7 +24,7 @@ class PhaseLockedClock : public Clock {
         referenceClock_.die();
     }
 
-    timestamp_t getValue();
+    tp getValue();
 
     // Return whether we're in sync with referenceClock_.
     // Sync becomes lost if the vfc's previous update was too long ago,
@@ -35,14 +35,14 @@ class PhaseLockedClock : public Clock {
     }
 
     // Phase offset of vfc relative to referenceClock_, i.e., phase_.
-    int getOffset();
+    dur getOffset();
 
-    inline void setPhasePanic(timestamp_t phasePanic)
+    inline void setPhasePanic(dur phasePanic)
     {
         phasePanic_ = phasePanic;
     }
 
-    inline void setUpdatePanic(timestamp_t usec)
+    inline void setUpdatePanic(dur usec)
     {
         updatePanic_ = usec;
     }
@@ -69,7 +69,7 @@ class PhaseLockedClock : public Clock {
     Clock& referenceClock_;
     VariableFrequencyClock variableFrequencyClock_;
 
-    timestamp_t primaryValue() const
+    tp primaryValue() const
     {
         return primaryClock_.getValue();
     }
@@ -77,26 +77,26 @@ class PhaseLockedClock : public Clock {
     bool inSync_;
 
     // Phase between vfc and referenceClock_.
-    timestamp_t phase_;
-    timestamp_t phasePrev_;
+    dur phase_;
+    dur phasePrev_;
 
     // Value of vfc.
-    timestamp_t variableValue_;
-    timestamp_t variableValuePrev_;
+    tp variableValue_;
+    tp variableValuePrev_;
 
     // Value of primaryClock_.
-    timestamp_t primaryValue_;
-    timestamp_t primaryValuePrev_;
+    tp primaryValue_;
+    tp primaryValuePrev_;
 
     // Average frequency of primaryClock_, in Hz.
     double primaryFrequencyAvg_;
 
     // Thresholds set by setPhasePanic() and setUpdatePanic().
-    timestamp_t phasePanic_;
-    timestamp_t updatePanic_;
+    dur phasePanic_;
+    dur updatePanic_;
 
     // When updatePhase() last succeeded.
-    timestamp_t updatePrev_;
+    tp updatePrev_;
 };
 
 }  // namespace dex

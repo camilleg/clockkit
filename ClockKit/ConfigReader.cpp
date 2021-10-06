@@ -76,8 +76,8 @@ PhaseLockedClock* ConfigReader::buildClock()
     client_->setTimeout(this->timeout);
     client_->setAcknowledge(true);
     PhaseLockedClock* plc = new PhaseLockedClock(HighResolutionClock::instance(), *client_);
-    plc->setPhasePanic(this->phasePanic);
-    plc->setUpdatePanic(this->updatePanic);
+    plc->setPhasePanic(DurFromUsec(this->phasePanic));
+    plc->setUpdatePanic(DurFromUsec(this->updatePanic));
     return plc;
 }
 

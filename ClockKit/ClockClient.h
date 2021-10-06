@@ -33,18 +33,18 @@ class ClockClient : public Clock {
     // Slower and less accurate than getPhase().
     // Calls getPhase(HighResolutionClock::instance()).
     // Returns "invalid" on error.
-    timestamp_t getValue();
+    tp getValue();
 
     inline int getTimeout() const
     {
-        return timeout_;
+        return UsecFromDur(timeout_);
     }
-    inline void setTimeout(int timeout)
+    inline void setTimeout(int usec)
     {
-        timeout_ = timeout;
+        timeout_ = DurFromUsec(usec);
     }
 
-    inline int rtt() const
+    inline dur rtt() const
     {
         return rtt_;
     }
@@ -61,7 +61,7 @@ class ClockClient : public Clock {
     // Phase between a local clock and a ClockServer's clock.
     // Reports the phase to the server, if acknowledge_.
     // The most accurate way to get timing from a ClockServer.
-    inline timestamp_t getPhase(Clock& clock)
+    inline dur getPhase(Clock& clock)
     {
         return getPhase(clock, acknowledge_);
     }
@@ -69,18 +69,15 @@ class ClockClient : public Clock {
     // Kill the connected ClockServer.
     void die() const
     {
-        (void)sendPacket(ClockPacket(ClockPacket::KILL, 0, 0));
+        (void)sendPacket(ClockPacket(ClockPacket::KILL));
     }
-
-    // Typically 9223372036854775807 usec, or 293,000 years, obviously invalid.
-    static constexpr auto invalid = std::numeric_limits<timestamp_t>::max();
 
    private:
     explicit ClockClient(ClockClient&);
     ClockClient& operator=(ClockClient&);
 
-    int timeout_;  // Timeout (usec).  Sets the max error on phase calculations.
-    size_t rtt_;   // The previous call's round trip time (usec).
+    dur timeout_;  // The max error on phase calculations.
+    dur rtt_;      // The previous call's round trip time.
     unsigned char sequence_;
     bool acknowledge_;
     ost::UDPSocket* socket_;
@@ -91,8 +88,8 @@ class ClockClient : public Clock {
     // On error, the returned packet's type is INVALID.
     ClockPacket receivePacket(Clock&);
 
-    // Returns "invalid" on error.
-    timestamp_t getPhase(Clock&, bool acknowledge);
+    // Returns durInvalid on error.
+    dur getPhase(Clock&, bool acknowledge);
 };
 
 }  // namespace dex

@@ -14,45 +14,42 @@ using std::endl;
 
 namespace dex {
 
+using namespace std::chrono;
+
 // A guard for the vfc and refclock's getPhase().
 // One mutex for *all* PLCs may be too careful in practice,
 // but it lets multiple PLCs use the same reference clock.
 std::mutex mutexPLC;
-
-// Typically 9223372036854775807 usec, or 293,000 years, obviously invalid.
-static constexpr auto invalid = std::numeric_limits<timestamp_t>::max();
 
 PhaseLockedClock::PhaseLockedClock(Clock &primary, Clock &reference)
     : primaryClock_(primary)
     , referenceClock_(reference)
     , variableFrequencyClock_(primary)
     , inSync_(false)
-    , phase_{0}
-    , phasePrev_{0}
-    , variableValue_{0}
-    , variableValuePrev_{0}
-    , primaryValue_{0}
-    , primaryValuePrev_{0}
+    , phase_(0s)
+    , phasePrev_(0s)
+    , variableValue_(0s)
+    , variableValuePrev_(0s)
+    , primaryValue_(0s)
+    , primaryValuePrev_(0s)
     , primaryFrequencyAvg_(1000000.0)
-    , phasePanic_(5000)
-    , updatePanic_(5000000)
-    , updatePrev_(0)
+    , phasePanic_(5ms)
+    , updatePanic_(5s)
+    , updatePrev_(0s)
 {
 }
 
-timestamp_t PhaseLockedClock::getValue()
+tp PhaseLockedClock::getValue()
 {
     if (!inSync_)
-        return invalid;
+        return tpInvalid;
     const std::lock_guard<std::mutex> lock(mutexPLC);
     return variableFrequencyClock_.getValue();
 }
 
-int PhaseLockedClock::getOffset()
+dur PhaseLockedClock::getOffset()
 {
-    if (!inSync_)
-        return std::numeric_limits<int>::max();  // == clockkit.cpp ckOffset() int invalid.
-    return phase_;
+    return inSync_ ? phase_ : durInvalid;
 }
 
 void PhaseLockedClock::run(std::atomic_bool &end_clocks)
@@ -63,7 +60,6 @@ void PhaseLockedClock::run(std::atomic_bool &end_clocks)
     randNumGen.seed(std::random_device{}());
     while (!end_clocks) {
         update();
-        using namespace std::chrono_literals;
         std::this_thread::sleep_for(200ms * vary(randNumGen));
     }
 }
@@ -96,7 +92,7 @@ bool PhaseLockedClock::updatePhase()
     const auto variableValue = variableFrequencyClock_.getValue();
     const auto tmp = primaryValue();  // Not guarded by the mutex.  But read all 3 numbers at once.
     mutexPLC.unlock();
-    if (phase == invalid) {
+    if (phase == durInvalid) {
 #ifdef DEBUG
         cout << "lost sync: problem with referenceClock_" << endl;
 #endif
@@ -120,14 +116,14 @@ bool PhaseLockedClock::updatePhase()
 
 bool PhaseLockedClock::updateClock()
 {
-    if (phase_ == invalid) {
+    if (phase_ == durInvalid) {
 #ifdef DEBUG
         cout << "lost sync: invalid phase" << endl;
 #endif
         inSync_ = false;
         return false;
     }
-    // todo: phasePanic_ unsigned, or timestamp_t phase_ unsigned, or abs().
+    // abs() would need -std=c++1z, or UsecFromDur.
     if (phase_ > phasePanic_ || phase_ < -phasePanic_) {
         // The phase is too large.
 #ifdef DEBUG
@@ -137,17 +133,16 @@ bool PhaseLockedClock::updateClock()
         return false;
     }
 
-    // todo: tidy this mishmash of int usec and double.
     {
         // Measure referenceClock_'s elapsed time.
         const auto referenceValuePrev = variableValuePrev_ + phasePrev_;
         const auto referenceValue = variableValue_ + phase_;
-        const double referenceElapsed = referenceValue - referenceValuePrev;
+        const auto referenceElapsed = UsecFromDur(referenceValue - referenceValuePrev);
 
         // Estimate the primary clock's frequency.
         // Average away noise with an IIR filter.
-        const auto ticks = primaryValue_ - primaryValuePrev_;
-        const auto primaryFrequency = 1000000.0 * ticks / referenceElapsed;
+        const auto ticks = UsecFromDur(primaryValue_ - primaryValuePrev_);
+        const auto primaryFrequency = ticks * 1000000.0 / referenceElapsed;
         primaryFrequencyAvg_ += (primaryFrequency - primaryFrequencyAvg_) * 0.1;
     }
 #ifdef DEBUG
@@ -155,9 +150,9 @@ bool PhaseLockedClock::updateClock()
 #endif
 
     // Adjust the variable clock's frequency.
-    const auto phaseDiff = phase_ * 0.1;
+    const auto phaseDiff = UsecFromDur(phase_) * 0.1;
     const auto frequencyDiff = 1000000.0 - primaryFrequencyAvg_;
-    const int variableClockFrequency = 1000000 + frequencyDiff + phaseDiff;
+    const auto variableClockFrequency = 1000000.0 + frequencyDiff + phaseDiff;
 #ifdef DEBUG
     cout << "frequency := " << variableClockFrequency << endl;
 #endif

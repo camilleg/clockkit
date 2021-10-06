@@ -14,18 +14,31 @@ class ClockServer {
     const ost::InetAddress addr_;
     const int port_;
     Clock& clock_;
+    static constexpr auto zero = std::chrono::seconds(0);  // aka 0s
 
     struct Entry {
-        timestamp_t time;    // "Now."
-        timestamp_t offset;  // From ClockPacket::getClockOffset().
-        timestamp_t rtt;     // From ClockPacket::rtt().
+        tp time;     // "Now."
+        dur offset;  // From ClockPacket::getClockOffset().
+        dur rtt;     // From ClockPacket::rtt().
+        Entry(tp a, dur b, dur c)
+            : time(a)
+            , offset(b)
+            , rtt(c)
+        {
+        }
+        Entry()
+            : time(zero)
+            , offset(zero)
+            , rtt(zero)
+        {
+        }
     };
     std::map<std::string, Entry> ackData_;
 
     bool log_;
 
     // When offsetMax was most recently recalculated.
-    timestamp_t tRecalculated_;
+    tp tRecalculated_;
 
    public:
     // Provide requests for timestamps to clients via a UDP port.
@@ -41,7 +54,7 @@ class ClockServer {
     void run();
 
    protected:
-    void updateEntry(const std::string& addr, timestamp_t offset, timestamp_t rtt);
+    void updateEntry(const std::string& addr, dur offset, dur rtt);
 };
 
 }  // namespace dex

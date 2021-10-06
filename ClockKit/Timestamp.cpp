@@ -6,16 +6,17 @@
 //#include <endian.h>
 //#endif
 
-#include <stdio.h>
 #include <cstddef>
+#include <cstdio>
 #include <cstring>
 
 namespace dex {
 
 const char* format = "<time %d %6d>";  // %i might misparse 0123 as octal.
 
-std::string timestampToString(timestamp_t t)
+std::string timestampToString(tp point)
 {
+    const auto t = UsecFromTp(point);
     const int sec = t / 1000000;
     const int usec = t % 1000000;
     char buf[100];
@@ -23,12 +24,12 @@ std::string timestampToString(timestamp_t t)
     return std::string(buf);
 }
 
-timestamp_t stringToTimestamp(const std::string& t)
+tp stringToTimestamp(const std::string& s)
 {
     int sec, usec;
-    if (sscanf(t.c_str(), format, &sec, &usec) != 2)
-        return 0;
-    return sec * 1000000 + usec;
+    if (sscanf(s.c_str(), format, &sec, &usec) != 2)
+        return tpInvalid;
+    return TpFromUsec(sec * 1000000 + usec);
 }
 
 #if __BYTE_ORDER == __BIG_ENDIAN
@@ -38,23 +39,22 @@ timestamp_t stringToTimestamp(const std::string& t)
 #endif
 
 union timestampBytes {
-    timestamp_t t;
+    int64_t t;
     std::array<uint8_t, 8> bytes;
 };
 
-std::array<uint8_t, 8> timestampToBytes(timestamp_t time)
+std::array<uint8_t, 8> timestampToBytes(tp point)
 {
     timestampBytes u;
-    u.t = REORDER(time);
+    u.t = REORDER(UsecFromTp(point));
     return u.bytes;
 }
 
-timestamp_t bytesToTimestamp(const uint8_t* buffer)
+tp bytesToTimestamp(const uint8_t* buffer)
 {
     timestampBytes u;
     std::memcpy(u.bytes.data(), buffer, 8);
-
-    return static_cast<timestamp_t>(REORDER(u.t));
+    return TpFromUsec(REORDER(u.t));
 }
 
 }  // namespace dex

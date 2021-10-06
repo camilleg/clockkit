@@ -32,9 +32,9 @@ class ConfigReader {
 
     std::string server;
     unsigned port;
-    unsigned timeout;
-    unsigned phasePanic;
-    unsigned updatePanic;
+    unsigned timeout;      // usec
+    unsigned phasePanic;   // usec
+    unsigned updatePanic;  // usec
 
     // Print the current values to stdout.
     void print();

@@ -8,7 +8,7 @@ class SystemClock : public Clock {
     {
         return instance_;
     }
-    timestamp_t getValue();
+    tp getValue();
     SystemClock(SystemClock&) = delete;
     SystemClock& operator=(SystemClock&) = delete;
 

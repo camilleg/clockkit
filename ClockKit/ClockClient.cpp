@@ -5,6 +5,7 @@
 // #define DEBUG
 
 using namespace std;
+using namespace std::chrono;
 
 namespace dex {
 
@@ -41,7 +42,7 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
 #endif
     constexpr auto length = ClockPacket::PACKET_LENGTH;
     uint8_t buffer[length];
-    const auto timeoutMsec = std::max(1, timeout_ / 1000);
+    const auto timeoutMsec = std::max(1, getTimeout() / 1000);
 
     while (true) {
         if (!socket_->isPending(ost::Socket::pendingInput, timeoutMsec)) {
@@ -92,12 +93,12 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
     }
 }
 
-timestamp_t ClockClient::getValue()
+tp ClockClient::getValue()
 {
     Clock& baseClock = HighResolutionClock::instance();
     const auto phase = getPhase(baseClock, false);
-    if (phase == invalid)
-        return invalid;
+    if (phase == durInvalid)
+        return tpInvalid;
     return baseClock.getValue() + phase;
     // primary clock = secondary clock + phase
 }
@@ -105,18 +106,18 @@ timestamp_t ClockClient::getValue()
 // We can't use a default value "bool acknowledge = acknowledge_"
 // because the base class's signature for getPhase has only the first arg.
 // Always false, while it's called from only ClockClient::getValue().
-timestamp_t ClockClient::getPhase(Clock& clock, bool acknowledge)
+dur ClockClient::getPhase(Clock& clock, bool acknowledge)
 {
     ++sequence_ %= 250;  // One byte.
     if (!sendPacket(ClockPacket(ClockPacket::REQUEST, sequence_, clock.getValue())))
-        return invalid;
+        return durInvalid;
     ClockPacket packet(receivePacket(clock));
     if (packet.invalid())
-        return invalid;
+        return durInvalid;
     if (acknowledge) {
         packet.setType(ClockPacket::ACKNOWLEDGE);
         if (!sendPacket(packet))
-            return invalid;
+            return durInvalid;
     }
     return packet.getClockOffset();
 }
