@@ -14,7 +14,6 @@ class ClockServer {
     const ost::InetAddress addr_;
     const int port_;
     Clock& clock_;
-    static constexpr auto zero = std::chrono::seconds(0);  // aka 0s
 
     struct Entry {
         tp time;     // "Now."
@@ -27,9 +26,9 @@ class ClockServer {
         {
         }
         Entry()
-            : time(zero)
-            , offset(zero)
-            , rtt(zero)
+            : time(std::chrono::seconds(0))
+            , offset(std::chrono::seconds(0))
+            , rtt(std::chrono::seconds(0))
         {
         }
     };
