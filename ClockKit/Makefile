@@ -4,11 +4,11 @@ CPP = c++
 # -fPIC is only to make $(SWIGEXES).
 # -fpic would be smaller and faster, but that is only for gcc.
 CFLAGS = -O3 -fPIC -Wall -Werror -Weffc++ -std=c++17
+LIBS = -lccgnu2 -lpthread -ldl
 
 # Optional file containing debugging options for CFLAGS and LDFLAGS.
 -include Rules.debug
 
-LIBS = -lccgnu2 -lpthread -ldl
 SWIG = swig -Wallkw -Werror
 RUBY   = $$(pkg-config --list-all | grep ruby-   | sort | tail -1 | sed 's/ .*//')
 PYTHON = $$(pkg-config --list-all | grep python- | sort | tail -1 | sed 's/ .*//')
