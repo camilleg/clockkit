@@ -30,7 +30,7 @@ bool ClockClient::sendPacket(const ClockPacket& packet) const
     cerr << "\nsending " << packet.getTypeName() << "\n";
 #endif
     constexpr auto length = ClockPacket::PACKET_LENGTH;
-    uint8_t buffer[length];
+    std::byte buffer[length];
     packet.write(buffer);
     return socket_->send(buffer, length) == length;
 }
@@ -41,7 +41,7 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
     cerr << "expecting...\n";
 #endif
     constexpr auto length = ClockPacket::PACKET_LENGTH;
-    uint8_t buffer[length];
+    std::byte buffer[length];
     const auto timeoutMsec = std::max(1, getTimeout() / 1000);
 
     while (true) {

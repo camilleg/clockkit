@@ -40,17 +40,17 @@ tp stringToTimestamp(const std::string& s)
 
 union timestampBytes {
     int64_t t;
-    std::array<uint8_t, 8> bytes;
+    std::array<std::byte, 8> bytes;
 };
 
-std::array<uint8_t, 8> timestampToBytes(tp point)
+std::array<std::byte, 8> timestampToBytes(tp point)
 {
     timestampBytes u;
     u.t = REORDER(UsecFromTp(point));
     return u.bytes;
 }
 
-tp bytesToTimestamp(const uint8_t* buffer)
+tp bytesToTimestamp(const std::byte* buffer)
 {
     timestampBytes u;
     std::memcpy(u.bytes.data(), buffer, 8);

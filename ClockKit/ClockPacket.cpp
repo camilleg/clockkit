@@ -13,7 +13,7 @@ ClockPacket::ClockPacket()
 {
 }
 
-ClockPacket::ClockPacket(Type t, uint8_t n, tp crt)
+ClockPacket::ClockPacket(Type t, seqnum n, tp crt)
     : sequenceNumber_(n)
     , type_(t)
     , clientRequestTime_(crt)
@@ -22,19 +22,19 @@ ClockPacket::ClockPacket(Type t, uint8_t n, tp crt)
 {
 }
 
-ClockPacket::ClockPacket(uint8_t* buffer)
-    : sequenceNumber_(buffer[1])
-    , type_(Type(buffer[0]))
+ClockPacket::ClockPacket(const std::byte* buffer)
+    : sequenceNumber_(static_cast<seqnum>(buffer[1]))
+    , type_(static_cast<Type>(Type(buffer[0])))
     , clientRequestTime_(bytesToTimestamp(buffer + 2))
     , serverReplyTime_(bytesToTimestamp(buffer + 10))
     , clientReceiveTime_(bytesToTimestamp(buffer + 18))
 {
 }
 
-void ClockPacket::write(uint8_t* buffer) const
+void ClockPacket::write(std::byte* buffer) const
 {
-    buffer[0] = static_cast<uint8_t>(type_);
-    buffer[1] = sequenceNumber_;
+    buffer[0] = static_cast<std::byte>(type_);
+    buffer[1] = static_cast<std::byte>(sequenceNumber_);
     auto t = timestampToBytes(clientRequestTime_);
     std::copy(t.begin(), t.end(), buffer + 2);
 

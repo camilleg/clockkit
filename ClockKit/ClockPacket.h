@@ -24,7 +24,9 @@ class ClockPacket {
     // (A byte isn't too small, because even at 10 packets per second,
     // this detects packets as much as 25 seconds late,
     // which is much larger than the typical tolerance of a fraction of a second.)
-    const uint8_t sequenceNumber_;
+    // Using more than a byte would be a breaking change for the packet format.
+    using seqnum = uint8_t;
+    const seqnum sequenceNumber_;
 
    private:
     Type type_;
@@ -33,16 +35,16 @@ class ClockPacket {
     tp clientReceiveTime_;  // Time on client when it got the corresponding REPLY packet.
 
    public:
-    explicit ClockPacket(Type t, uint8_t seqNum = 0, tp clientRequestTime = tpInvalid);
+    explicit ClockPacket(Type t, seqnum seqNum = 0, tp clientRequestTime = tpInvalid);
 
     // Unpack buffer into member variables.
-    explicit ClockPacket(uint8_t* buffer);
+    explicit ClockPacket(const std::byte* buffer);
 
     // Invalid.
     explicit ClockPacket();
 
     // Write member variables to a buffer of PACKET_LENGTH bytes.
-    void write(uint8_t* buffer) const;
+    void write(std::byte* buffer) const;
 
     inline Type getType() const
     {

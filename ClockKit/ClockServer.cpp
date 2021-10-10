@@ -25,7 +25,7 @@ void ClockServer::run()
     if (log_)
         cout << "time                     host    \toffset\tround-trip-time" << endl;
     constexpr auto length = ClockPacket::PACKET_LENGTH;
-    uint8_t buffer[length];
+    std::byte buffer[length];
     ost::UDPSocket socket(addr_, port_);
 
     while (socket.isPending(ost::Socket::pendingInput, TIMEOUT_INF)) {

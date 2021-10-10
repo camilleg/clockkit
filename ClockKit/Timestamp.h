@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <chrono>
+#include <cstddef>
 #include <limits>
 #include <string>
 
@@ -18,8 +19,8 @@ std::string timestampToString(tp);
 tp stringToTimestamp(const std::string&);
 
 // Read/write a 64 bit timestamp with proper byte ordering.
-std::array<uint8_t, 8> timestampToBytes(tp);
-tp bytesToTimestamp(const uint8_t*);
+std::array<std::byte, 8> timestampToBytes(tp);
+tp bytesToTimestamp(const std::byte*);
 
 dur constexpr DurFromUsec(int64_t t)
 {
