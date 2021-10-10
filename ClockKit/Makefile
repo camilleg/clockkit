@@ -3,7 +3,7 @@ CPP = c++
 
 # -fPIC is only to make $(SWIGEXES).
 # -fpic would be smaller and faster, but that is only for gcc.
-CFLAGS = -O3 -fPIC -Wall -Werror -Weffc++
+CFLAGS = -O3 -fPIC -Wall -Werror -Weffc++ -std=c++17
 
 # Optional file containing debugging options for CFLAGS and LDFLAGS.
 -include Rules.debug
@@ -99,11 +99,12 @@ tcl/clockkit.so: tcl/wrap.o $(OBJS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
 # The sed casts _wrap_ck's to (VALUE (*)(...)) in lines starting with rb_define_module_function.
+# -Wno-register is for Ubuntu 18, whose Ruby 2.5's .h files use C++17-illegal "register".
 ruby/wrap.c: clockkit.h
 	$(SWIG) -ruby -o $@ clockkit.h
 	sed -i -e "s/ _wrap_ck/ (VALUE (*)(...))_wrap_ck/" $@
 ruby/wrap.o: ruby/wrap.c
-	$(CPP) -c $(CFLAGS) -Wno-pedantic -I. $$(pkg-config --cflags $(RUBY)) $? -o $@
+	$(CPP) -c $(CFLAGS) -Wno-pedantic -Wno-register -I. $$(pkg-config --cflags $(RUBY)) $? -o $@
 ruby/clockkit.so: ruby/wrap.o $(OBJS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
@@ -121,4 +122,4 @@ DEPENDFLAGS = -MMD -MT $@ -MF $(patsubst %.o,.depend/%.d,$@)
 # .depend/*.d is built by %.o:%.cpp.
 -include $(patsubst %.o,.depend/%.d,$(OBJS))
 
-.PHONY: all profile bindings purge clean test-all test-30 test-standalone test-bindings test-python test-ruby test-tcl
+.PHONY: all profile bindings purge clean test-30 test-standalone test-bindings test-python test-ruby test-tcl
