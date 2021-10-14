@@ -65,14 +65,11 @@ int main(int argc, char* argv[])
         runtime -= wait;
     }
 
-    for (const auto plc : clocks) {
-        plc->die();
-        delete plc;
-    }
-    end_clocks = true;
+    end_clocks = true;  // Tell each plc::run() to quit, in about 200ms.
+    for (const auto plc : clocks) plc->die();
     for (auto& thread : threads) thread.join();
-    for (const auto client : clients) delete client;
-
+    for (const auto plc : clocks) delete plc;
+    for (const auto cli : clients) delete cli;
     th_server.join();
     return 0;
 }

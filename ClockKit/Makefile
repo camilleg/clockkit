@@ -52,7 +52,7 @@ test-bindings: test-python test-python2 test-ruby test-ruby2 test-tcl test-tcl2
 test: ckserver ckphaselock
 	./testcase.sh 4440
 test-standalone: cktest-standalone
-	./$? 4480 5 3 > /dev/null
+	./$? 4480 500 3 > /dev/null
 test-30: ckserver ckphaselock
 	./testcase-n.sh 30 4430
 
