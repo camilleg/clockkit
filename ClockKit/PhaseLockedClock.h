@@ -44,7 +44,8 @@ class PhaseLockedClock : public Clock {
 
     inline void setUpdatePanic(dur usec)
     {
-        updatePanic_ = usec;
+        if (updatePanic_ != durInvalid)
+            updatePanic_ = usec;
     }
 
     // Call update() periodically, until the caller sets the arg to true.

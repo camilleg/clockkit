@@ -16,10 +16,12 @@ const char* format = "<time %d %6d>";  // %i might misparse 0123 as octal.
 
 std::string timestampToString(tp point)
 {
+    // Specially treating point==tpInvalid would be a breaking change.
+    // Convert it conventionally, like everything else in Timestamp.h.
     const auto t = UsecFromTp(point);
     const int sec = t / 1000000;
     const int usec = t % 1000000;
-    char buf[100];
+    char buf[10 + (22 - 6) + 7];  // <time  >, sec, usec
     sprintf(buf, format, sec, usec);
     return std::string(buf);
 }

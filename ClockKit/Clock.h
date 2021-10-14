@@ -14,7 +14,7 @@ class Clock {
     // The phase, or offset, between this (primary) clock and another clock.
     virtual dur getPhase(Clock& c)
     {
-        return getValue() - c.getValue();
+        return diff(getValue(), c.getValue());
     }
 
     virtual ~Clock() = default;

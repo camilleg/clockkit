@@ -29,7 +29,12 @@ void ClockServer::run()
     ost::UDPSocket socket(addr_, port_);
 
     while (socket.isPending(ost::Socket::pendingInput, TIMEOUT_INF)) {
-        const auto now = clock_.getValue();              // Before anything else.
+        const auto now = clock_.getValue();  // Before anything else.
+        if (now == tpInvalid) {
+            // Very unlikely, for std::chrono::system_clock::now().
+            cerr << "ClockServer's clock is corrupt.\n";
+            continue;
+        }
         const ost::InetAddress peer = socket.getPeer();  // also sets up the socket to send back to the sender
         if (socket.receive(buffer, length) != length) {
             cerr << "ClockServer ignored packet with wrong length.\n";
@@ -60,6 +65,11 @@ void ClockServer::updateEntry(const string& addr, dur offset, dur rtt)
     if (!log_)
         return;
     const auto now = clock_.getValue();
+    if (now == tpInvalid) {
+        // Very unlikely, for std::chrono::system_clock::now().
+        cerr << "ClockServer's clock is corrupt.\n";
+        return;
+    }
     const auto nowStr = timestampToString(now);
     cout << nowStr << ' ' << addr << '\t' << UsecFromDur(offset) << '\t' << UsecFromDur(rtt) << endl;
     ackData_[addr] = Entry(now, offset, rtt);
@@ -82,6 +92,11 @@ void ClockServer::updateEntry(const string& addr, dur offset, dur rtt)
     int64_t offsetMax = 0;
     for (const auto& data : ackData_) {
         const auto& entry = data.second;
+        if (entry.offset == durInvalid || entry.rtt == durInvalid) {
+            offsetMax = usecInvalid;
+            break;
+        }
+        // RHS isn't invalid.
         offsetMax = max(offsetMax, abs(UsecFromDur(entry.offset)) + UsecFromDur(entry.rtt) / 2);
     }
     cout << nowStr << ' ' << "offsetMax" << '\t' << offsetMax << '\t' << "---" << endl;

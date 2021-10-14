@@ -17,18 +17,23 @@ tp VariableFrequencyClock::getValue()
 {
     if (rolledOver_)
         return tpInvalid;
-    const auto ticksSrc = UsecFromDur(clockSrc_.getValue() - markerSrc_);
+    const auto t = diff(clockSrc_.getValue(), markerSrc_);
+    if (t == durInvalid)
+        return tpInvalid;
+    const auto ticksSrc = UsecFromDur(t);
     if (ticksSrc < 0) {
         rolledOver_ = true;
         return tpInvalid;
     }
-    return marker_ + DurFromUsec(ticksSrc * (frequency_ / frequencySrc_));
+    // ticksSrc isn't invalid.
+    // marker_ is often invalid at the start of make test-30.
+    return marker_ == tpInvalid ? tpInvalid : marker_ + DurFromUsec(ticksSrc * (frequency_ / frequencySrc_));
 }
 
 void VariableFrequencyClock::setValue(tp t)
 {
-    marker_ = t;
-    markerSrc_ = clockSrc_.getValue();
+    marker_ = t;                        // possibly tpInvalid
+    markerSrc_ = clockSrc_.getValue();  // possibly tpInvalid
     rolledOver_ = false;
 }
 

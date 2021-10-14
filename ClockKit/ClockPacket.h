@@ -95,19 +95,23 @@ class ClockPacket {
     // but is technically possible.
     inline dur rtt() const
     {
-        return clientReceiveTime_ - clientRequestTime_;
+        return diff(clientReceiveTime_, clientRequestTime_);
     }
 
     // Estimated offset between the client and server clocks.
     dur getClockOffset() const
     {
-        return serverReplyTime_ + getErrorBound() - clientReceiveTime_;
+        const auto bound = getErrorBound();
+        return serverReplyTime_ == tpInvalid || clientReceiveTime_ == tpInvalid || bound == durInvalid
+                   ? durInvalid
+                   : serverReplyTime_ - clientReceiveTime_ + bound;
     }
 
     // Error bound on the calculation of clock offset.
     inline dur getErrorBound() const
     {
-        return rtt() / 2;
+        const auto t = rtt();
+        return t == durInvalid ? durInvalid : t / 2;
     }
 
     // Dump this packet to STDOUT, for debugging.

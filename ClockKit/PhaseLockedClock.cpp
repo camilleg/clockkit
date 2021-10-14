@@ -66,11 +66,24 @@ void PhaseLockedClock::run(std::atomic_bool &end_clocks)
 
 void PhaseLockedClock::update()
 {
-    // This logic is brittle, because of how inSync_ is used and set willy-nilly.
-    if (inSync_ && primaryValue() > updatePrev_ + updatePanic_) {
-        // The previous update was too long ago.
+    if (updatePrev_ == tpInvalid) {
         inSync_ = false;
     }
+    else {
+        const auto pv = primaryValue();
+        if (pv == tpInvalid) {
+            inSync_ = false;
+        }
+        else {
+            // This logic is brittle, because of how inSync_ is used and set willy-nilly.
+            // pv, updatePrev_, and updatePanic_ are not invalid.
+            if (inSync_ && pv > updatePrev_ + updatePanic_) {
+                // The previous update was too long ago.
+                inSync_ = false;
+            }
+        }
+    }
+
     if (inSync_) {
         if (!updateClock())
             return;
@@ -99,12 +112,28 @@ bool PhaseLockedClock::updatePhase()
         inSync_ = false;
         return false;
     }
+    if (variableValue == tpInvalid) {
+#ifdef DEBUG
+        cout << "lost sync: problem with vfc_" << endl;
+#endif
+        inSync_ = false;
+        return false;
+    }
+    if (tmp == tpInvalid) {
+#ifdef DEBUG
+        cout << "lost sync: problem with primaryClock_" << endl;
+#endif
+        inSync_ = false;
+        return false;
+    }
 
+    // None of these are invalid, because their values come from the next 3 lines.
     phasePrev_ = phase_;
     variableValuePrev_ = variableValue_;
     primaryValuePrev_ = primaryValue_;
 
-    phase_ = phase;  // Not invalid, because that was just checked.
+    // We've checked that none of these are invalid.
+    phase_ = phase;
     variableValue_ = variableValue;
     primaryValue_ = tmp;
 
@@ -127,7 +156,7 @@ bool PhaseLockedClock::updateClock()
     if (phase_ > phasePanic_ || phase_ < -phasePanic_) {
         // The phase is too large.
 #ifdef DEBUG
-        cout << "lost sync: " << phase_ << " > " << phasePanic_ << endl;
+        cout << "lost sync: abs(" << phase_ << ") > " << phasePanic_ << endl;
 #endif
         inSync_ = false;
         return false;
@@ -135,11 +164,13 @@ bool PhaseLockedClock::updateClock()
 
     {
         // Measure referenceClock_'s elapsed time.
+        // We've checked that none of these are invalid.
         const auto referenceValuePrev = variableValuePrev_ + phasePrev_;
         const auto referenceValue = variableValue_ + phase_;
         const auto referenceElapsed = UsecFromDur(referenceValue - referenceValuePrev);
 
         // Estimate the primary clock's frequency.
+        // We've checked that none of these are invalid.
         // Average away noise with an IIR filter.
         const auto ticks = UsecFromDur(primaryValue_ - primaryValuePrev_);
         const auto primaryFrequency = ticks * 1000000.0 / referenceElapsed;
@@ -150,6 +181,7 @@ bool PhaseLockedClock::updateClock()
 #endif
 
     // Adjust the variable clock's frequency.
+    // phase_ isn't invalid.
     const auto phaseDiff = UsecFromDur(phase_) * 0.1;
     const auto frequencyDiff = 1000000.0 - primaryFrequencyAvg_;
     const auto variableClockFrequency = 1000000.0 + frequencyDiff + phaseDiff;

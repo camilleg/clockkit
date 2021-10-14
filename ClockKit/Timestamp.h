@@ -19,6 +19,7 @@ std::string timestampToString(tp);
 tp stringToTimestamp(const std::string&);
 
 // Read/write a 64 bit timestamp with proper byte ordering.
+// Convert xxxInvalid conventionally, without special treatment.
 std::array<std::byte, 8> timestampToBytes(tp);
 tp bytesToTimestamp(const std::byte*);
 
@@ -44,5 +45,16 @@ int64_t constexpr UsecFromDur(dur t)
 constexpr int64_t usecInvalid = std::numeric_limits<int64_t>::max();
 constexpr tp tpInvalid = TpFromUsec(usecInvalid);
 constexpr dur durInvalid = DurFromUsec(usecInvalid);
+
+// Avoid arithmetic with tpInvalid.
+#if 0
+// This compiles, but it recurses infinitely and thus overflows the stack.
+dur constexpr operator-(const tp a, const tp b)
+#else
+dur constexpr diff(const tp a, const tp b)
+#endif
+{
+    return a == tpInvalid || b == tpInvalid ? durInvalid : a - b;
+}
 
 }  // namespace dex

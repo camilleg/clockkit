@@ -24,7 +24,7 @@ ClockPacket::ClockPacket(Type t, seqnum n, tp crt)
 
 ClockPacket::ClockPacket(const std::byte* buffer)
     : sequenceNumber_(static_cast<seqnum>(buffer[1]))
-    , type_(static_cast<Type>(Type(buffer[0])))
+    , type_(static_cast<Type>(buffer[0]))
     , clientRequestTime_(bytesToTimestamp(buffer + 2))
     , serverReplyTime_(bytesToTimestamp(buffer + 10))
     , clientReceiveTime_(bytesToTimestamp(buffer + 18))

@@ -42,6 +42,7 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
 #endif
     constexpr auto length = ClockPacket::PACKET_LENGTH;
     std::byte buffer[length];
+    // getTimeout() isn't invalid.
     const auto timeoutMsec = std::max(1, getTimeout() / 1000);
 
     while (true) {
@@ -82,7 +83,8 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
 
         packet.setClientReceiveTime(now);
         const auto rtt = packet.rtt();
-        if (rtt > timeout_) {
+        // timeout_ isn't invalid.
+        if (rtt == durInvalid || rtt > timeout_) {
 #ifdef DEBUG
             cerr << "ignoring reply that arrived more than " << timeout_ << " usec later\n";
 #endif
