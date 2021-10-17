@@ -1,7 +1,9 @@
 #pragma once
-#include <cc++/socket.h>  // for ost::lotsastuff
 #include <map>
 #include <string>
+
+#define KISSNET_NO_EXCEP
+#include "kissnet.hpp"
 
 #include "Clock.h"
 
@@ -11,9 +13,9 @@ namespace dex {
 // It stores responses from the clients on the state of their synchronization.
 class ClockServer {
    private:
-    const ost::InetAddress addr_;
-    const int port_;
+    kissnet::endpoint addr_port_;
     Clock& clock_;
+    void updateEntry(const std::string& addr, dur offset, dur rtt, tp now);
 
     struct Entry {
         tp time;     // "Now."
@@ -43,7 +45,7 @@ class ClockServer {
     // Provide requests for timestamps to clients via a UDP port.
     // To accept connections from clients on *any* local address,
     // set InetAddress to 0.0.0.0.
-    ClockServer(ost::InetAddress addr, int port, Clock& clock);
+    ClockServer(kissnet::endpoint addr_port, Clock& clock);
 
     void setLogging(bool log)
     {
@@ -51,9 +53,6 @@ class ClockServer {
     }
 
     void run();
-
-   protected:
-    void updateEntry(const std::string& addr, dur offset, dur rtt);
 };
 
 }  // namespace dex

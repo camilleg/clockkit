@@ -22,12 +22,12 @@ ClockPacket::ClockPacket(Type t, seqnum n, tp crt)
 {
 }
 
-ClockPacket::ClockPacket(const std::byte* buffer)
+ClockPacket::ClockPacket(std::array<std::byte, PACKET_LENGTH> buffer)
     : sequenceNumber_(static_cast<seqnum>(buffer[1]))
     , type_(static_cast<Type>(buffer[0]))
-    , clientRequestTime_(bytesToTimestamp(buffer + 2))
-    , serverReplyTime_(bytesToTimestamp(buffer + 10))
-    , clientReceiveTime_(bytesToTimestamp(buffer + 18))
+    , clientRequestTime_(bytesToTimestamp(buffer.data() + 2))
+    , serverReplyTime_(bytesToTimestamp(buffer.data() + 10))
+    , clientReceiveTime_(bytesToTimestamp(buffer.data() + 18))
 {
 }
 
@@ -35,14 +35,9 @@ void ClockPacket::write(std::byte* buffer) const
 {
     buffer[0] = static_cast<std::byte>(type_);
     buffer[1] = static_cast<std::byte>(sequenceNumber_);
-    auto t = timestampToBytes(clientRequestTime_);
-    std::copy(t.begin(), t.end(), buffer + 2);
-
-    t = timestampToBytes(serverReplyTime_);
-    std::copy(t.begin(), t.end(), buffer + 10);
-
-    t = timestampToBytes(clientReceiveTime_);
-    std::copy(t.begin(), t.end(), buffer + 18);
+    timestampToBytes(clientRequestTime_, buffer + 2);
+    timestampToBytes(serverReplyTime_, buffer + 10);
+    timestampToBytes(clientReceiveTime_, buffer + 18);
 }
 
 const char* ClockPacket::getTypeName() const
@@ -53,10 +48,10 @@ const char* ClockPacket::getTypeName() const
 
 void ClockPacket::print() const
 {
-    std::cout << "--- PACKET ---"
-              << "\nclientRequestTime: " << timestampToString(clientRequestTime_)
-              << "\nserverReplyTime: " << timestampToString(serverReplyTime_)
-              << "\nclientReceiveTime: " << timestampToString(clientReceiveTime_) << std::endl;
+    std::cout << "--- Packet " << getTypeName() << " ---"
+              << "\n  clientRequestTime " << timestampToString(clientRequestTime_) << "\n    serverReplyTime "
+              << timestampToString(serverReplyTime_) << "\n  clientReceiveTime "
+              << timestampToString(clientReceiveTime_) << std::endl;
 }
 
 }  // namespace dex

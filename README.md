@@ -15,16 +15,16 @@ quickly churning set of other sensors and outputs, for over a decade.
 Clockkit was published in 2004 on [http://zx81.isl.uiuc.edu/camilleg/clockkit](https://web.archive.org/web/20041205064911/http://zx81.isl.uiuc.edu/camilleg/dsceu04.pdf) (defunct).  
 It was revised and moved to GitHub in 2020.
 
-The source code is licensed under the [Creative Commons 2.0 Attribution License](http://creativecommons.org/licenses/by/2.0).
+The source code is licensed under the [MIT License](https://mit-license.org/).
 
 ## To install:
 
 #### Ubuntu 20:
-`sudo apt install make g++ libcommoncpp2-dev swig tcl8.6-dev libpython3.8-dev ruby ruby2.7-dev`  
+`sudo apt install make g++ swig tcl8.6-dev libpython3.8-dev ruby ruby2.7-dev`  
 `cd ClockKit && make`
 
 #### Ubuntu 18:<br>Raspberry Pi 3 and 4 (Debian/Raspbian):
-`sudo apt install make g++ libcommoncpp2-dev swig tcl tcl8.6-dev libpython3.8-dev ruby ruby2.5-dev`  
+`sudo apt install make g++ swig tcl tcl8.6-dev libpython3.8-dev ruby ruby2.5-dev`  
 `cd ClockKit && make`
 
 #### Windows 10:

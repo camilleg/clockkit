@@ -1,6 +1,8 @@
 #pragma once
-#include <cc++/socket.h>
 #include <limits>
+
+#define KISSNET_NO_EXCEP
+#include "kissnet.hpp"
 
 #include "Clock.h"
 #include "ClockPacket.h"
@@ -22,7 +24,7 @@ namespace dex {
 class ClockClient : public Clock {
    public:
     // Connect to a host and port.
-    explicit ClockClient(ost::InetHostAddress addr, int port);
+    explicit ClockClient(kissnet::endpoint);
 
     ~ClockClient()
     {
@@ -79,9 +81,9 @@ class ClockClient : public Clock {
 
     dur timeout_;  // The max error on phase calculations.
     dur rtt_;      // The previous call's round trip time.
-    unsigned char sequence_;
+    seqnum sequence_;
     bool acknowledge_;
-    ost::UDPSocket* socket_;
+    kissnet::udp_socket* socket_;
 
     bool sendPacket(const ClockPacket&) const;
 

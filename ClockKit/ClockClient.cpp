@@ -9,50 +9,59 @@ using namespace std::chrono;
 
 namespace dex {
 
-ClockClient::ClockClient(ost::InetHostAddress addr, int port)
+ClockClient::ClockClient(kissnet::endpoint addr_port)
     : timeout_(1000)
     , rtt_(0u)
     , sequence_(0)
     , acknowledge_(false)
-
-    // On Linux, 0 picks the next free port.  If eventually another
-    // OS doesn't, then pass localPort in as an arg to this constructor,
-    // from a localPort:5678 line in the config file.
-    , socket_{new ost::UDPSocket(ost::InetAddress("0.0.0.0"), 0)}
+    , socket_{new kissnet::udp_socket(addr_port)}
 {
-    // Set the destination address.
-    socket_->setPeer(addr, port);
 }
 
 bool ClockClient::sendPacket(const ClockPacket& packet) const
 {
-#ifdef DEBUG
-    cerr << "\nsending " << packet.getTypeName() << "\n";
-#endif
     constexpr auto length = ClockPacket::PACKET_LENGTH;
     std::byte buffer[length];
     packet.write(buffer);
-    return socket_->send(buffer, length) == length;
+#ifdef DEBUG
+    cerr << "\nsending " << packet.getTypeName() << "\n";
+#endif
+    const auto [num_bytes, status] = socket_->send(buffer, length);
+    if (status != kissnet::socket_status::valid) {
+        cerr << "problem sending a packet\n";
+        return false;
+    }
+    if (num_bytes != length) {
+        cerr << "sent incomplete packet\n";
+        return false;
+    }
+#ifdef DEBUG
+    cerr << "sent\n";
+    packet.print();
+#endif
+    return true;
 }
 
 ClockPacket ClockClient::receivePacket(Clock& clock)
 {
-#ifdef DEBUG
-    cerr << "expecting...\n";
-#endif
     constexpr auto length = ClockPacket::PACKET_LENGTH;
-    std::byte buffer[length];
+    kissnet::buffer<length> buffer;
     // getTimeout() isn't invalid.
     const auto timeoutMsec = std::max(1, getTimeout() / 1000);
-
     while (true) {
-        if (!socket_->isPending(ost::Socket::pendingInput, timeoutMsec)) {
+        auto ok = socket_->select(kissnet::fds_read, timeoutMsec);
+        if (ok.get_value() == kissnet::socket_status::timed_out) {
 #ifdef DEBUG
             cerr << "timed out waiting for packet after " << timeoutMsec << " ms\n";
 #endif
             return ClockPacket();
         }
-        if (socket_->receive(buffer, length) != length) {
+        auto [num_bytes, status] = socket_->recv(buffer);
+        if (status != kissnet::socket_status::valid) {
+            cerr << "received no packet\n";
+            return ClockPacket();
+        }
+        if (num_bytes != length) {
 #ifdef DEBUG
             cerr << "ignoring wrong-length packet\n";
 #endif
@@ -69,8 +78,7 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
         }
         if (packet.sequenceNumber_ != sequence_) {
 #ifdef DEBUG
-            cerr << "ignoring out-of-order packet " << int(packet.sequenceNumber_) << "; expected " << int(sequence_)
-                 << "\n";
+            cerr << "ignoring out-of-order packet " << packet.sequenceNumber_ << "; expected " << sequence_ << "\n";
 #endif
             continue;
         }
@@ -86,7 +94,7 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
         // timeout_ isn't invalid.
         if (rtt == durInvalid || rtt > timeout_) {
 #ifdef DEBUG
-            cerr << "ignoring reply that arrived more than " << timeout_ << " usec later\n";
+            cerr << "ignoring reply that arrived more than " << UsecFromDur(timeout_) << " usec later\n";
 #endif
             return ClockPacket();
         }

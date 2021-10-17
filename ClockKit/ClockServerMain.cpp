@@ -1,4 +1,3 @@
-#include <cc++/socket.h>  // Only for ost::InetAddress.
 #include <cstdlib>
 
 #include "ClockServer.h"
@@ -22,7 +21,7 @@ int main(int argc, char* argv[])
 #else
     auto& clock(dex::HighResolutionClock::instance());
 #endif
-    dex::ClockServer server(ost::InetAddress("0.0.0.0"), port, clock);
+    dex::ClockServer server(kissnet::endpoint("0.0.0.0", port), clock);
     server.setLogging(true);
     server.run();
     return 0;

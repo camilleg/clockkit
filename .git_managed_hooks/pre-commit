@@ -6,7 +6,7 @@ if test $(git diff --cached --name-only $against | wc -c) != 0; then
     # The commit has files added, so format them.
     for FILE in $(git diff --cached --name-only)
     do
-        # Reformat only C++, and only files that weren't deleted.
+        # Reformat only C++, and only files that weren't deleted, and not kissnet.hpp.
         if [[ "$FILE" =~ \.(cpp|h)$ && -f "$FILE" ]]; then
             old=$(mktemp /tmp/clockkit.XXXXXX)
             cp "$FILE" "$old"

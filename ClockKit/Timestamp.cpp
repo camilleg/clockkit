@@ -1,11 +1,5 @@
 #include "Timestamp.h"
 
-// May include endian.h.  Defines __BYTE_ORDER and __BIG_ENDIAN.
-#include <cc++/config.h>
-//#if defined(__GLIBC__)
-//#include <endian.h>
-//#endif
-
 #include <cstddef>
 #include <cstdio>
 #include <cstring>
@@ -42,20 +36,20 @@ tp stringToTimestamp(const std::string& s)
 
 union timestampBytes {
     int64_t t;
-    std::array<std::byte, 8> bytes;
+    std::byte bytes[8];
 };
 
-std::array<std::byte, 8> timestampToBytes(tp point)
+void timestampToBytes(tp point, std::byte* buffer)
 {
     timestampBytes u;
     u.t = REORDER(UsecFromTp(point));
-    return u.bytes;
+    std::memcpy(buffer, u.bytes, 8);
 }
 
 tp bytesToTimestamp(const std::byte* buffer)
 {
     timestampBytes u;
-    std::memcpy(u.bytes.data(), buffer, 8);
+    std::memcpy(u.bytes, buffer, 8);
     return TpFromUsec(REORDER(u.t));
 }
 

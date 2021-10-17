@@ -3,6 +3,8 @@
 
 namespace dex {
 
+using seqnum = uint8_t;
+
 // UDP packet used with ClockServer and ClockClient.
 class ClockPacket {
    public:
@@ -25,7 +27,6 @@ class ClockPacket {
     // this detects packets as much as 25 seconds late,
     // which is much larger than the typical tolerance of a fraction of a second.)
     // Using more than a byte would be a breaking change for the packet format.
-    using seqnum = uint8_t;
     const seqnum sequenceNumber_;
 
    private:
@@ -38,7 +39,7 @@ class ClockPacket {
     explicit ClockPacket(Type t, seqnum seqNum = 0, tp clientRequestTime = tpInvalid);
 
     // Unpack buffer into member variables.
-    explicit ClockPacket(const std::byte* buffer);
+    explicit ClockPacket(std::array<std::byte, PACKET_LENGTH>);
 
     // Invalid.
     explicit ClockPacket();

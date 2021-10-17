@@ -20,7 +20,7 @@ tp stringToTimestamp(const std::string&);
 
 // Read/write a 64 bit timestamp with proper byte ordering.
 // Convert xxxInvalid conventionally, without special treatment.
-std::array<std::byte, 8> timestampToBytes(tp);
+void timestampToBytes(tp, std::byte*);
 tp bytesToTimestamp(const std::byte*);
 
 dur constexpr DurFromUsec(int64_t t)

@@ -1,6 +1,6 @@
 #include "ConfigReader.h"
 
-#include <iostream>
+#include <fstream>
 
 #include "HighResolutionClock.h"
 
@@ -26,12 +26,6 @@ bool ConfigReader::readFrom(const char* filename)
         return false;
     }
 
-    char server[1000] = "localhost";
-    auto port = defaultPort;
-    auto timeout = defaultTimeout;
-    auto phasePanic = defaultPhasePanic;
-    auto updatePanic = defaultUpdatePanic;
-
     auto foundServer = false;
     auto foundPort = false;
     auto foundTimeout = false;
@@ -42,7 +36,7 @@ bool ConfigReader::readFrom(const char* filename)
     char dummy[1000];
     while (std::getline(file, line)) {
         const char* pch = line.c_str();
-        if (sscanf(pch, " %s", dummy) == EOF)  // Blank or empty line.
+        if (sscanf(pch, " %s", dummy) == EOF)  // Blank or empty.
             continue;
         if (sscanf(pch, " %[#]", dummy) == 1)  // Comment.
             continue;
@@ -51,43 +45,27 @@ bool ConfigReader::readFrom(const char* filename)
         SSCANF("%u", "timeout", &timeout, foundTimeout);
         SSCANF("%u", "phasePanic", &phasePanic, foundPhasepanic);
         SSCANF("%u", "updatePanic", &updatePanic, foundUpdatepanic);
-        std::cerr << "Config file " << filename << " has syntax error: " << line << "\n";
+        std::cerr << "Syntax error in config file " << filename << ": " << line << "\n";
         return false;
     }
-
-    // Update, probably from the defaults, whichever values were in the file.
-    if (foundServer)
-        this->server = server;
-    if (foundPort)
-        this->port = port;
-    if (foundTimeout)
-        this->timeout = timeout;
-    if (foundPhasepanic)
-        this->phasePanic = phasePanic;
-    if (foundUpdatepanic)
-        this->updatePanic = updatePanic;
     return true;
 }
 
 PhaseLockedClock* ConfigReader::buildClock()
 {
-    const ost::InetHostAddress addr(this->server.c_str());
-    client_ = new ClockClient(addr, this->port);
-    client_->setTimeout(this->timeout);
+    client_ = new ClockClient(kissnet::endpoint(server, port));
+    client_->setTimeout(timeout);
     client_->setAcknowledge(true);
-    PhaseLockedClock* plc = new PhaseLockedClock(HighResolutionClock::instance(), *client_);
-    plc->setPhasePanic(DurFromUsec(this->phasePanic));
-    plc->setUpdatePanic(DurFromUsec(this->updatePanic));
+    auto plc = new PhaseLockedClock(HighResolutionClock::instance(), *client_);
+    plc->setPhasePanic(DurFromUsec(phasePanic));
+    plc->setUpdatePanic(DurFromUsec(updatePanic));
     return plc;
 }
 
 void ConfigReader::print()
 {
-    std::cout << "config [server:" << server << "]\n"
-              << "config [port:" << port << "]\n"
-              << "config [timeout:" << timeout << "]\n"
-              << "config [phasePanic:" << phasePanic << "]\n"
-              << "config [updatePanic:" << updatePanic << "]" << std::endl;
+    std::cout << "config:\n  server: " << server << "\n  port: " << port << "\n  timeout: " << timeout
+              << " μs\n  phasePanic: " << phasePanic << " μs\n  updatePanic: " << updatePanic << " μs" << std::endl;
 }
 
 }  // namespace dex

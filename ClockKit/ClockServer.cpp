@@ -10,9 +10,8 @@ using namespace std::chrono;
 
 namespace dex {
 
-ClockServer::ClockServer(ost::InetAddress addr, int port, Clock& clock)
-    : addr_(addr)
-    , port_(port)
+ClockServer::ClockServer(kissnet::endpoint addr_port, Clock& clock)
+    : addr_port_(addr_port)
     , clock_(clock)
     , ackData_{map<string, Entry>()}
     , log_(false)
@@ -25,56 +24,81 @@ void ClockServer::run()
     if (log_)
         cout << "time                     host    \toffset\tround-trip-time" << endl;
     constexpr auto length = ClockPacket::PACKET_LENGTH;
-    std::byte buffer[length];
-    ost::UDPSocket socket(addr_, port_);
+    kissnet::buffer<length> buffer;
+    kissnet::udp_socket socket(addr_port_);
+    socket.bind();
 
-    while (socket.isPending(ost::Socket::pendingInput, TIMEOUT_INF)) {
+    for (;;) {
+        switch (socket.select(0x1 /*fds_read*/, std::numeric_limits<int64_t>::max()).value) {
+            case kissnet::socket_status::errored:
+                cerr << "error waiting for packet\n";
+                continue;
+            case kissnet::socket_status::valid:;  // cerr << "We have something to recv.\n";
+#if 0
+	case kissnet::socket_status::timed_out:
+	    cerr << "timed out waiting for packet for 293,000 years\n";
+	    continue;
+#endif
+            default:
+                break;
+        }
+
         const auto now = clock_.getValue();  // Before anything else.
         if (now == tpInvalid) {
             // Very unlikely, for std::chrono::system_clock::now().
             cerr << "ClockServer's clock is corrupt.\n";
             continue;
         }
-        const ost::InetAddress peer = socket.getPeer();  // also sets up the socket to send back to the sender
-        if (socket.receive(buffer, length) != length) {
-            cerr << "ClockServer ignored packet with wrong length.\n";
+        kissnet::addr_collection peer;
+        const auto [num_bytes, status] = socket.recv(buffer, 0, &peer);
+        const auto peer2 = socket.get_recv_endpoint();  // Same as peer.
+        if (status != 0x1 /*valid*/) {
+            cerr << "ClockServer had problems receiving a packet; status " << status << "\n";
+            continue;
+        }
+        if (num_bytes != length) {
+            cerr << "ClockServer ignored packet with wrong length " << num_bytes << ".\n";
             continue;
         }
         ClockPacket packet(buffer);
+        // cout << "got "; packet.print();
         switch (packet.getType()) {
             case ClockPacket::REQUEST:
                 packet.setType(ClockPacket::REPLY);
                 packet.setServerReplyTime(now);
-                packet.write(buffer);
-                if (socket.send(buffer, length) != length)
-                    cerr << "ClockServer sent incomplete packet.\n";
-                break;
+                // cout << "srv replying: "; packet.print();
+                packet.write(buffer.data());
+                {
+                    const auto [num_bytes, status] = socket.send(buffer, length, &peer);
+                    if (status != kissnet::socket_status::valid)
+                        cerr << "ClockServer had problems sending a packet; status " << status << "\n";
+                    if (num_bytes != length)
+                        cerr << "ClockServer sent incomplete packet.\n";
+                    // cout << "sent to " << peer2.address << ":" << peer2.port << "\n";
+                    break;
+                }
             case ClockPacket::ACKNOWLEDGE:
-                updateEntry(peer.getHostname(), packet.getClockOffset(), packet.rtt());
+                // CC++ printed localhost as "localhost", unlike kissnet's "127.0.0.1."
+                // But no test cases used that.
+                updateEntry(peer2.address, packet.getClockOffset(), packet.rtt(), now);
                 break;
             case ClockPacket::KILL:
                 return;
             default:
-                cerr << "ClockServer ignored packet with unknown type.\n";
+                cerr << "ClockServer ignored packet with unexpected type " << packet.getTypeName() << ".\n";
         }
     }
 }
 
-void ClockServer::updateEntry(const string& addr, dur offset, dur rtt)
+void ClockServer::updateEntry(const string& addr, dur offset, dur rtt, tp now)
 {
     if (!log_)
         return;
-    const auto now = clock_.getValue();
-    if (now == tpInvalid) {
-        // Very unlikely, for std::chrono::system_clock::now().
-        cerr << "ClockServer's clock is corrupt.\n";
-        return;
-    }
     const auto nowStr = timestampToString(now);
     cout << nowStr << ' ' << addr << '\t' << UsecFromDur(offset) << '\t' << UsecFromDur(rtt) << endl;
     ackData_[addr] = Entry(now, offset, rtt);
 
-    if (now < tRecalculated_ + 250ms)
+    if (now < tRecalculated_ + 500ms)
         return;
     tRecalculated_ = now;
 

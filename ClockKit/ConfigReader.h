@@ -30,7 +30,7 @@ class ConfigReader {
     ConfigReader(const ConfigReader&) = delete;
     ConfigReader& operator=(const ConfigReader&) = delete;
 
-    std::string server;
+    char server[1000];
     unsigned port;
     unsigned timeout;      // usec
     unsigned phasePanic;   // usec
