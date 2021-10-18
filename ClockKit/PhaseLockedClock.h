@@ -19,7 +19,7 @@ class PhaseLockedClock : public Clock {
     ~PhaseLockedClock() = default;
 
     // Kill the referenceClock_, which is likely a ClockClient, and its ClockServer.
-    void die()
+    void die() const
     {
         referenceClock_.die();
     }
