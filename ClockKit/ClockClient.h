@@ -41,7 +41,7 @@ class ClockClient : public Clock {
     {
         return UsecFromDur(timeout_);
     }
-    inline void setTimeout(int usec)
+    inline void setTimeout(int64_t usec)
     {
         if (usec != usecInvalid)
             timeout_ = DurFromUsec(usec);
