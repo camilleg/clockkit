@@ -69,7 +69,7 @@ void ClockServer::run()
                 packet.setType(ClockPacket::REPLY);
                 packet.setServerReplyTime(now);
                 // cout << "srv replying: "; packet.print();
-                packet.write(buffer.data());
+                packet.write(buffer);
                 {
                     const auto [num_bytes, status] = socket.send(buffer, length, &peer);
                     if (status != kissnet::socket_status::valid)

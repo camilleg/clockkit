@@ -20,18 +20,17 @@ ClockClient::ClockClient(kissnet::endpoint addr_port)
 
 bool ClockClient::sendPacket(const ClockPacket& packet) const
 {
-    constexpr auto length = ClockPacket::PACKET_LENGTH;
-    std::byte buffer[length];
+    ClockPacket::packetbuf buffer;
     packet.write(buffer);
 #ifdef DEBUG
     cerr << "\nsending " << packet.getTypeName() << "\n";
 #endif
-    const auto [num_bytes, status] = socket_->send(buffer, length);
+    const auto [num_bytes, status] = socket_->send(buffer);
     if (status != kissnet::socket_status::valid) {
         cerr << "problem sending a packet\n";
         return false;
     }
-    if (num_bytes != length) {
+    if (num_bytes != ClockPacket::PACKET_LENGTH) {
         cerr << "sent incomplete packet\n";
         return false;
     }
@@ -44,8 +43,7 @@ bool ClockClient::sendPacket(const ClockPacket& packet) const
 
 ClockPacket ClockClient::receivePacket(Clock& clock)
 {
-    constexpr auto length = ClockPacket::PACKET_LENGTH;
-    kissnet::buffer<length> buffer;
+    ClockPacket::packetbuf buffer;
     // getTimeout() isn't invalid.
     const auto timeoutMsec = std::max(1, getTimeout() / 1000);
     while (true) {
@@ -66,7 +64,7 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
             cerr << "got no packet: status " << status << "\n";
             return ClockPacket();
         }
-        if (num_bytes != length) {
+        if (num_bytes != ClockPacket::PACKET_LENGTH) {
 #ifdef DEBUG
             cerr << "ignored wrong-length packet\n";
 #endif
