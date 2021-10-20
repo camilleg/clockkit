@@ -20,11 +20,11 @@ The source code is licensed under the [MIT License](https://mit-license.org/).
 ## To install:
 
 #### Ubuntu 20:
-`sudo apt install make g++ swig tcl8.6-dev libpython3.8-dev pkg-config ruby ruby2.7-dev`  
+`sudo apt install make g++ psmisc swig tcl8.6-dev libpython3.8-dev pkg-config ruby ruby2.7-dev`  
 `cd ClockKit && make`
 
 #### Ubuntu 18:<br>Raspberry Pi 3 and 4 (Debian/Raspbian):
-`sudo apt install make g++ swig tcl tcl8.6-dev libpython3.8-dev pkg-config ruby ruby2.5-dev`  
+`sudo apt install make g++ psmisc swig tcl tcl8.6-dev libpython3.8-dev pkg-config ruby ruby2.5-dev`  
 `cd ClockKit && make`
 
 #### Windows 10:
