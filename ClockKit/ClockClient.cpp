@@ -49,21 +49,26 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
     // getTimeout() isn't invalid.
     const auto timeoutMsec = std::max(1, getTimeout() / 1000);
     while (true) {
-        auto ok = socket_->select(kissnet::fds_read, timeoutMsec);
-        if (ok.get_value() == kissnet::socket_status::timed_out) {
+        switch (socket_->select(kissnet::fds_read, timeoutMsec).value) {
+            case kissnet::socket_status::errored:
+                cerr << "error waiting for packet\n";
+                return ClockPacket();
+            case kissnet::socket_status::timed_out:
 #ifdef DEBUG
-            cerr << "timed out waiting for packet after " << timeoutMsec << " ms\n";
+                cerr << "timed out waiting for packet after " << timeoutMsec << " ms\n";
 #endif
-            return ClockPacket();
+                return ClockPacket();
+            default:
+                break;
         }
-        auto [num_bytes, status] = socket_->recv(buffer);
+        const auto [num_bytes, status] = socket_->recv(buffer);
         if (status != kissnet::socket_status::valid) {
-            cerr << "received no packet\n";
+            cerr << "got no packet: status " << status << "\n";
             return ClockPacket();
         }
         if (num_bytes != length) {
 #ifdef DEBUG
-            cerr << "ignoring wrong-length packet\n";
+            cerr << "ignored wrong-length packet\n";
 #endif
             return ClockPacket();
         }
@@ -78,13 +83,13 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
         }
         if (packet.sequenceNumber_ != sequence_) {
 #ifdef DEBUG
-            cerr << "ignoring out-of-order packet " << packet.sequenceNumber_ << "; expected " << sequence_ << "\n";
+            cerr << "ignored out-of-order packet " << packet.sequenceNumber_ << "; expected " << sequence_ << "\n";
 #endif
             continue;
         }
         if (packet.getType() != ClockPacket::REPLY) {
 #ifdef DEBUG
-            cerr << "ignoring non-reply packet\n";
+            cerr << "ignored non-reply packet of type " << packet.getTypeName() << "\n";
 #endif
             continue;
         }
@@ -94,7 +99,7 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
         // timeout_ isn't invalid.
         if (rtt == durInvalid || rtt > timeout_) {
 #ifdef DEBUG
-            cerr << "ignoring reply that arrived more than " << UsecFromDur(timeout_) << " usec later\n";
+            cerr << "ignoring reply that arrived more than " << UsecFromDur(timeout_) << " μs later\n";
 #endif
             return ClockPacket();
         }

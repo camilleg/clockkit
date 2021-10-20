@@ -29,15 +29,17 @@ void ClockServer::run()
     socket.bind();
 
     for (;;) {
-        switch (socket.select(0x1 /*fds_read*/, std::numeric_limits<int64_t>::max()).value) {
+        constexpr auto timeoutMsec = std::numeric_limits<int64_t>::max();
+        switch (socket.select(kissnet::fds_read, timeoutMsec).value) {
             case kissnet::socket_status::errored:
                 cerr << "error waiting for packet\n";
                 continue;
-            case kissnet::socket_status::valid:;  // cerr << "We have something to recv.\n";
 #if 0
-	case kissnet::socket_status::timed_out:
-	    cerr << "timed out waiting for packet for 293,000 years\n";
-	    continue;
+            case kissnet::socket_status::valid:
+		break;  // cerr << "We have something to recv.\n";
+	    case kissnet::socket_status::timed_out:
+		cerr << "timed out waiting for packet for 293,000 years\n";
+		continue;
 #endif
             default:
                 break;
@@ -51,15 +53,15 @@ void ClockServer::run()
         }
         kissnet::addr_collection peer;
         const auto [num_bytes, status] = socket.recv(buffer, 0, &peer);
-        const auto peer2 = socket.get_recv_endpoint();  // Same as peer.
-        if (status != 0x1 /*valid*/) {
-            cerr << "ClockServer had problems receiving a packet; status " << status << "\n";
+        if (status != kissnet::socket_status::valid) {
+            cerr << "got no packet: status " << status << "\n";
             continue;
         }
         if (num_bytes != length) {
-            cerr << "ClockServer ignored packet with wrong length " << num_bytes << ".\n";
+            cerr << "ignored packet with wrong length " << num_bytes << ".\n";
             continue;
         }
+        const auto peer2 = socket.get_recv_endpoint();  // Same as peer.
         ClockPacket packet(buffer);
         // cout << "got "; packet.print();
         switch (packet.getType()) {
