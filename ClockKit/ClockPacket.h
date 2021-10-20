@@ -1,6 +1,9 @@
 #pragma once
 #include "Timestamp.h"
 
+#define KISSNET_NO_EXCEP
+#include "kissnet.hpp"
+
 namespace dex {
 
 using seqnum = uint8_t;
@@ -21,6 +24,7 @@ class ClockPacket {
     // - 3 timestamps : 8 bytes each
     // - total : 26 bytes
     enum { PACKET_LENGTH = 26 };
+    using packetbuf = kissnet::buffer<PACKET_LENGTH>;
 
     // Detects out-of-order packets and thus delayed responses.
     // (A byte isn't too small, because even at 10 packets per second,
@@ -39,13 +43,13 @@ class ClockPacket {
     explicit ClockPacket(Type t, seqnum seqNum = 0, tp clientRequestTime = tpInvalid);
 
     // Unpack buffer into member variables.
-    explicit ClockPacket(std::array<std::byte, PACKET_LENGTH>);
+    explicit ClockPacket(const packetbuf& buffer);
 
     // Invalid.
     explicit ClockPacket();
 
-    // Write member variables to a buffer of PACKET_LENGTH bytes.
-    void write(std::byte* buffer) const;
+    // Write member variables to bytes.
+    void write(packetbuf&) const;
 
     inline Type getType() const
     {

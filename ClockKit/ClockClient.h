@@ -1,9 +1,6 @@
 #pragma once
 #include <limits>
 
-#define KISSNET_NO_EXCEP
-#include "kissnet.hpp"
-
 #include "Clock.h"
 #include "ClockPacket.h"
 
