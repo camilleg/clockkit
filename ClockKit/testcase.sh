@@ -2,6 +2,8 @@
 
 # Ensure that one server and one client run, and print plausible output.
 
+. test-common.sh
+
 if [[ $# -ge 1 ]]; then
   port=$1
 else
@@ -15,12 +17,12 @@ conf=$(mktemp /tmp/clockkit.XXXXXX)
 trap "rm -f $srv $cli $conf" 0 2 3 15
 
 sed "s/^port:.*/port:$port/" < clockkit.conf > $conf
-killall -q -w ckserver ckphaselock
+nuke ckserver ckphaselock
 ./ckserver $port > $srv &
 ./ckphaselock $conf 3 > $cli
-a=$(tail -10 $srv | grep -c -P '<time \d+ +\d+>\s')
-b=$(tail -20 $cli | grep -c -P '<time \d+ +\d+>')
-c=$(tail -20 $cli | grep -c -P 'offset: [-\d]+')
+a=$(tail -10 $srv | grepregex '<time \d+ +\d+>\s')
+b=$(tail -20 $cli | grepregex '<time \d+ +\d+>')
+c=$(tail -20 $cli | grepregex 'offset: [-\d]+')
 if [[ "$a" != "10" ]]; then
   echo "$0: unexpected output from srv:" >&2
   cat $srv >&2

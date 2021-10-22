@@ -10,6 +10,8 @@
 # For a simpler example of syncing two hosts,
 # in README.md see the section "To sync host B to host A."
 
+. test-common.sh
+
 if [[ $# -ne 1 ]]; then
   echo "usage: $0 <configfile.sh>" >&2
   exit 1
@@ -30,16 +32,16 @@ sed -e "s/^server:.*/server:$host/" \
     -e "s/^port:.*/port:$port/" \
     -e "s/^timeout:.*/timeout:${timeout_msec}000/" \
     < clockkit.conf > $conf
-killall -q -w ckphaselock
+nuke ckphaselock
 ssh="ssh -p $sshport -o ConnectTimeout=2 $host" # Abort after 2 seconds.
 ./ckphaselock $conf 0 > /dev/null # Kill any ckserver already listening to $host:$port.
 $ssh $dirRemote/ckserver $port > $srv &
 sleep 1.8 # Reduce timeouts during startup.
 ./ckphaselock $conf 5 > $cli
 # If firewalls block packets, then ckserver hears nothing.
-a=$(tail -10 $srv | grep -c -P '<time \d+ +\d+>\s')
-b=$(tail -20 $cli | grep -c -P '<time \d+ +\d+>')
-c=$(tail -20 $cli | grep -c -P 'offset: [-\d]+')
+a=$(tail -10 $srv | grepregex '<time \d+ +\d+>\s')
+b=$(tail -20 $cli | grepregex '<time \d+ +\d+>')
+c=$(tail -20 $cli | grepregex 'offset: [-\d]+')
 if [[ "$a $b $c" != "10 10 10" ]]; then
   echo "$0 $1: unexpected outputs" >&2
   # Save the output, to debug.
@@ -72,7 +74,7 @@ fi
 
 # The final offset's abs() should be small.
 a=$(( $(grep offset $cli | tail -1 | ./parse.rb offset) ))
-if [[ $a -gt 10000 ]]; then
+if [[ $a -gt 100000 ]]; then
   echo "$0 $1: final offset $a too large" >&2
   exit 1
 fi
