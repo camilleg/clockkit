@@ -24,35 +24,19 @@ void ClockServer::run()
     if (log_)
         cout << "time                     host    \toffset\tround-trip-time" << endl;
     constexpr auto length = ClockPacket::PACKET_LENGTH;
-    kissnet::buffer<length> buffer;
+    ClockPacket::packetbuf buffer;
     kissnet::udp_socket socket(addr_port_);
     socket.bind();
 
     for (;;) {
-        constexpr auto timeoutMsec = std::numeric_limits<int64_t>::max();
-        switch (socket.select(kissnet::fds_read, timeoutMsec).value) {
-            case kissnet::socket_status::errored:
-                cerr << "error waiting for packet\n";
-                continue;
-#if 0
-            case kissnet::socket_status::valid:
-		break;  // cerr << "We have something to recv.\n";
-	    case kissnet::socket_status::timed_out:
-		cerr << "timed out waiting for packet for 293,000 years\n";
-		continue;
-#endif
-            default:
-                break;
-        }
-
+        kissnet::addr_collection peer;
+        const auto [num_bytes, status] = socket.recv(buffer, 0, &peer);
         const auto now = clock_.getValue();  // Before anything else.
         if (now == tpInvalid) {
             // Very unlikely, for std::chrono::system_clock::now().
             cerr << "ClockServer's clock is corrupt.\n";
             continue;
         }
-        kissnet::addr_collection peer;
-        const auto [num_bytes, status] = socket.recv(buffer, 0, &peer);
         if (status != kissnet::socket_status::valid) {
             cerr << "got no packet: status " << status << "\n";
             continue;
