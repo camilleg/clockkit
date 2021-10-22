@@ -84,32 +84,32 @@ ckserver: ClockServerMain.cpp $(OBJS)
 ckphaselock: PhaseLockMain.cpp $(OBJS)
 	$(CPP) $(CFLAGS) $^ $(LIBS) -o $@
 
-python/wrap.c: clockkit.h
+python/wrap.cpp: clockkit.h
 	$(SWIG) -python -o $@ clockkit.h
-python/wrap.o: python/wrap.c
+python/wrap.o: python/wrap.cpp
 	$(CPP) -c $(CFLAGS) -I. $$(pkg-config --cflags $(PYTHON)) $? -o $@
 python/_clockkit.so: python/wrap.o $(OBJS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
-tcl/wrap.c: clockkit.h
+tcl/wrap.cpp: clockkit.h
 	$(SWIG) -tcl -o $@ clockkit.h
-tcl/wrap.o: tcl/wrap.c
+tcl/wrap.o: tcl/wrap.cpp
 	$(CPP) -c $(CFLAGS) -I. -I/usr/include/tcl8.6 $? -o $@
 tcl/clockkit.so: tcl/wrap.o $(OBJS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
 # The sed casts _wrap_ck's to (VALUE (*)(...)) in lines starting with rb_define_module_function.
 # -Wno-register is for Ubuntu 18, whose Ruby 2.5's .h files use C++17-illegal "register".
-ruby/wrap.c: clockkit.h
+ruby/wrap.cpp: clockkit.h
 	$(SWIG) -ruby -o $@ clockkit.h
 	sed -i -e "s/ _wrap_ck/ (VALUE (*)(...))_wrap_ck/" $@
-ruby/wrap.o: ruby/wrap.c
+ruby/wrap.o: ruby/wrap.cpp
 	$(CPP) -c $(CFLAGS) -Wno-pedantic -Wno-register -I. $$(pkg-config --cflags $(RUBY)) $? -o $@
 ruby/clockkit.so: ruby/wrap.o $(OBJS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
 clean:
-	rm -rf $(EXES) $(SWIGEXES) $(OBJS) .depend */wrap.o */wrap.c python/clockkit.py *.gcno *.gcov
+	rm -rf $(EXES) $(SWIGEXES) $(OBJS) .depend */wrap.o */wrap.cpp python/clockkit.py *.gcno *.gcov
 
 purge: clean
 	rm -rf *.gcda
