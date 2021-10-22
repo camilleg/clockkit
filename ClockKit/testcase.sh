@@ -1,7 +1,6 @@
 #!/bin/bash
+
 # Ensure that one server and one client run, and print plausible output.
-# Fancier tests would run more clients, parse the outputs,
-# and measure how close they are.
 
 if [[ $# -ge 1 ]]; then
   port=$1
@@ -22,8 +21,14 @@ killall -q -w ckserver ckphaselock
 a=$(tail -10 $srv | grep -c -P '<time \d+ +\d+>\s')
 b=$(tail -20 $cli | grep -c -P '<time \d+ +\d+>')
 c=$(tail -20 $cli | grep -c -P 'offset: [-\d]+')
-if [[ "$a $b $c" != "10 10 10" ]]; then
-  echo "$0: unexpected outputs" >&2
+if [[ "$a" != "10" ]]; then
+  echo "$0: unexpected output from srv:" >&2
+  cat $srv >&2
+  exit 1
+fi
+if [[ "$b $c" != "10 10" ]]; then
+  echo "$0: unexpected output from cli:" >&2
+  cat $cli >&2
   exit 1
 fi
 
@@ -35,20 +40,19 @@ b=$(( $(tail -1 $cli | ./parse.rb time) ))
 diff=$(( $a - $b ))
 diffAbs=$(( ${diff#-} )) # Get absolute value by dropping the hyphen.
 if [[ $diffAbs -gt 300000 ]]; then
-  echo "$0: clocks too different" >&2
+  echo "$0: clock difference $diffAbs exceeds 300 ms" >&2
   exit 1
 fi
 
-# offsetMax (already abs()'d) should be small.
+# offsetMax was already abs()'d.
 a=$(( $(tail -1 $srv | ./parse.rb offsetMax) ))
 if [[ $a -gt 500 ]]; then
-  echo "$0: offsetMax too large" >&2
+  echo "$0: offsetMax $a exceeds 500 μs" >&2
   exit 1
 fi
 
-# Final offset should be small.
 a=$(( $(grep offset $cli | tail -1 | ./parse.rb offset) ))
 if [[ $a -gt 50 ]]; then
-  echo "$0: final offset too large" >&2
+  echo "$0: final offset $a exceeds 50 μs" >&2
   exit 1
 fi
