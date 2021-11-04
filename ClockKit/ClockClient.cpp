@@ -14,18 +14,18 @@ ClockClient::ClockClient(kissnet::endpoint addr_port)
     , rtt_(0u)
     , sequence_(0)
     , acknowledge_(false)
-    , socket_{new kissnet::udp_socket(addr_port)}
+    , socket_(addr_port)
 {
 }
 
-bool ClockClient::sendPacket(const ClockPacket& packet) const
+bool ClockClient::sendPacket(const ClockPacket& packet)
 {
     ClockPacket::packetbuf buffer;
     packet.write(buffer);
 #ifdef DEBUG
     cerr << "\nsending " << packet.getTypeName() << "\n";
 #endif
-    const auto [num_bytes, status] = socket_->send(buffer);
+    const auto [num_bytes, status] = socket_.send(buffer);
     if (status != kissnet::socket_status::valid) {
         cerr << "problem sending a packet\n";
         return false;
@@ -47,7 +47,7 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
     // getTimeout() isn't invalid.
     const auto timeoutMsec = std::max(1, getTimeout() / 1000);
     while (true) {
-        switch (socket_->select(kissnet::fds_read, timeoutMsec).value) {
+        switch (socket_.select(kissnet::fds_read, timeoutMsec).value) {
             case kissnet::socket_status::errored:
                 cerr << "error waiting for packet\n";
                 return ClockPacket();
@@ -59,7 +59,7 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
             default:
                 break;
         }
-        const auto [num_bytes, status] = socket_->recv(buffer);
+        const auto [num_bytes, status] = socket_.recv(buffer);
         if (status != kissnet::socket_status::valid) {
             cerr << "got no packet: status " << status << "\n";
             return ClockPacket();

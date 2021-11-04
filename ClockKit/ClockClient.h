@@ -25,7 +25,6 @@ class ClockClient : public Clock {
 
     ~ClockClient()
     {
-        delete socket_;
     }
 
     // Get the ClockServer's "current" time.
@@ -67,7 +66,7 @@ class ClockClient : public Clock {
     }
 
     // Kill the connected ClockServer.
-    void die() const
+    void die()
     {
         (void)sendPacket(ClockPacket(ClockPacket::KILL));
     }
@@ -80,9 +79,9 @@ class ClockClient : public Clock {
     dur rtt_;      // The previous call's round trip time.
     seqnum sequence_;
     bool acknowledge_;
-    kissnet::udp_socket* socket_;
+    kissnet::udp_socket socket_;
 
-    bool sendPacket(const ClockPacket&) const;
+    bool sendPacket(const ClockPacket&);
 
     // Receives the packet and sets the receipt time via the provided clock.
     // On error, the returned packet's type is INVALID.
