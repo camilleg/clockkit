@@ -21,12 +21,7 @@ int main(int argc, char* argv[])
         return 1;
     }
     config.print();
-
-    PhaseLockedClock* plc = config.buildClock();
-    if (!plc) {
-        std::cerr << argv[0] << ": failed to get a clock.\n";
-        return 1;
-    }
+    auto [plc, cli] = config.buildClock();
 
     const auto fTerminate = argc == 3;
     microseconds runtime(fTerminate ? int64_t(1000000 * atof(argv[2])) : 0);
@@ -50,5 +45,6 @@ int main(int argc, char* argv[])
     plc->die();
     th_clock.join();
     delete plc;
+    delete cli;
     return 0;
 }

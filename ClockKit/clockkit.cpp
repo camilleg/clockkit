@@ -13,7 +13,7 @@ using namespace dex;
 // To verify: readelf -sW clockkit.o | c++filt -t | grep -v UND
 namespace {
 PhaseLockedClock* plc = nullptr;
-ConfigReader config;  // Contains a ClockClient*, which may not be destructed before plc is.
+ClockClient* cli = nullptr;
 std::thread* th_clock = nullptr;
 std::atomic_bool end_clocks(false);  // .load() and .store() are implicit.
 std::string strTime;                 // Static storage for the pointer returned by ckTimeAsString().
@@ -42,12 +42,15 @@ void atexit_handler()
 void ckInitialize(const char* filename)
 {
     if (!plc) {
+        ConfigReader config;
         if (filename)
             if (!config.readFrom(filename)) {
                 std::cerr << "clockkit.cpp: failed to parse config file '" << filename << "'.\n";
                 return;
             }
-        plc = config.buildClock();
+        auto plc_and_cli = config.buildClock();
+        plc = plc_and_cli.first;
+        cli = plc_and_cli.second;
     }
     test_ok("ckInitialize");
 #ifdef DEBUG
@@ -64,6 +67,8 @@ void ckTerminate()
 #endif
     delete plc;
     plc = nullptr;
+    delete cli;
+    cli = nullptr;
 }
 
 void ckKill()

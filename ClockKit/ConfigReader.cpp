@@ -51,15 +51,15 @@ bool ConfigReader::readFrom(const char* filename)
     return true;
 }
 
-PhaseLockedClock* ConfigReader::buildClock()
+std::pair<PhaseLockedClock*, ClockClient*> ConfigReader::buildClock()
 {
-    client_ = new ClockClient(kissnet::endpoint(server, port));
-    client_->setTimeout(timeout);
-    client_->setAcknowledge(true);
-    auto plc = new PhaseLockedClock(SystemClock::instance(), *client_);
+    auto cli = new ClockClient(kissnet::endpoint(server, port));
+    cli->setTimeout(timeout);
+    cli->setAcknowledge(true);
+    auto plc = new PhaseLockedClock(SystemClock::instance(), *cli);
     plc->setPhasePanic(DurFromUsec(phasePanic));
     plc->setUpdatePanic(DurFromUsec(updatePanic));
-    return plc;
+    return {plc, cli};
 }
 
 void ConfigReader::print()

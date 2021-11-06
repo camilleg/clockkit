@@ -17,13 +17,10 @@ class ConfigReader {
         , port{defaultPort}
         , timeout{defaultTimeout}
         , phasePanic{defaultPhasePanic}
-        , updatePanic{defaultUpdatePanic}
-        , client_(nullptr){};
+        , updatePanic{defaultUpdatePanic} {};
 
-    // Don't let this be called before destructing the PhaseLockedClock that uses client_.
     ~ConfigReader()
     {
-        delete client_;
     }
 
     // Another clock with the same config would be dangerous, not useful.
@@ -44,11 +41,11 @@ class ConfigReader {
     bool readFrom(const char*);
 
     // Make a clock from the reader's values.
-    // The caller owns the returned pointer (which cannot be nullptr),
-    // and is responsible for deleting it.
-    PhaseLockedClock* buildClock();
-
-   private:
-    ClockClient* client_;
+    // The caller owns both returned pointers (which cannot be null),
+    // and is responsible for deleting them, first plc, then cli.
+    //
+    // If we'll never need a cli (a reference clock) with multiple plc's
+    // (see test-standalone.cpp), then hide cli inside plc as a unique_ptr.
+    std::pair<PhaseLockedClock*, ClockClient*> buildClock();
 };
 }  // namespace dex

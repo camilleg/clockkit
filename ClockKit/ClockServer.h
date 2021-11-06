@@ -12,7 +12,6 @@ namespace dex {
 // A network server for a local clock.
 // It stores responses from the clients on the state of their synchronization.
 class ClockServer {
-   private:
     kissnet::endpoint addr_port_;
     Clock& clock_;
     void updateEntry(const std::string& addr, dur offset, dur rtt, tp now);
