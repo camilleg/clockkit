@@ -26,11 +26,11 @@ bool ClockClient::sendPacket(const ClockPacket& packet)
 #endif
     const auto [num_bytes, status] = socket_.send(buffer);
     if (status != kissnet::socket_status::valid) {
-        cerr << "problem sending a packet\n";
+        cerr << "ClockClient failed to send a packet: status " << status << "\n";
         return false;
     }
     if (num_bytes != ClockPacket::PACKET_LENGTH) {
-        cerr << "sent incomplete packet\n";
+        cerr << "ClockClient sent an incomplete packet.\n";
         return false;
     }
 #ifdef DEBUG
@@ -48,11 +48,11 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
     while (true) {
         switch (socket_.select(kissnet::fds_read, timeoutMsec).value) {
             case kissnet::socket_status::errored:
-                cerr << "error waiting for packet\n";
+                cerr << "ClockClient errored while waiting for a packet.\n";
                 return ClockPacket();
             case kissnet::socket_status::timed_out:
 #ifdef DEBUG
-                cerr << "timed out waiting for packet after " << timeoutMsec << " ms\n";
+                cerr << "timed out waiting for a packet after " << timeoutMsec << " ms\n";
 #endif
                 return ClockPacket();
             default:
@@ -60,7 +60,7 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
         }
         const auto [num_bytes, status] = socket_.recv(buffer);
         if (status != kissnet::socket_status::valid) {
-            cerr << "got no packet: status " << status << "\n";
+            cerr << "ClockClient got no packet: status " << status << "\n";
             return ClockPacket();
         }
         if (num_bytes != ClockPacket::PACKET_LENGTH) {
