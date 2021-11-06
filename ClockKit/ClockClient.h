@@ -29,7 +29,7 @@ class ClockClient : public Clock {
 
     // Get the ClockServer's "current" time.
     // Slower and less accurate than getPhase().
-    // Calls getPhase(HighResolutionClock::instance()).
+    // Calls getPhase(SystemClock::instance()).
     // Returns "invalid" on error.
     tp getValue();
 

@@ -1,6 +1,5 @@
 #include "ClockClient.h"
-
-#include "HighResolutionClock.h"
+#include "SystemClock.h"
 
 // #define DEBUG
 
@@ -108,7 +107,7 @@ ClockPacket ClockClient::receivePacket(Clock& clock)
 
 tp ClockClient::getValue()
 {
-    Clock& baseClock = HighResolutionClock::instance();
+    Clock& baseClock = SystemClock::instance();
     const auto phase = getPhase(baseClock, false);
     if (phase == durInvalid)
         return tpInvalid;

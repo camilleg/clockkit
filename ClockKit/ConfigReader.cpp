@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-#include "HighResolutionClock.h"
+#include "SystemClock.h"
 
 namespace dex {
 
@@ -56,7 +56,7 @@ PhaseLockedClock* ConfigReader::buildClock()
     client_ = new ClockClient(kissnet::endpoint(server, port));
     client_->setTimeout(timeout);
     client_->setAcknowledge(true);
-    auto plc = new PhaseLockedClock(HighResolutionClock::instance(), *client_);
+    auto plc = new PhaseLockedClock(SystemClock::instance(), *client_);
     plc->setPhasePanic(DurFromUsec(phasePanic));
     plc->setUpdatePanic(DurFromUsec(updatePanic));
     return plc;

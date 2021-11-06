@@ -6,7 +6,6 @@
 
 #include "ClockClient.h"
 #include "ConfigReader.h"
-#include "HighResolutionClock.h"
 
 using namespace dex;
 

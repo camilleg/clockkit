@@ -1,7 +1,7 @@
 #include <cstdlib>
 
 #include "ClockServer.h"
-#include "HighResolutionClock.h"
+#include "SystemClock.h"
 #ifdef DEBUG
 #include "VariableFrequencyClock.h"
 #endif
@@ -16,10 +16,10 @@ int main(int argc, char* argv[])
 
 #ifdef DEBUG
     // A slow clock, for testing.
-    dex::VariableFrequencyClock clock(dex::HighResolutionClock::instance());
+    dex::VariableFrequencyClock clock(dex::SystemClock::instance());
     clock.setFrequency(1000000.0 - 2000.0);
 #else
-    auto& clock(dex::HighResolutionClock::instance());
+    auto& clock(dex::SystemClock::instance());
 #endif
     dex::ClockServer server(kissnet::endpoint("0.0.0.0", port), clock);
     server.setLogging(true);

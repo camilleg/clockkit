@@ -7,7 +7,7 @@ namespace dex {
 
 // This class reads two clocks, primaryClock_ and referenceClock_,
 // both assumed to run at 1000000 Hz.
-// primaryClock_ is usually a HighResolutionClock.
+// primaryClock_ is usually a SystemClock.
 // referenceClock_ is usually a ClockClient.
 // It makes a VariableFrequencyClock, whose phase and frequency
 // it keeps locked to those of referenceClock_.

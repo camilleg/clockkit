@@ -7,8 +7,8 @@
 
 #include "ClockClient.h"
 #include "ClockServer.h"
-#include "HighResolutionClock.h"
 #include "PhaseLockedClock.h"
+#include "SystemClock.h"
 
 using namespace dex;
 using namespace std::chrono;
@@ -23,8 +23,8 @@ int main(int argc, char* argv[])
     const auto numClients = atoi(argv[2]);
     microseconds runtime(int64_t(1000000 * atof(argv[3])));
 
-    auto& clockHiRes = HighResolutionClock::instance();
-    ClockServer server(kissnet::endpoint("0.0.0.0", port), clockHiRes);
+    auto& clockSystem = SystemClock::instance();
+    ClockServer server(kissnet::endpoint("0.0.0.0", port), clockSystem);
     server.setLogging(true);
     std::thread th_server(&ClockServer::run, &server);
 
@@ -33,9 +33,9 @@ int main(int argc, char* argv[])
     ClockClient client(kissnet::endpoint("127.0.0.1", port));
     client.setTimeout(1000);
     client.setAcknowledge(true);
-    PhaseLockedClock plc(clockHiRes, client);
-    plc.setPhasePanic(5000);
-    plc.setUpdatePanic(5000000);
+    PhaseLockedClock plc(clockSystem, client);
+    plc.setPhasePanic(5ms);
+    plc.setUpdatePanic(5s);
 #endif
 
     std::atomic_bool end_clocks(false);
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
         // private copy constructor causes baroque workarounds,
         // https://stackoverflow.com/q/17007977/2097284, or maybe std::move.
         clients.push_back(cli);
-        auto plc = new PhaseLockedClock(clockHiRes, *cli);
+        auto plc = new PhaseLockedClock(clockSystem, *cli);
         plc->setPhasePanic(5ms);
         plc->setUpdatePanic(5s);
         clocks.push_back(plc);
