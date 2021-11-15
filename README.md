@@ -5,6 +5,10 @@ as described in the conference paper [Synchronous data collection from diverse h
 It runs on Linux, Windows, and Raspi,
 and needs neither extra hardware nor elevated privileges.
 
+It includes bindings for Python, Ruby, and TCL.  It also has a
+[Rust API](https://github.com/Infrasonics/rust-clockkit) and a
+[Rust FFI](https://github.com/Infrasonics/rust-clockkit-sys).
+
 It can measure a system's realtime behavior,
 by providing a common time reference for events recorded by different sensors
 (audio, video, gamepad, GPS, SMS, MIDI, biometrics),
