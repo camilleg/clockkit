@@ -15,13 +15,13 @@ using tp = std::chrono::time_point<std::chrono::system_clock, dur>;
 
 // Converters.
 
-std::string timestampToString(tp);
-tp stringToTimestamp(const std::string&);
+std::string StringFromTp(tp);
+tp TpFromString(const std::string&);
 
 // Read/write a 64 bit timestamp with proper byte ordering.
 // Convert xxxInvalid conventionally, without special treatment.
-void timestampToBytes(tp, std::byte*);
-tp bytesToTimestamp(const std::byte*);
+void BytesFromTp(tp, std::byte*);
+tp TpFromBytes(const std::byte*);
 
 dur constexpr DurFromUsec(int64_t t)
 {

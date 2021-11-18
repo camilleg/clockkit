@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
     while (!end_clocks) {
         const auto offset = UsecFromDur(plc->getOffset());
         std::cout << "offset: " << (offset == usecInvalid ? "invalid" : std::to_string(offset)) << "\n"
-                  << timestampToString(plc->getValue()) << std::endl;
+                  << StringFromTp(plc->getValue()) << std::endl;
         // endl flushes stdout, to show output even after Ctrl+C.
         std::this_thread::sleep_for(200ms);
         if (fTerminate) {

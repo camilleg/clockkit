@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
     while (runtime.count() > 0) {
         for (const auto plc : clocks)
             std::cout << "offset: " << UsecFromDur(plc->getOffset()) << "\n"
-                      << timestampToString(plc->getValue()) << std::endl;
+                      << StringFromTp(plc->getValue()) << std::endl;
         std::cout << std::endl;
         constexpr auto wait = 600ms;
         std::this_thread::sleep_for(wait);

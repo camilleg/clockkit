@@ -80,7 +80,7 @@ void ClockServer::updateEntry(const string& addr, dur offset, dur rtt, tp now)
 {
     if (!log_)
         return;
-    const auto nowStr = timestampToString(now);
+    const auto nowStr = StringFromTp(now);
     cout << nowStr << ' ' << addr << '\t' << UsecFromDur(offset) << '\t' << UsecFromDur(rtt) << endl;
     ackData_[addr] = Entry(now, offset, rtt);
 

@@ -8,7 +8,7 @@ namespace dex {
 
 const char* format = "<time %d %6d>";  // %i might misparse 0123 as octal.
 
-std::string timestampToString(tp point)
+std::string StringFromTp(tp point)
 {
     // Specially treating point==tpInvalid would be a breaking change.
     // Convert it conventionally, like everything else in Timestamp.h.
@@ -20,7 +20,7 @@ std::string timestampToString(tp point)
     return std::string(buf);
 }
 
-tp stringToTimestamp(const std::string& s)
+tp TpFromString(const std::string& s)
 {
     int sec, usec;
     if (sscanf(s.c_str(), format, &sec, &usec) != 2)
@@ -39,14 +39,14 @@ union timestampBytes {
     std::byte bytes[8];
 };
 
-void timestampToBytes(tp point, std::byte* buffer)
+void BytesFromTp(tp point, std::byte* buffer)
 {
     timestampBytes u;
     u.t = REORDER(UsecFromTp(point));
     std::memcpy(buffer, u.bytes, 8);
 }
 
-tp bytesToTimestamp(const std::byte* buffer)
+tp TpFromBytes(const std::byte* buffer)
 {
     timestampBytes u;
     std::memcpy(u.bytes, buffer, 8);
