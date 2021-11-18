@@ -20,6 +20,7 @@ using namespace std::chrono;
 // One mutex for *all* PLCs may be too careful in practice,
 // but it lets multiple PLCs use the same reference clock.
 std::mutex mutexPLC;
+using Guard = const std::lock_guard<std::mutex>;
 
 PhaseLockedClock::PhaseLockedClock(Clock &primary, Clock &reference)
     : primaryClock_(primary)
@@ -43,7 +44,7 @@ tp PhaseLockedClock::getValue()
 {
     if (!inSync_)
         return tpInvalid;
-    const std::lock_guard<std::mutex> lock(mutexPLC);
+    Guard guard(mutexPLC);
     return variableFrequencyClock_.getValue();
 }
 
@@ -188,7 +189,7 @@ bool PhaseLockedClock::updateClock()
 #ifdef DEBUG
     cout << "frequency := " << variableClockFrequency << endl;
 #endif
-    const std::lock_guard<std::mutex> lock(mutexPLC);
+    Guard guard(mutexPLC);
     variableFrequencyClock_.setFrequency(variableClockFrequency);
     return true;
 }
@@ -199,7 +200,7 @@ void PhaseLockedClock::setClock()
     cout << "resyncing" << endl;
 #endif
     inSync_ = true;
-    const std::lock_guard<std::mutex> lock(mutexPLC);
+    Guard guard(mutexPLC);
     variableFrequencyClock_.setValue(referenceClock_.getValue());
 }
 
