@@ -92,7 +92,7 @@ const char* ckTimeAsString()
     test_ok("ckTimeAsString");
     if (!plc)
         return "";
-    strTime = timestampToString(plc->getValue());
+    strTime = StringFromTp(plc->getValue());
     return strTime.c_str();
 }
 
