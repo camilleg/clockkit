@@ -27,6 +27,10 @@ class ClockClient : public Clock {
     {
     }
 
+    // Another client with the same host:port would be dangerous, not useful.
+    ClockClient(const ClockClient&) = delete;
+    ClockClient& operator=(const ClockClient&) = delete;
+
     // Get the ClockServer's "current" time.
     // Slower and less accurate than getPhase().
     // Calls getPhase(SystemClock::instance()).
@@ -72,9 +76,6 @@ class ClockClient : public Clock {
     }
 
    private:
-    explicit ClockClient(ClockClient&);
-    ClockClient& operator=(ClockClient&);
-
     dur timeout_;  // The max error on phase calculations.
     dur rtt_;      // The previous call's round trip time.
     seqnum sequence_;

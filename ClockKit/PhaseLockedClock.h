@@ -18,6 +18,9 @@ class PhaseLockedClock : public Clock {
 
     ~PhaseLockedClock() = default;
 
+    PhaseLockedClock(PhaseLockedClock&) = delete;
+    PhaseLockedClock& operator=(PhaseLockedClock&) = delete;
+
     // Kill the referenceClock_, which is likely a ClockClient, and its ClockServer.
     void die()
     {
@@ -63,9 +66,6 @@ class PhaseLockedClock : public Clock {
     void setClock();
 
    private:
-    explicit PhaseLockedClock(PhaseLockedClock&);
-    PhaseLockedClock& operator=(PhaseLockedClock&);
-
     Clock& primaryClock_;
     Clock& referenceClock_;
     VariableFrequencyClock variableFrequencyClock_;

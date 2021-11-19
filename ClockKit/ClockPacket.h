@@ -42,10 +42,10 @@ class ClockPacket {
    public:
     explicit ClockPacket(Type t, seqnum seqNum = 0, tp clientRequestTime = tpInvalid);
 
-    // Unpack buffer into member variables.
-    explicit ClockPacket(const packetbuf& buffer);
+    // Unpack buffer into members.
+    explicit ClockPacket(const packetbuf&);
 
-    // Invalid.
+    // Initialized as invalid.
     explicit ClockPacket();
 
     // Write member variables to bytes.
