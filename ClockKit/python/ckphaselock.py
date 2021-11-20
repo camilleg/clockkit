@@ -26,7 +26,9 @@ signal.signal(signal.SIGTERM, signal_handler)
 sec_remaining = float(sys.argv[2]) if terminate else 1.0
 while sec_remaining > 0.0:
     if _clockkit.ckInSync():
-        print("offset:", _clockkit.ckOffset(), "\n", _clockkit.ckTimeAsString())
+        s = _clockkit.ckTimeAsString()
+        t = _clockkit.ckTimeAsValue() # This might be 10 usec later than s.
+        print("offset:", _clockkit.ckOffset(), "\n", s)
     else:
         print("offset: OUT OF SYNC")
     time.sleep(0.1)

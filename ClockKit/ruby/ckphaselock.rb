@@ -17,7 +17,9 @@ Clockkit.ckInitialize ARGV[0]
 
 while sec_remaining > 0.0
   if Clockkit.ckInSync then
-    puts "offset: #{Clockkit.ckOffset}\n#{Clockkit.ckTimeAsString}"
+    s = Clockkit.ckTimeAsString;
+    t = Clockkit.ckTimeAsValue; # This might be 10 usec later than s.
+    puts "offset: #{Clockkit.ckOffset}\n#{s}"
   else
     puts "offset: OUT OF SYNC"
   end

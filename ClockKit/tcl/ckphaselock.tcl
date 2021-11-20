@@ -24,6 +24,8 @@ while {$sec_remaining > 0.0} {
   if {[ckInSync]} {
     set offset [ckOffset]
     set timestamp [ckTimeAsString]
+    set timestamp_num [ckTimeAsValue]
+    # timestamp_num might be 10 usec later than timestamp.
     puts "offset: $offset\n$timestamp"
   } else {
     puts "offset: OUT OF SYNC"
