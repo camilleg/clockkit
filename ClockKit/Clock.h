@@ -1,6 +1,8 @@
 #pragma once
 #include "Timestamp.h"
 
+#include <iostream>
+
 namespace dex {
 
 // Abstract base class.
@@ -22,5 +24,38 @@ class Clock {
     // Cleanly kill a ClockServer or ClockClient.
     virtual void die(){};
 };
+
+// For parsing numbers from argv[] at the start of main(),
+// more robustly than atoi() and atof().
+// On error, simply exit(1).
+inline int parseInt(const char* s)
+{
+    const auto saved = errno;
+    errno = 0;
+    char* tmp;
+    const auto val = strtol(s, &tmp, 0);
+    if (tmp == s || *tmp != '\0' || errno == ERANGE || errno == EINVAL) {
+        std::cerr << "Failed to parse int from '" << s << "'.\n";
+        exit(1);
+    }
+    if (errno == 0)
+        errno = saved;
+    return int(val);
+}
+
+inline double parseFloat(const char* s)
+{
+    const auto saved = errno;
+    errno = 0;
+    char* tmp;
+    const auto val = strtod(s, &tmp);
+    if (tmp == s || *tmp != '\0' || errno == ERANGE || errno == EINVAL) {
+        std::cerr << "Failed to parse float from '" << s << "'.\n";
+        exit(1);
+    }
+    if (errno == 0)
+        errno = saved;
+    return val;
+}
 
 }  // namespace dex

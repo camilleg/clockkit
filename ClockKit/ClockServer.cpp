@@ -1,7 +1,6 @@
 #include "ClockServer.h"
 
 #include <cmath>
-#include <iostream>
 
 #include "ClockPacket.h"
 

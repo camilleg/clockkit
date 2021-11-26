@@ -1,5 +1,4 @@
 #include <atomic>
-#include <iostream>
 #include <limits>
 #include <thread>
 
@@ -24,7 +23,7 @@ int main(int argc, char* argv[])
     auto [plc, cli] = config.buildClock();
 
     const auto fTerminate = argc == 3;
-    microseconds runtime(fTerminate ? int64_t(1000000 * atof(argv[2])) : 0);
+    microseconds runtime(fTerminate ? int64_t(1000000 * parseFloat(argv[2])) : 0);
     std::atomic_bool end_clocks(fTerminate && runtime.count() <= 0);
     std::thread th_clock(&PhaseLockedClock::run, plc, std::ref(end_clocks));
 

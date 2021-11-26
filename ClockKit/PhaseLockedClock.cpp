@@ -1,7 +1,6 @@
 #include "PhaseLockedClock.h"
 
 #include <cstdlib>
-#include <iostream>
 #include <mutex>
 #include <random>
 #include <thread>

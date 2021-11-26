@@ -1,7 +1,5 @@
 #include "ClockPacket.h"
 
-#include <iostream>
-
 namespace dex {
 
 ClockPacket::ClockPacket()

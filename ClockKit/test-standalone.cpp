@@ -19,9 +19,13 @@ int main(int argc, char* argv[])
         std::cerr << "usage: " << argv[0] << " port num_clients duration\n";
         return 1;
     }
-    const auto port = atoi(argv[1]);
-    const auto numClients = atoi(argv[2]);
-    microseconds runtime(int64_t(1000000 * atof(argv[3])));
+    const auto port = parseInt(argv[1]);
+    const auto numClients = parseInt(argv[2]);
+    if (numClients < 1) {
+        std::cerr << argv[0] << ": at least 1 client.\n";
+        return 1;
+    }
+    microseconds runtime(int64_t(1000000 * parseFloat(argv[3])));
 
     auto& clockSystem = SystemClock::instance();
     ClockServer server(kissnet::endpoint("0.0.0.0", port), clockSystem);

@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
         std::cerr << "usage: " << argv[0] << " <port>\n";
         return 1;
     }
-    const auto port = atoi(argv[1]);
+    const auto port = dex::parseInt(argv[1]);
 
 #ifdef DEBUG
     // A slow clock, for testing.
