@@ -63,8 +63,6 @@ void ClockServer::run()
                     break;
                 }
             case ClockPacket::ACKNOWLEDGE:
-                // CC++ printed localhost as "localhost", unlike kissnet's "127.0.0.1."
-                // But no test cases used that.
                 updateEntry(peer2.address, packet.getClockOffset(), packet.rtt(), now);
                 break;
             case ClockPacket::KILL:
@@ -75,6 +73,8 @@ void ClockServer::run()
     }
 }
 
+// Don't shrink this to (addr, packet, now), because
+// that would more tightly couple ClockServer.h to ClockPacket.h.
 void ClockServer::updateEntry(const string& addr, dur offset, dur rtt, tp now)
 {
     if (!log_)
