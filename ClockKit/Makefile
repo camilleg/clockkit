@@ -3,8 +3,8 @@ CPP = c++
 
 # -fPIC is only to make $(SWIGEXES).
 # -fpic would be smaller and faster, but that is only for gcc.
-CFLAGS = -O3 -fPIC -Wall -Werror -Weffc++ -std=c++17
-LIBS = -lpthread -ldl
+CFLAGS := -O3 -fPIC -Wall -Werror -Weffc++ -std=c++17 -pedantic
+LIBS := -lpthread -ldl
 
 # Optional file containing debugging options for CFLAGS and LDFLAGS.
 -include Rules.debug
@@ -35,7 +35,6 @@ SWIGEXES = \
   ruby/clockkit.so \
   tcl/clockkit.so
 
-all: CFLAGS += -pedantic
 all: $(EXES)
 
 bindings: all $(SWIGEXES)
@@ -122,4 +121,18 @@ DEPENDFLAGS = -MMD -MT $@ -MF $(patsubst %.o,.depend/%.d,$@)
 # .depend/*.d is built by %.o:%.cpp.
 -include $(patsubst %.o,.depend/%.d,$(OBJS))
 
-.PHONY: all profile bindings purge clean test-30 test-standalone test-bindings test-python test-ruby test-tcl
+.PHONY: \
+  all \
+  bindings \
+  clean \
+  debug \
+  profile \
+  purge \
+  test \
+  test-30 \
+  test-bindings \
+  test-python test-python2 \
+  test-remote test-remote2 \
+  test-ruby test-ruby2 \
+  test-standalone \
+  test-tcl test-tcl2
