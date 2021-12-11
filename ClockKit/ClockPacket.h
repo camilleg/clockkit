@@ -51,46 +51,46 @@ class ClockPacket {
     // Write member variables to bytes.
     void write(packetbuf&) const;
 
-    inline Type getType() const
+    Type getType() const
     {
         return type_;
     }
-    inline void setType(Type t)
+    void setType(Type t)
     {
         type_ = t;
     }
     const char* getTypeName() const;  // Prettyprint type_.
 
-    inline bool invalid() const
+    bool invalid() const
     {
         return type_ == INVALID;
     }
 
 #ifdef UNUSED
-    inline tp getClientRequestTime() const
+    tp getClientRequestTime() const
     {
         return clientRequestTime_;
     }
-    inline void setClientRequestTime(tp t)
+    void setClientRequestTime(tp t)
     {
         clientRequestTime_ = t;
     }
 
-    inline tp getServerReplyTime() const
+    tp getServerReplyTime() const
     {
         return serverReplyTime_;
     }
-    inline tp getClientReceiveTime() const
+    tp getClientReceiveTime() const
     {
         return clientReceiveTime_;
     }
 #endif
 
-    inline void setServerReplyTime(tp t)
+    void setServerReplyTime(tp t)
     {
         serverReplyTime_ = t;
     }
-    inline void setClientReceiveTime(tp t)
+    void setClientReceiveTime(tp t)
     {
         clientReceiveTime_ = t;
     }
@@ -98,7 +98,7 @@ class ClockPacket {
     // Round trip time for the client-server correspondence.
     // Todo: complain if this is negative, which it should never be,
     // but is technically possible.
-    inline dur rtt() const
+    dur rtt() const
     {
         return diff(clientReceiveTime_, clientRequestTime_);
     }
@@ -113,7 +113,7 @@ class ClockPacket {
     }
 
     // Error bound on the calculation of clock offset.
-    inline dur getErrorBound() const
+    dur getErrorBound() const
     {
         const auto t = rtt();
         return t == durInvalid ? durInvalid : t / 2;

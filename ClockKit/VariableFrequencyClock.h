@@ -22,7 +22,7 @@ class VariableFrequencyClock : public Clock {
     void setValue(tp);
 
     // todo: unused yet, but define in Clock, for a VFC based on another VFC.
-    inline double getFrequency() const
+    double getFrequency() const
     {
         return frequency_;
     }

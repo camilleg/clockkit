@@ -37,17 +37,17 @@ class ClockClient : public Clock {
     // Returns "invalid" on error.
     tp getValue();
 
-    inline int getTimeout() const
+    int getTimeout() const
     {
         return UsecFromDur(timeout_);
     }
-    inline void setTimeout(int64_t usec)
+    void setTimeout(int64_t usec)
     {
         if (usec != usecInvalid)
             timeout_ = DurFromUsec(usec);
     }
 
-    inline dur rtt() const
+    dur rtt() const
     {
         return rtt_;
     }
@@ -56,7 +56,7 @@ class ClockClient : public Clock {
     // instead of internally by getValue(),
     // it finishes by sending the server an ACKNOWLEDGE packet,
     // for the server to track the total error bound.
-    inline void setAcknowledge(bool acknowledge)
+    void setAcknowledge(bool acknowledge)
     {
         acknowledge_ = acknowledge;
     }
@@ -64,7 +64,7 @@ class ClockClient : public Clock {
     // Phase between a local clock and a ClockServer's clock.
     // Reports the phase to the server, if acknowledge_.
     // The most accurate way to get timing from a ClockServer.
-    inline dur getPhase(Clock& clock)
+    dur getPhase(Clock& clock)
     {
         return getPhase(clock, acknowledge_);
     }
