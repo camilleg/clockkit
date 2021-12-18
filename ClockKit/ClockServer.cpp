@@ -16,16 +16,17 @@ ClockServer::ClockServer(kissnet::endpoint addr_port, Clock& clock)
     , log_(false)
     , tRecalculated_(clock_.getValue())
 {
+    kissnet_init();
 }
 
 void ClockServer::run()
 {
-    if (log_)
-        cout << "time                     host    \toffset\tround-trip-time" << endl;
-    constexpr auto length = ClockPacket::PACKET_LENGTH;
-    ClockPacket::packetbuf buffer;
     kissnet::udp_socket socket(addr_port_);
     socket.bind();
+    constexpr auto length = ClockPacket::PACKET_LENGTH;
+    ClockPacket::packetbuf buffer;
+    if (log_)
+        cout << "time                     host    \toffset\tround-trip-time" << endl;
 
     for (;;) {
         kissnet::addr_collection peer;

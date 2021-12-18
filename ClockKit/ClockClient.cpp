@@ -15,6 +15,7 @@ ClockClient::ClockClient(kissnet::endpoint addr_port)
     , acknowledge_(false)
     , socket_(addr_port)
 {
+    kissnet_init();
 }
 
 bool ClockClient::sendPacket(const ClockPacket& packet)

@@ -1,4 +1,8 @@
 #pragma once
+
+#define KISSNET_NO_EXCEP
+#include "kissnet.hpp"
+
 #include "Timestamp.h"
 
 #include <iostream>
@@ -56,6 +60,21 @@ inline double parseFloat(const char* s)
     if (errno == 0)
         errno = saved;
     return val;
+}
+
+// Handle some errors specially, instead of just aborting.
+static inline void kissnet_error(const std::string& s, void*)
+{
+    if (s == "bind() failed\n")
+        std::cerr << "bind() failed: bad port number, or another ckserver might be running on that port.\n";
+    else
+        std::cerr << s << "\n";
+    exit(1);
+}
+static inline void kissnet_init()
+{
+    kissnet::error::abortOnFatalError = false;
+    kissnet::error::callback = &kissnet_error;
 }
 
 }  // namespace dex
