@@ -3,8 +3,8 @@
 namespace dex {
 
 ClockPacket::ClockPacket()
-    : sequenceNumber_(0)
-    , type_(INVALID)
+    : type_(INVALID)
+    , sequenceNumber_(0)
     , clientRequestTime_(tpInvalid)
     , serverReplyTime_(tpInvalid)
     , clientReceiveTime_(tpInvalid)
@@ -12,8 +12,8 @@ ClockPacket::ClockPacket()
 }
 
 ClockPacket::ClockPacket(Type t, seqnum n, tp crt)
-    : sequenceNumber_(n)
-    , type_(t)
+    : type_(t)
+    , sequenceNumber_(n)
     , clientRequestTime_(crt)
     , serverReplyTime_(tpInvalid)
     , clientReceiveTime_(tpInvalid)
@@ -21,8 +21,8 @@ ClockPacket::ClockPacket(Type t, seqnum n, tp crt)
 }
 
 ClockPacket::ClockPacket(const packetbuf& buffer)
-    : sequenceNumber_(static_cast<seqnum>(buffer[1]))
-    , type_(static_cast<Type>(buffer[0]))
+    : type_(static_cast<Type>(buffer[0]))
+    , sequenceNumber_(static_cast<seqnum>(buffer[1]))
     , clientRequestTime_(TpFromBytes(buffer.data() + 2))
     , serverReplyTime_(TpFromBytes(buffer.data() + 10))
     , clientReceiveTime_(TpFromBytes(buffer.data() + 18))

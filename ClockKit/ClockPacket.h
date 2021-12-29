@@ -6,40 +6,39 @@
 
 namespace dex {
 
+// Detects out-of-order packets and thus delayed responses.
+// (A byte isn't too small, because even at 10 packets per second,
+// this detects packets as much as 25 seconds late,
+// much more than the typical tolerance of a fraction of a second.
+// Using more than a byte would be a breaking change for the packet format.)
 using seqnum = uint8_t;
 
-// UDP packet used with ClockServer and ClockClient.
+// UDP packet for ClockServer and ClockClient.
 class ClockPacket {
    public:
-    // - INVALID: uninitialized.
-    // - REQUEST: Client sends packet to server requesting current time.
-    // - REPLY: Server sends client the current time, after a REQUEST.
-    // - ACKNOWLEDGE: Client sends server the status of its synchronization, from getPhase().
-    // - KILL: terminate client and server.
+    // INVALID: uninitialized.
+    // REQUEST: Client sends packet to server requesting current time.
+    // REPLY: Server sends client the current time, after a REQUEST.
+    // ACKNOWLEDGE: Client sends server the status of its synchronization, from getPhase().
+    // KILL: terminate client and server.
     enum Type { INVALID = 0, REQUEST, REPLY, ACKNOWLEDGE, KILL };
-
-    // Each packet has:
-    // - type : 1 byte
-    // - sequence : 1 bytes
-    // - 3 timestamps : 8 bytes each
-    // - total : 26 bytes
-    enum { PACKET_LENGTH = 26 };
-    using packetbuf = kissnet::buffer<PACKET_LENGTH>;
-
-    // Detects out-of-order packets and thus delayed responses.
-    // (A byte isn't too small, because even at 10 packets per second,
-    // this detects packets as much as 25 seconds late,
-    // which is much larger than the typical tolerance of a fraction of a second.)
-    // Using more than a byte would be a breaking change for the packet format.
-    const seqnum sequenceNumber_;
 
    private:
     Type type_;
+    const seqnum sequenceNumber_;
     tp clientRequestTime_;  // Time on client when it sent a REQUEST packet.
     tp serverReplyTime_;    // Time on server when it got that REQUEST packet.
     tp clientReceiveTime_;  // Time on client when it got the corresponding REPLY packet.
 
    public:
+    // Each packet has:
+    // - type, 1 byte
+    // - sequence, 1 byte
+    // - 3 timestamps, 3 * 8 bytes
+    // - total, 26 bytes
+    constexpr static auto PACKET_LENGTH = 26;
+    using packetbuf = kissnet::buffer<PACKET_LENGTH>;
+
     explicit ClockPacket(Type t, seqnum seqNum = 0, tp clientRequestTime = tpInvalid);
 
     // Unpack buffer into members.
@@ -50,6 +49,11 @@ class ClockPacket {
 
     // Write member variables to bytes.
     void write(packetbuf&) const;
+
+    seqnum getSeqnum() const
+    {
+        return sequenceNumber_;
+    }
 
     Type getType() const
     {
