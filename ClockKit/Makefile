@@ -77,10 +77,10 @@ test-remote2: ckphaselock
 cktest-standalone: test-standalone.cpp $(OBJS)
 	$(CPP) $(CFLAGS) $^ $(LIBS) -o $@
 
-ckserver: ClockServerMain.cpp $(OBJS)
+ckserver: ClockServerMain.o $(OBJS)
 	$(CPP) $(CFLAGS) $^ $(LIBS) -o $@
 
-ckphaselock: PhaseLockMain.cpp $(OBJS)
+ckphaselock: PhaseLockMain.o $(OBJS)
 	$(CPP) $(CFLAGS) $^ $(LIBS) -o $@
 
 python/wrap.cpp: clockkit.h
