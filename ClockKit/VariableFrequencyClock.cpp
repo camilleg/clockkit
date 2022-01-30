@@ -4,7 +4,7 @@ namespace dex {
 
 VariableFrequencyClock::VariableFrequencyClock(Clock& src)
     : clockSrc_(src)
-    , frequencySrc_(1000000.0)
+    , frequencySrc_(src.getFrequency())
     , frequency_(1000000.0)
     , markerSrc_(clockSrc_.getValue())
     , marker_(TpFromUsec(0))

@@ -27,6 +27,11 @@ class Clock {
 
     // Cleanly kill a ClockServer or ClockClient.
     virtual void die(){};
+
+    virtual double getFrequency() const
+    {
+        return 1000000.0;
+    }
 };
 
 // For parsing numbers from argv[] at the start of main(),
