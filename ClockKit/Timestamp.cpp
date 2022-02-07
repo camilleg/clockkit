@@ -1,6 +1,5 @@
 #include "Timestamp.h"
 
-#include <cstddef>
 #include <cstdio>
 #include <cstring>
 
