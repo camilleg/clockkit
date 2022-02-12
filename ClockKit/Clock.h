@@ -15,6 +15,8 @@ class Clock {
    public:
     // This clock's value, when this returns (not when it was called).
     // The lag between those two may be large for ClockClient.
+    // Not const because VFC's sets rolledOver_, and because
+    // ClockClient's calls its getPhase which sets sequence_.
     virtual tp getValue() = 0;
 
     // The phase, or offset, between this (primary) clock and another clock.
@@ -27,11 +29,6 @@ class Clock {
 
     // Cleanly kill a ClockServer or ClockClient.
     virtual void die(){};
-
-    virtual double getFrequency() const
-    {
-        return 1000000.0;
-    }
 };
 
 // For parsing numbers from argv[] at the start of main(),

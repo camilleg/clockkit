@@ -3,33 +3,35 @@
 
 namespace dex {
 
-// All other clocks in ClockKit run at 1000000 Hz,
-// but this clock's frequency can be changed.
-// Its value starts at 0.
-// It wraps a source clock.
+// Other clocks in ClockKit run at 1000000 Hz,
+// but this clock's frequency can be changed,
+// to run faster or slower than the source clock that it wraps.
+// Its value starts at 0 (not at usec since the epoch).
+
+// Constructing multiple VFCs around the same SystemClock is safe because
+// the latter has no state for "const in spirit" getValue() to change.
+// But not around a ClockClient, because its sequence_ would get
+// updated too fast, by each VFC's getValue().
+
 class VariableFrequencyClock : public Clock {
    public:
-    explicit VariableFrequencyClock(Clock&);
+    explicit VariableFrequencyClock(Clock&, double frequency = 1000000.0);
 
-    // Returns the clock's value, in usec (*not* since the epoch).
-    // Returns a big negative number (obviously invalid, because
-    // the clock starts at zero) if the source clock moves backwards,
-    // such as a counter that wrapped around.
-    // If that happens, call setValue().
+    // Wrapping a VFC around another VFC would be confusing, not useful.
+    // It would also smell like a shallow-copy copy ctor.
+    VariableFrequencyClock(VariableFrequencyClock&) = delete;
+    VariableFrequencyClock(const VariableFrequencyClock&) = delete;
+    VariableFrequencyClock& operator=(const VariableFrequencyClock&) = delete;
+
+    // Returns tpInvalid if the source clock moves backwards, such as
+    // a counter that wrapped around.  If that happens, call setValue().
     tp getValue();
 
-    // Sets the current time (the clock's value).
     void setValue(tp);
-
-    double getFrequency() const
-    {
-        return frequency_;
-    }
     void setFrequency(double);
 
    private:
     Clock& clockSrc_;
-    double frequencySrc_;
     double frequency_;
     tp markerSrc_;
     tp marker_;
