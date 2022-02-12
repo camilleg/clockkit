@@ -25,10 +25,19 @@ OBJS = \
   VariableFrequencyClock.o \
   clockkit.o
 
+OBJS_EXE = \
+  ClockServerMain.o \
+  kissnet-udp.o \
+  PhaseLockMain.o \
+  test-unit.o
+
+OBJS_ALL = $(sort $(OBJS) $(OBJS_EXE))
+
 EXES = \
   ckserver \
   ckphaselock \
   cktest-standalone \
+  cktest-unit \
 
 SWIGEXES = \
   python/_clockkit.so \
@@ -37,7 +46,7 @@ SWIGEXES = \
 
 all: $(EXES)
 
-bindings: all $(SWIGEXES)
+bindings: $(SWIGEXES)
 
 debug: override CFLAGS += -O0 -ggdb
 debug: all
@@ -45,13 +54,15 @@ debug: all
 profile: CFLAGS += --coverage -fprofile-arcs -ftest-coverage -O0
 profile: $(EXES)
 
-test-bindings: test-python test-python2 test-ruby test-ruby2 test-tcl test-tcl2
+test-bindings: ckserver test-python test-python2 test-ruby test-ruby2 test-tcl test-tcl2
 
 # Different ports let these tests run simultaneously, via --jobs=99.
 test: ckserver ckphaselock
 	./testcase.sh 4440
 test-standalone: cktest-standalone
 	./$? 4480 500 3 > /dev/null
+test-unit: cktest-unit
+	./$?
 test-30: ckserver ckphaselock
 	./testcase-n.sh 30 4430
 
@@ -75,6 +86,9 @@ test-remote2: ckphaselock
 # Don't generalize this here.  Instead, manually ./test2hosts.sh config-myOtherHost.sh.
 
 cktest-standalone: test-standalone.cpp $(OBJS)
+	$(CPP) $(CFLAGS) $^ $(LIBS) -o $@
+
+cktest-unit: test-unit.o $(OBJS)
 	$(CPP) $(CFLAGS) $^ $(LIBS) -o $@
 
 ckserver: ClockServerMain.o $(OBJS)
@@ -108,7 +122,7 @@ ruby/clockkit.so: ruby/wrap.o $(OBJS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
 clean:
-	rm -rf $(EXES) $(SWIGEXES) $(OBJS) .depend */wrap.o */wrap.cpp python/clockkit.py *.gcno *.gcov
+	rm -rf $(EXES) $(SWIGEXES) $(OBJS) $(OBJS_EXE) .depend */wrap.o */wrap.cpp python/clockkit.py *.gcno *.gcov
 
 purge: clean
 	rm -rf *.gcda
@@ -119,7 +133,7 @@ DEPENDFLAGS = -MMD -MT $@ -MF $(patsubst %.o,.depend/%.d,$@)
 	$(CPP) -c $(CFLAGS) $(DEPENDFLAGS) $<
 
 # .depend/*.d is built by %.o:%.cpp.
--include $(patsubst %.o,.depend/%.d,$(OBJS))
+-include $(patsubst %.o,.depend/%.d,$(OBJS_ALL))
 
 .PHONY: \
   all \
@@ -135,4 +149,5 @@ DEPENDFLAGS = -MMD -MT $@ -MF $(patsubst %.o,.depend/%.d,$@)
   test-remote test-remote2 \
   test-ruby test-ruby2 \
   test-standalone \
-  test-tcl test-tcl2
+  test-tcl test-tcl2 \
+  test-unit
