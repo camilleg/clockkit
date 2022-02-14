@@ -5,6 +5,7 @@ ClockKit/*.o
 ClockKit/ckphaselock
 ClockKit/ckserver
 ClockKit/cktest-standalone
+ClockKit/cktest-unit
 ClockKit/config-remote*.sh
 ClockKit/Rules.debug*
 ClockKit/python/clockkit.py
