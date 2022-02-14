@@ -12,22 +12,39 @@ using namespace std::chrono;
 auto& sys = SystemClock::instance();
 using vfc = VariableFrequencyClock;
 using plc = PhaseLockedClock;
-using std::cout, std::cerr;
+using std::cerr;
+
+// A countdown timer.
+class Countdown {
+    const dur step_;
+    dur runtime_;
+
+   public:
+    Countdown(dur step, dur runtime)
+        : step_(step)
+        , runtime_(runtime)
+    {
+    }
+    // Wait, then return true iff the countdown is still running.
+    operator bool()
+    {
+        std::this_thread::sleep_for(step_);
+        runtime_ -= step_;
+        return runtime_.count() > 0;
+    }
+};
 
 // Do two clocks based on SystemClock agree?
 bool clones_vfc()
 {
     vfc c1(sys);
     vfc c2(sys);
-    milliseconds runtime(500);
-    while (runtime.count() > 0) {
+    Countdown countdown(10ms, 500ms);
+    while (countdown) {
         if (abs(UsecFromDur(diff(c1.getValue(), c2.getValue()))) > 20) {
             cerr << "VFC clones drifted apart.\n";
             return false;
         }
-        constexpr auto wait = 10ms;
-        std::this_thread::sleep_for(wait);
-        runtime -= wait;
     }
     return true;
 }
@@ -41,15 +58,12 @@ bool clones_plc()
     plc c2(sys, sys);
     threads.emplace_back(&plc::run, &c1, std::ref(end_clocks));
     threads.emplace_back(&plc::run, &c2, std::ref(end_clocks));
-    milliseconds runtime(250);
-    while (runtime.count() > 0) {
+    Countdown countdown(10ms, 250ms);
+    while (countdown) {
         if (abs(UsecFromDur(diff(c1.getValue(), c2.getValue()))) > 20) {
             cerr << "PLC clones drifted apart.\n";
             return false;
         }
-        constexpr auto wait = 10ms;
-        std::this_thread::sleep_for(wait);
-        runtime -= wait;
     }
     end_clocks = true;
     c1.die();
@@ -63,18 +77,15 @@ bool slowclock()
 {
     vfc c1(sys);
     vfc c2(sys, 990000);  // Runs 1% slow.
-    milliseconds runtime(200);
     dur drift;
-    constexpr auto wait = 10ms;
-    while (runtime.count() > 0) {
+    Countdown countdown(10ms, 250ms);
+    while (countdown) {
+        drift = drift + 100us;  // 1% of 10ms
         auto d = diff(c1.getValue(), c2.getValue());
         if (abs(UsecFromDur(d) - UsecFromDur(drift)) > 100) {
             cerr << "slowclock drifted apart.\n";
             return false;
         }
-        drift = drift + 100us;  // 0.01 * wait;
-        std::this_thread::sleep_for(wait);
-        runtime -= wait;
     }
     return true;
 }
@@ -84,19 +95,16 @@ bool fastclock()
 {
     vfc c1(sys);
     vfc c2(sys, 1050000);  // Runs 5% fast.
-    milliseconds runtime(200);
     dur drift;
-    constexpr auto wait = 10ms;
-    while (runtime.count() > 0) {
+    Countdown countdown(8ms, 200ms);
+    while (countdown) {
+        drift = drift - 400us;  // -5% of 8ms
         auto d = diff(c1.getValue(), c2.getValue());
-        // cout << d << "\t" << drift << "\n";
+        // cerr << d << "\t" << drift << "\n";
         if (abs(UsecFromDur(d) - UsecFromDur(drift)) > 300) {
             cerr << "fastclock drifted apart.\n";
             return false;
         }
-        drift = drift - 500us;  // -0.05 * wait;
-        std::this_thread::sleep_for(wait);
-        runtime -= wait;
     }
     return true;
 }
@@ -106,16 +114,15 @@ bool speedyclocks()
 {
     vfc c1(sys, 5000000);
     vfc c2(sys, 5000000);
-    milliseconds runtime(200);
-    constexpr auto wait = 10ms;
-    while (runtime.count() > 0) {
-        // cout << c1.getValue() << " " << c2.getValue() << "\n";
-        if (abs(UsecFromDur(diff(c1.getValue(), c2.getValue()))) > 20) {
+    Countdown countdown(10ms, 200ms);
+    while (countdown) {
+        const auto t1 = c1.getValue();
+        const auto t2 = c2.getValue();
+        // cerr << t1 << " " << t2 << "\n";
+        if (abs(UsecFromDur(diff(t1, t2))) > 10) {
             cerr << "speedyclocks drifted apart.\n";
             return false;
         }
-        std::this_thread::sleep_for(wait);
-        runtime -= wait;
     }
     return true;
 }
