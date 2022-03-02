@@ -19,7 +19,9 @@ sshport=123
 # On $host, the dir containing ckserver.
 dirRemote=/foo/bar/clockkit/ClockKit
 
-# On $host, the address on which ckserver will listen.
+# On $host, the address on which ckserver will listen
+# (0.0.0.0 for all networks;  more safely, $host's public IP address;
+# but 127.0.0.1 will fail make test-remote, because that's *not* remote).
 address=127.0.0.1
 
 # On $host, the port on which ckserver will listen.
