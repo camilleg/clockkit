@@ -35,7 +35,7 @@ sed -e "s/^server:.*/server:$host/" \
 nuke ckphaselock
 ssh="ssh -p $sshport -o ConnectTimeout=2 $host" # Abort after 2 seconds.
 ./ckphaselock $conf 0 > /dev/null # Kill any ckserver already listening to $host:$port.
-$ssh $dirRemote/ckserver $port > $srv &
+$ssh $dirRemote/ckserver $address $port > $srv &
 sleep 1.8 # Reduce timeouts during startup.
 ./ckphaselock $conf 5 > $cli
 # If firewalls block packets, then ckserver hears nothing.

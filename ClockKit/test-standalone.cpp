@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
     microseconds runtime(int64_t(1000000 * parseFloat(argv[3])));
 
     auto& clockSystem = SystemClock::instance();
-    ClockServer server(kissnet::endpoint("0.0.0.0", port), clockSystem);
+    ClockServer server(kissnet::endpoint("127.0.0.1", port), clockSystem);
     server.setLogging(true);
     std::thread th_server(&ClockServer::run, &server);
 

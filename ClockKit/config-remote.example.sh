@@ -19,6 +19,9 @@ sshport=123
 # On $host, the dir containing ckserver.
 dirRemote=/foo/bar/clockkit/ClockKit
 
+# On $host, the address on which ckserver will listen.
+address=127.0.0.1
+
 # On $host, the port on which ckserver will listen.
 # You may need to poke holes in firewalls for this UDP port, e.g.,
 # ufw allow 4567/udp comment ClockKit
