@@ -41,7 +41,7 @@ Proceed as with Ubuntu 18 or 20.
 `cd ClockKit && make test`
 
 ### To sync host B to host A:
-On host A, `ckserver 4567`  
+On host A, `ckserver <address to bind to> <port>`  
 On host B:  
 - `cp clockkit.conf my-clockkit.conf`
 - Edit `my-clockkit.conf`.  Set the `server` to host A, e.g., `192.168.1.1` or `myhost.example.com`.  Set the `port` to 4567, or whatever port you told ckserver to use.  
