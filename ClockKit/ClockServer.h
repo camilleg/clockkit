@@ -41,7 +41,7 @@ class ClockServer {
     // Provide requests for timestamps to clients via a UDP port.
     // To accept connections from clients on *any* local address,
     // set InetAddress to 0.0.0.0.
-    ClockServer(kissnet::endpoint addr_port, Clock& clock);
+    ClockServer(const kissnet::endpoint& addr_port, Clock& clock);
 
     void setLogging(bool log)
     {

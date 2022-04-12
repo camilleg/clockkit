@@ -8,7 +8,7 @@ using namespace std::chrono;
 
 namespace dex {
 
-ClockClient::ClockClient(kissnet::endpoint addr_port)
+ClockClient::ClockClient(const kissnet::endpoint& addr_port)
     : timeout_(1000)
     , rtt_(0u)
     , sequence_(0)

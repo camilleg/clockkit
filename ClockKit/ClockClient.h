@@ -21,7 +21,7 @@ namespace dex {
 class ClockClient : public Clock {
    public:
     // Connect to a host and port.
-    explicit ClockClient(kissnet::endpoint);
+    explicit ClockClient(const kissnet::endpoint&);
 
     ~ClockClient()
     {

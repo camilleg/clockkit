@@ -36,15 +36,15 @@ bool ConfigReader::readFrom(const char* filename)
     char dummy[1000];
     while (std::getline(file, line)) {
         const char* pch = line.c_str();
-        if (sscanf(pch, " %s", dummy) == EOF)  // Blank or empty.
+        if (sscanf(pch, " %990s", dummy) == EOF)  // Blank or empty.
             continue;
-        if (sscanf(pch, " %[#]", dummy) == 1)  // Comment.
+        if (sscanf(pch, " %990[#]", dummy) == 1)  // Comment.
             continue;
-        SSCANF("%s", "server", server, foundServer);
-        SSCANF("%u", "port", &port, foundPort);
-        SSCANF("%u", "timeout", &timeout, foundTimeout);
-        SSCANF("%u", "phasePanic", &phasePanic, foundPhasepanic);
-        SSCANF("%u", "updatePanic", &updatePanic, foundUpdatepanic);
+        SSCANF("%990s", "server", server, foundServer);
+        SSCANF("%990u", "port", &port, foundPort);
+        SSCANF("%990u", "timeout", &timeout, foundTimeout);
+        SSCANF("%990u", "phasePanic", &phasePanic, foundPhasepanic);
+        SSCANF("%990u", "updatePanic", &updatePanic, foundUpdatepanic);
         std::cerr << "Syntax error in config file " << filename << ": " << line << "\n";
         return false;
     }

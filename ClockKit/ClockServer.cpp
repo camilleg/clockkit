@@ -9,7 +9,7 @@ using namespace std::chrono;
 
 namespace dex {
 
-ClockServer::ClockServer(kissnet::endpoint addr_port, Clock& clock)
+ClockServer::ClockServer(const kissnet::endpoint& addr_port, Clock& clock)
     : addr_port_(addr_port)
     , clock_(clock)
     , ackData_{map<string, Entry>()}
