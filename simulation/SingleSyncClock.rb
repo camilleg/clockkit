@@ -70,6 +70,6 @@ class SyncClock
     # time since the last frequency measurement
     # clock variability assumption
 
-    freq_error = elapsed * @worst_possible_freq_error / $REFERENCE_FREQ + @worst_possible_phase_error
+    elapsed * @worst_possible_freq_error / $REFERENCE_FREQ + @worst_possible_phase_error
   end
 end

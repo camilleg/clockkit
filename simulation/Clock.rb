@@ -23,6 +23,5 @@ class Clock
     @@clocks.each { |c| c.advance usec }
   end
 
-private
   @@clocks = []
 end

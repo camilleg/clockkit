@@ -48,8 +48,6 @@ class SyncClock
     time1  =  this_measure.local_time
     phase0 = @last_measure.phase
     phase1 =  this_measure.phase
-    error0 = @last_measure.error_bound
-    error1 =  this_measure.error_bound
 
     interval = (time1 + phase1) - (time0 + phase0)
     freq = (phase0 - phase1) * $REFERENCE_FREQ / interval + $REFERENCE_FREQ

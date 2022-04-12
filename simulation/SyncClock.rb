@@ -83,10 +83,7 @@ class SyncClock
     time1 = measure.local_time
     phase0 = @clock2_measure.phase
     phase1 = measure.phase
-    error0 = @clock2_measure.error_bound
     error1 = measure.error_bound
-
-    interval = (time1 + phase1) - (time0 + phase0)
 
     if phase1 > 0 && phase1 > error1
       conservative_phase = phase1 - error1
