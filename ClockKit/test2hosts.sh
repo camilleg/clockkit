@@ -18,7 +18,7 @@ if [[ $# -ne 1 ]]; then
   exit 1
 fi
 if [ ! -s "$1" ]; then
-  echo "$0: Please copy config-remote.example.sh to "$1" and edit it."
+  echo "$0: Please copy config-remote.example.sh to $1 and edit it."
   exit 1
 fi
 . "$1"
