@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # An example configuration for test2hosts.sh.
 # Copy this to config-remote.sh and edit it.
 # Then test2hosts.sh can run.

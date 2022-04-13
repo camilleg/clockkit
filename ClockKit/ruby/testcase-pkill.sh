@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ $# -ge 1 ]]; then
-  port=$1
+  port="$1"
 else
   port=4444
 fi
