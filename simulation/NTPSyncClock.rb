@@ -2,17 +2,12 @@ require './PhaseDetector'
 require './VariableFrequencyClock'
 
 class SyncClock
-
-  @@POLL_INTERVAL_MULTIPLIER = 2**6
-  @@TIME_CONSTANT = 1
-  @@COMPLIANCE_MAX = 2**4
-
   def initialize local_clock, phase_detector
     @clock = VariableFrequencyClock.new local_clock
     @phase_detector = phase_detector
-    @time_constant = @@TIME_CONSTANT
-    @update_interval = @@POLL_INTERVAL_MULTIPLIER
-    @compliance = @@COMPLIANCE_MAX
+    @time_constant = 1       # TIME_CONSTANT
+    @update_interval = 2**6  # POLL_INTERVAL_MULTIPLIER
+    @compliance = 2**4       # COMPLIANCE_MAX
     @frequency_error = 0
     @phase_error = 0
     @last_measure = nil
