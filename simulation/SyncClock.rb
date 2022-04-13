@@ -79,9 +79,6 @@ class SyncClock
       return
     end
 
-    time0 = @clock2_measure.local_time
-    time1 = measure.local_time
-    phase0 = @clock2_measure.phase
     phase1 = measure.phase
     error1 = measure.error_bound
 
