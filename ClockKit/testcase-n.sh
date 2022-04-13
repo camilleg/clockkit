@@ -19,7 +19,7 @@ srv=$(mktemp /tmp/clockkit.srv.XXX)
 clis=''
 for i in $(seq "$n"); do
   cli[i]=$(mktemp /tmp/clockkit.cli.XXX)
-  clis+=${cli[i]}
+  clis+="${cli[i]}"
   clis+=' '
 done
 # Clean up after all possible exits.
@@ -30,7 +30,7 @@ nuke ckserver ckphaselock
 
 ./ckserver "$port" > "$srv" &
 for i in $(seq "$n"); do
-  ./ckphaselock "$conf" > ${cli[i]} &
+  ./ckphaselock "$conf" > "${cli[i]}" &
 done
 
 sleep 4
@@ -42,8 +42,8 @@ if [[ "$a" != "10" ]]; then
 fi
 
 for i in $(seq "$n"); do
-  b=$(tail -20 ${cli[i]} | grepregex '<time \d+ +\d+>')
-  c=$(tail -20 ${cli[i]} | grepregex 'offset: [-\d]+')
+  b=$(tail -20 "${cli[i]}" | grepregex '<time \d+ +\d+>')
+  c=$(tail -20 "${cli[i]}" | grepregex 'offset: [-\d]+')
   if [[ "$b $c" != "10 10" ]]; then
     exit 2
   fi
