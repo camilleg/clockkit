@@ -22,12 +22,17 @@ The source code is licensed under the [MIT License](https://mit-license.org/).
 
 ## To install:
 
+<!-- The package ruby is needed for `make test`, not just for `make bindings`. -->
+#### Ubuntu 22:
+`sudo apt install g++ libpython3.10-dev make pkgconf ruby ruby3.0-dev swig tcl8.6-dev`  
+`cd ClockKit && make`
+
 #### Ubuntu 20:
-`sudo apt install make g++ psmisc swig tcl8.6-dev libpython3.8-dev pkg-config ruby ruby2.7-dev`  
+`sudo apt install g++ libpython3.8-dev make pkg-config psmisc ruby ruby2.7-dev swig tcl8.6-dev`  
 `cd ClockKit && make`
 
 #### Ubuntu 18:<br>Raspberry Pi 3 and 4 (Debian/Raspbian):
-`sudo apt install make g++ psmisc swig tcl tcl8.6-dev libpython3.8-dev pkg-config ruby ruby2.5-dev`  
+`sudo apt install g++ libpython3.8-dev make pkg-config psmisc ruby ruby2.5-dev swig tcl tcl8.6-dev`  
 `cd ClockKit && make`
 
 #### Windows 10:
