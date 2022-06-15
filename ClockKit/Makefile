@@ -10,9 +10,14 @@ LIBS := -lpthread -ldl
 -include Rules.debug
 
 SWIG = swig -Wallkw -Werror
-RUBY   = $$(pkg-config --list-all | grep ruby-   | sort | tail -1 | sed 's/ .*//')
-PYTHON = $$(pkg-config --list-all | grep python- | sort | tail -1 | sed 's/ .*//')
+RUBY   := $(shell pkg-config --list-all | grep ruby-   | sort | tail -1 | sed 's/ .*//')
+PYTHON := $(shell pkg-config --list-all | grep python- | sort | tail -1 | sed 's/ .*//')
 # pkg-config doesn't know about tcl.
+
+# Output of swig isn't effc++ compliant, starting with Ruby 3.
+ifeq "$(RUBY)" "ruby-3.0"
+	CFLAGS_SPECIAL := -Wno-effc++
+endif
 
 OBJS = \
   ClockClient.o \
@@ -117,7 +122,7 @@ ruby/wrap.cpp: clockkit.h
 	$(SWIG) -ruby -o $@ clockkit.h
 	sed -i -e "s/ _wrap_ck/ (VALUE (*)(...))_wrap_ck/" $@
 ruby/wrap.o: ruby/wrap.cpp
-	$(CPP) -c $(CFLAGS) -Wno-pedantic -Wno-register -I. $$(pkg-config --cflags $(RUBY)) $? -o $@
+	$(CPP) -c $(CFLAGS) $(CFLAGS_SPECIAL) -Wno-pedantic -Wno-register -I. $$(pkg-config --cflags $(RUBY)) $? -o $@
 ruby/clockkit.so: ruby/wrap.o $(OBJS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
