@@ -20,7 +20,7 @@ It was revised and moved to GitHub in 2020.
 
 The source code is licensed under the [MIT License](https://mit-license.org/).
 
-## To install:
+## Installing
 
 <!-- The package ruby is needed for `make test`, not just for `make bindings`. -->
 #### Ubuntu 22
@@ -41,11 +41,17 @@ Install [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/w
 Proceed as with Ubuntu 18 or 20.  
 (Native builds for older versions of Windows may return, but no older than XP.)
 
+## Using Python, Ruby, or TCL
+`make bindings` builds the modules used by python/ckphaselock.py, ruby/ckphaselock.rb, and tcl/ckphaselock.tcl.  
+To build for only one language, e.g. Python, `make python/_clockkit.so`.  For details, in the Makefile look for `SWIGEXES`.
+
+## Running
+
 ### To test on localhost:
 `cd ClockKit && make test`
 
 ### To sync host B to host A:
-On host A, `ckserver <address to bind to> <port>`  
+On host A, `ckserver <IP address to bind to> <port>`  
 On host B:  
 - `cp clockkit.conf my-clockkit.conf`
 - Edit `my-clockkit.conf`.  Set the `server` to host A, e.g., `192.168.1.1` or `myhost.example.com`.  Set the `port` to 4567, or whatever port you told ckserver to use.  
@@ -53,19 +59,17 @@ On host B:
 (`make test-remote` automates this, using an ssh key.)
 
 Of course, these steps for host B can be repeated on other hosts C, D, E,... to sync them all.
-Remember that "syncing" here means providing synchronized timestamps, *not* adjusting the hosts' own clocks.
+Here, "syncing" means providing synchronized timestamps, *not* adjusting the hosts' own clocks.
 
 ### To plot performance:
 `sudo apt install gnuplot`  
 `cd simulation && make`
 
-## To cite:
+## Citing
 Camille Goudeseune and Braden Kowitz.  2004.  "Synchronous data collection from diverse hardware."  
 *Driving Simulation Conference - Europe (Conférence Simulation de Conduite)*, pp. 245-252. 
 
 ## Contributing
-The project is currently undergoing significant changes. Contributions of any
-form are welcome nonetheless.
 
 - To maintain the formatting style, `sudo apt install clang-format`, and use `clang-format` through the provided git hook:  
   `git config core.hooksPath .git_managed_hooks`
