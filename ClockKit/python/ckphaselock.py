@@ -20,6 +20,8 @@ _clockkit.ckInitialize(sys.argv[1])
 # and pass the signal to clockkit.cpp's atexit(), which calls Clockkit.ckTerminate.
 def signal_handler(sig, frame):
     sys.exit(0)
+
+
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 
