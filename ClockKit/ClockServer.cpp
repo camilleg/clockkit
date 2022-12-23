@@ -80,6 +80,19 @@ void ClockServer::updateEntry(const string& addr, dur offset, dur rtt, tp now)
 {
     if (!log_)
         return;
+
+    // This output (from ./ckserver) is _only informational_.  What really matters are the timestamps that
+    // clients (./ckphaselock, python/ckphaselock.py, etc.) get by calling `ckTimeAsString` or `ckTimeAsValue`.
+    //
+    // To get synced timestamps on two (or more) hosts, run a client on each host, and run the server
+    // somewhere (possibly on a host that's already running a client).  Get the timestamps from the clients,
+    // not directly from the host.
+    //
+    // Anyhow, this output is:
+    // - the time "now", in seconds + microseconds since the Unix epoch;
+    // - either a client's IP address followed by the client's clock's offset in microseconds,
+    // or "offsetMax" followed by the largest offset of all currently connected clients (updated every few seconds).
+
     const auto nowStr = StringFromTp(now);
     cout << nowStr << ' ' << addr << '\t' << UsecFromDur(offset) << '\t' << UsecFromDur(rtt) << endl;
     ackData_[addr] = Entry(now, offset, rtt);
