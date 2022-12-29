@@ -102,14 +102,11 @@ void ClockServer::updateEntry(const string& addr, dur offset, dur rtt, tp now)
     tRecalculated_ = now;
 
     // Purge entries older than 1.5 s.
-    // (erase+remove_if+lambda would that fails with map; wait for C++20's erase_if.)
     const auto tPurge = now - 1500ms;
-    for (auto it = ackData_.begin(); it != ackData_.end();) {
-        if (it->second.time < tPurge)
-            it = ackData_.erase(it);
-        else
-            ++it;
-    }
+    std::erase_if(ackData_, [tPurge](const auto& a) {
+        auto const& [str, entry] = a;
+        return entry.time < tPurge;
+    });
 
     // Recalculate the maximum offset.
     int64_t offsetMax = 0;

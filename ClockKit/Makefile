@@ -3,7 +3,7 @@ CPP = c++
 
 # -fPIC is only to make $(SWIGEXES).
 # -fpic would be smaller and faster, but that is only for gcc.
-CFLAGS := -O3 -fPIC -Wall -Werror -Weffc++ -std=c++17 -pedantic
+CFLAGS := -O3 -fPIC -Wall -Werror -Weffc++ -std=c++20 -pedantic
 LIBS := -ldl
 
 # Optional file containing debugging options for CFLAGS and LDFLAGS.
@@ -117,12 +117,14 @@ tcl/clockkit.so: tcl/wrap.o $(OBJS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
 # The sed casts _wrap_ck's to (VALUE (*)(...)) in lines starting with rb_define_module_function.
-# -Wno-register is for Ubuntu 18, whose Ruby 2.5's .h files use C++17-illegal "register".
+# Ubuntu 18 would need -Wno-register, for its Ruby 2.5's .h files that use C++20-illegal "register".
+# Ubuntu 22's Ruby 3.0 needs -Wno-volatile for its .h files that use C++20-illegal "volatile",
+# and -Wno-deprecated-enum-enum-conversion for another Ruby .h file.
 ruby/wrap.cpp: clockkit.h
 	$(SWIG) -ruby -o $@ clockkit.h
 	sed -i -e "s/ _wrap_ck/ (VALUE (*)(...))_wrap_ck/" $@
 ruby/wrap.o: ruby/wrap.cpp
-	$(CPP) -c $(CFLAGS) $(CFLAGS_SPECIAL) -Wno-pedantic -Wno-register -I. $$(pkg-config --cflags $(RUBY)) $? -o $@
+	$(CPP) -c $(CFLAGS) $(CFLAGS_SPECIAL) -Wno-pedantic -Wno-volatile -Wno-deprecated-enum-enum-conversion -I. $$(pkg-config --cflags $(RUBY)) $? -o $@
 ruby/clockkit.so: ruby/wrap.o $(OBJS)
 	$(CPP) $(CFLAGS) -shared $? $(LIBS) -o $@
 
