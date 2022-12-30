@@ -31,15 +31,20 @@ The source code is licensed under the [MIT License](https://mit-license.org/).
 `sudo apt install g++ libpython3.8-dev make pkg-config psmisc ruby ruby2.7-dev swig tcl8.6-dev`  
 `cd ClockKit && make`
 
-#### Ubuntu 18<br>Raspberry Pi 3 and 4 (Debian/Raspbian)
+#### Ubuntu 18 and older
+Install a g++ that supports C++20: `sudo apt install g++-8`.  
+Change the Makefile's `-std=c++20` to `-std=c++2a`.  
+Proceed as with Raspberry Pi.
+
+#### Raspberry Pi 3 and 4 (Debian/Raspbian)
 `sudo apt install g++ libpython3.8-dev make pkg-config psmisc ruby ruby2.5-dev swig tcl tcl8.6-dev`  
 `cd ClockKit && make`
 
 #### Windows 10
-Install [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10), using the [Ubuntu 18](https://www.microsoft.com/store/apps/9N9TNGVNDL3Q) or [Ubuntu 20](https://www.microsoft.com/store/apps/9n6svws3rx71) distro.  
+Install [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10), using the [Ubuntu 20](https://www.microsoft.com/store/apps/9n6svws3rx71) distro.  
 `sudo apt install tcl`  
-Proceed as with Ubuntu 18 or 20.  
-(Native builds for older versions of Windows may return, but no older than XP.)
+Proceed as with Ubuntu 20.  
+(We may restore native builds for older versions of Windows, but no older than Windows XP.)
 
 ## Using Python, Ruby, or TCL
 `make bindings` builds the modules used by python/ckphaselock.py, ruby/ckphaselock.rb, and tcl/ckphaselock.tcl.  
