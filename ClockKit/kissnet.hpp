@@ -1,3 +1,7 @@
+// clockkit got this from
+// https://raw.githubusercontent.com/Ybalrid/kissnet/master/kissnet.hpp
+// and added a few corrections.
+
 /*
  * MIT License
  *
@@ -1230,9 +1234,9 @@ namespace kissnet
 			}
 
 			int ret = syscall_select(static_cast<int>(sock) + 1,
-									 fds & fds_read ? &fd_read : NULL,
-									 fds & fds_write ? &fd_write : NULL,
-									 fds & fds_except ? &fd_except : NULL,
+									 (fds & fds_read) ? &fd_read : NULL,
+									 (fds & fds_write) ? &fd_write : NULL,
+									 (fds & fds_except) ? &fd_except : NULL,
 									 &tv);
 			if (ret == -1)
 				return socket_status::errored;
