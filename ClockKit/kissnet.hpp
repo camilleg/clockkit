@@ -1007,7 +1007,7 @@ namespace kissnet
 			//IPv4
 			if (multicast_addr->ai_family  == PF_INET && multicast_addr->ai_addrlen == sizeof(struct sockaddr_in))
 			{
-				struct ip_mreq multicastRequest = {0};
+				struct ip_mreq multicastRequest; // Zero-initialized implicitly.
 				memcpy(&multicastRequest.imr_multiaddr,
 					   &((struct sockaddr_in*)(multicast_addr->ai_addr))->sin_addr,
 					   sizeof(multicastRequest.imr_multiaddr));
@@ -1027,7 +1027,7 @@ namespace kissnet
 			//IPv6
 			else if (multicast_addr->ai_family  == PF_INET6 && multicast_addr->ai_addrlen == sizeof(struct sockaddr_in6))
 			{
-				struct ipv6_mreq multicastRequest = {0};
+				struct ipv6_mreq multicastRequest; // Zero-initialized implicitly.
 				memcpy(&multicastRequest.ipv6mr_multiaddr,
 					   &((struct sockaddr_in6*)(multicast_addr->ai_addr))->sin6_addr,
 					   sizeof(multicastRequest.ipv6mr_multiaddr));
