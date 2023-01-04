@@ -1,7 +1,3 @@
-// clockkit got this from
-// https://raw.githubusercontent.com/Ybalrid/kissnet/master/kissnet.hpp
-// and added a few corrections.
-
 /*
  * MIT License
  *
@@ -123,7 +119,6 @@
 #include <stdexcept>
 #include <string>
 #include <utility>
-#include <iostream> // clockkit
 
 #ifdef _WIN32
 
@@ -589,12 +584,12 @@ namespace kissnet
 			return value > 0;
 		}
 
-		int8_t get_value()
+		int8_t get_value() const
 		{
 			return value;
 		}
 
-		bool operator==(values v)
+		bool operator==(values v) const
 		{
 			return v == value;
 		}
@@ -794,8 +789,7 @@ namespace kissnet
 	public:
 
 		///Construct an invalid socket
-		//socket() = default;
-		socket() : dummy{42} {}; // clockkit: for -Weffc++
+		socket() = default;
 
 		///socket<> isn't copyable
 		socket(const socket&) = delete;
@@ -907,7 +901,6 @@ namespace kissnet
 
 		///Construct a socket from an operating system socket, an additional endpoint to remember from where we are
 		socket(SOCKET native_sock, endpoint bind_to) :
-		 dummy { 42 }, // clockkit, for -Weffc++
 		 sock { native_sock }, bind_loc(std::move(bind_to))
 		{
 			KISSNET_OS_INIT;
@@ -924,7 +917,7 @@ namespace kissnet
 			if (ioctlsocket(sock, FIONBIO, &set) < 0)
 #else
 			const auto flags	= fcntl(sock, F_GETFL, 0);
-			const auto newflags = state ? flags | O_NONBLOCK : flags ^ O_NONBLOCK;
+			const auto newflags = state ? (flags | O_NONBLOCK) : (flags & ~O_NONBLOCK);
 			if (fcntl(sock, F_SETFL, newflags) < 0)
 #endif
 				kissnet_fatal_error("setting socket to nonblock returned an error");
@@ -970,6 +963,95 @@ namespace kissnet
 				kissnet_fatal_error("bind() failed\n");
 			}
 		}
+
+        ///Join a multicast group
+        void join(const endpoint& multi_cast_endpoint, const std::string& interface = "")
+        {
+			if (sock_proto != protocol::udp)
+			{
+				kissnet_fatal_error("joining a multicast is only possible in UDP mode\n");
+			}
+
+			addrinfo *multicast_addr;
+			addrinfo *local_addr;
+			addrinfo  hints = {0};
+			hints.ai_family = PF_UNSPEC;
+			hints.ai_flags  = AI_NUMERICHOST;
+			if (getaddrinfo(multi_cast_endpoint.address.c_str(), nullptr, &hints, &multicast_addr) != 0)
+			{
+				kissnet_fatal_error("getaddrinfo() failed\n");
+			}
+
+			hints.ai_family   = multicast_addr->ai_family;
+			hints.ai_socktype = SOCK_DGRAM;
+			hints.ai_flags    = AI_PASSIVE;
+			if (getaddrinfo(nullptr, std::to_string(multi_cast_endpoint.port).c_str(), &hints, &local_addr) != 0)
+			{
+				kissnet_fatal_error("getaddrinfo() failed\n");
+			}
+
+			sock = syscall_socket(local_addr->ai_family, local_addr->ai_socktype, local_addr->ai_protocol);
+			if (sock != INVALID_SOCKET)
+			{
+				socket_addrinfo = local_addr;
+			} else {
+				kissnet_fatal_error("syscall_socket() failed\n");
+			}
+
+			bind();
+
+			//IPv4
+			if (multicast_addr->ai_family  == PF_INET && multicast_addr->ai_addrlen == sizeof(struct sockaddr_in))
+			{
+				struct ip_mreq multicastRequest = {0};
+				memcpy(&multicastRequest.imr_multiaddr,
+					   &((struct sockaddr_in*)(multicast_addr->ai_addr))->sin_addr,
+					   sizeof(multicastRequest.imr_multiaddr));
+
+				if (interface.length()) {
+					multicastRequest.imr_interface.s_addr = inet_addr(interface.c_str());;
+				} else {
+					multicastRequest.imr_interface.s_addr = htonl(INADDR_ANY);
+				}
+
+				if (setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*) &multicastRequest, sizeof(multicastRequest)) != 0)
+				{
+					kissnet_fatal_error("setsockopt() failed\n");
+				}
+			}
+
+			//IPv6
+			else if (multicast_addr->ai_family  == PF_INET6 && multicast_addr->ai_addrlen == sizeof(struct sockaddr_in6))
+			{
+				struct ipv6_mreq multicastRequest = {0};
+				memcpy(&multicastRequest.ipv6mr_multiaddr,
+					   &((struct sockaddr_in6*)(multicast_addr->ai_addr))->sin6_addr,
+					   sizeof(multicastRequest.ipv6mr_multiaddr));
+
+				if (interface.length()) {
+					struct addrinfo *reslocal;
+					if (getaddrinfo(interface.c_str(), nullptr, nullptr, &reslocal)){
+						kissnet_fatal_error("getaddrinfo() failed\n");
+					}
+					multicastRequest.ipv6mr_interface = ((sockaddr_in6 *)reslocal->ai_addr)->sin6_scope_id;
+					freeaddrinfo(reslocal);
+				} else {
+					multicastRequest.ipv6mr_interface = 0;
+				}
+
+
+				if (setsockopt(sock, IPPROTO_IPV6, IPV6_JOIN_GROUP, (char*) &multicastRequest, sizeof(multicastRequest)) != 0)
+				{
+					kissnet_fatal_error("setsockopt() failed\n");
+				}
+			}
+			else
+			{
+				kissnet_fatal_error("unknown AI family.\n");
+			}
+
+			freeaddrinfo(multicast_addr);
+        }
 
 		///(For TCP) connect to the endpoint as client
 		socket_status connect(int64_t timeout = 0)
@@ -1148,9 +1230,9 @@ namespace kissnet
 			}
 
 			int ret = syscall_select(static_cast<int>(sock) + 1,
-									 (fds & fds_read) ? &fd_read : NULL,
-									 (fds & fds_write) ? &fd_write : NULL,
-									 (fds & fds_except) ? &fd_except : NULL,
+									 fds & fds_read ? &fd_read : NULL,
+									 fds & fds_write ? &fd_write : NULL,
+									 fds & fds_except ? &fd_except : NULL,
 									 &tv);
 			if (ret == -1)
 				return socket_status::errored;
@@ -1183,12 +1265,8 @@ namespace kissnet
 			else if constexpr (sock_proto == protocol::udp)
 			{
 			    if (addr) {
-					// struct sockaddr_in* dest = (SOCKADDR_IN*)(&addr->adrinf);
-					// std::cerr << "kissnet.hpp ClockServer sendto " << inet_ntoa(dest->sin_addr) << "\n";
 			        received_bytes = sendto(sock, reinterpret_cast<const char*>(read_buff), static_cast<buffsize_t>(length), 0, reinterpret_cast<sockaddr*>(&addr->adrinf) , addr->sock_size);
                 } else {
-					// struct sockaddr_in* dest = (SOCKADDR_IN*)(socket_addrinfo->ai_addr);
-					// std::cerr << "kissnet.hpp ClockClient sendto " << inet_ntoa(dest->sin_addr) << "\n";
                     received_bytes = sendto(sock, reinterpret_cast<const char*>(read_buff), static_cast<buffsize_t>(length), 0, static_cast<SOCKADDR*>(socket_addrinfo->ai_addr), socklen_t(socket_addrinfo->ai_addrlen));
                 }
 			}
@@ -1317,17 +1395,18 @@ namespace kissnet
 		}
 
 		///Return an endpoint that originated the data in the last recv
-		endpoint get_recv_endpoint() const
-		{
-			if constexpr (sock_proto == protocol::tcp)
-			{
-				return get_bind_loc();
-			}
-			if constexpr (sock_proto == protocol::udp)
-			{
-				return { (sockaddr*)&socket_input };
-			}
-		}
+        endpoint get_recv_endpoint() const
+        {
+            if constexpr (sock_proto == protocol::tcp)
+            {
+                return get_bind_loc();
+            }
+            if constexpr (sock_proto == protocol::udp)
+            {
+                const SOCKADDR* addr = reinterpret_cast<const SOCKADDR*>(&socket_input);
+                return endpoint(const_cast<SOCKADDR*>(addr));
+            }
+        }
 
 		///Return the number of bytes available inside the socket
 		size_t bytes_available() const
