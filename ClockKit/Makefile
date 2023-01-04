@@ -3,7 +3,7 @@ CPP = c++
 
 # -fPIC is only to make $(SWIGEXES).
 # -fpic would be smaller and faster, but that is only for gcc.
-CFLAGS := -O3 -fPIC -Wall -Werror -Weffc++ -std=c++20 -pedantic
+CFLAGS := -O3 -fPIC -Wall -Werror -Weffc++ -std=c++2a -pedantic
 LIBS := -ldl
 
 # Optional file containing debugging options for CFLAGS and LDFLAGS.
