@@ -37,8 +37,9 @@ Change the Makefile's `-std=c++20` to `-std=c++2a`.
 Proceed as with Raspberry Pi.
 
 #### Raspberry Pi 3 and 4 (Debian/Raspbian)
-`sudo apt install g++ libpython3.8-dev make pkg-config psmisc ruby ruby2.5-dev swig tcl tcl8.6-dev`  
-`cd ClockKit && make`
+`sudo apt install g++ libpython3.8-dev make pkg-config psmisc ruby ruby-dev swig tcl tcl8.6-dev`  
+`cd ClockKit && make`  
+(The package [`ruby-2.5dev`](https://pkgs.org/download/ruby2.5-dev) vanished after Debian 10 "Buster" and Ubuntu 18.)
 
 #### Windows 10
 Install [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10), using the [Ubuntu 20](https://www.microsoft.com/store/apps/9n6svws3rx71) distro.  
